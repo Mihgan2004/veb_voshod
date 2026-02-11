@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
+/* базовая типографика/фон */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: #0b0d10;
+  color: rgba(255,255,255,.92);
+}
+
+/* если у тебя используется bg-noise в классах — добавим утилиту */
+@layer utilities {
+  .bg-noise {
+    /* если есть public/noise.png — отлично */
+    background-image: url("/noise.png");
+    background-repeat: repeat;
+    background-size: 220px 220px;
+  }
 }
