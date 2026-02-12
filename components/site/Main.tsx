@@ -6,13 +6,11 @@ import { Footer } from "@/components/site/Footer";
 
 export default function Main({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-dvh bg-[#06070A] text-[#EDE7DA]">
+    <div className="min-h-screen bg-graphite font-sans text-gray-200 selection:bg-gold selection:text-black">
       <RouteScrollTop />
       <OrbitalDock />
 
-      <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-16">
-        {children}
-      </main>
+      <main className="relative z-10">{children}</main>
 
       <Footer />
     </div>

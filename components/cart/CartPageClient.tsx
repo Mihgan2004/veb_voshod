@@ -70,8 +70,12 @@ export function CartPageClient() {
 
   return (
     <div className="animate-fade-in min-h-screen">
-      <div className="flex items-end justify-between mb-10">
-        <h1 className="text-3xl sm:text-4xl font-light">CART</h1>
+      <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center gap-4">
+          <span className="text-[18px] font-mono tracking-widest text-[#9FA3B0]">CART</span>
+          <span className="h-px w-24 bg-white/10" />
+          <h1 className="text-2xl font-light text-white">{cart.length} item{cart.length === 1 ? "" : "s"}</h1>
+        </div>
         {cart.length > 0 && (
           <button
             onClick={clear}

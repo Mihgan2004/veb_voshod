@@ -4,54 +4,76 @@ import { WelcomeBlock } from "@/components/blocks/WelcomeBlock";
 import { TeeIntroBlock } from "@/components/blocks/TeeIntroBlock";
 import { ProductCard } from "@/components/product/ProductCard";
 import { catalog } from "@/lib/catalog";
-import type { Collection, Product } from "@/lib/catalog";
+import type { Collection } from "@/lib/catalog";
 
-function SectionHeader(props: { title: string; href?: string; linkText?: string }) {
-  return (
-    <div className="mb-6 flex items-end justify-between gap-4">
-      <h2 className="text-sm tracking-[0.35em] uppercase text-white/70">{props.title}</h2>
-      {props.href ? (
-        <Link
-          href={props.href}
-          className="text-[10px] tracking-[0.35em] uppercase text-white/45 hover:text-white/80 transition"
-        >
-          {props.linkText ?? "VIEW ALL"}
-        </Link>
-      ) : null}
-    </div>
-  );
-}
-
+/* ------------------------------------------------------------------ */
+/*  Collection card (inline — used only here)                         */
+/* ------------------------------------------------------------------ */
 function CollectionCard({ col }: { col: Collection }) {
   return (
     <Link
       href={`/collections/${col.slug}`}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/25 p-6 transition hover:border-white/20"
+      className="group relative flex flex-col justify-end rounded-xl sm:rounded-2xl border border-white/5 bg-graphite-light p-5 sm:p-7 min-h-[140px] sm:min-h-[180px] transition-all duration-300 hover:border-white/15 hover:bg-white/[0.02]"
     >
-      <div className="text-[10px] tracking-[0.35em] uppercase text-white/55">
+      <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.2em] uppercase text-white/45">
         {col.tag}
-      </div>
-      <div className="mt-3 text-xl font-semibold tracking-tight">{col.name}</div>
-      {col.description ? (
-        <div className="mt-2 text-xs leading-relaxed text-white/60 max-w-[44ch]">
+      </span>
+      <h2 className="mt-2 sm:mt-3 text-lg sm:text-xl md:text-2xl font-semibold tracking-tight text-white uppercase leading-tight">
+        {col.name}
+      </h2>
+      {col.description && (
+        <p className="mt-2 text-xs sm:text-sm leading-relaxed text-white/45 max-w-[42ch] line-clamp-2">
           {col.description}
-        </div>
-      ) : null}
-
-      <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
-        <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-[#C6902E]/10 blur-2xl" />
-        <div className="absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-white/5 blur-2xl" />
-      </div>
+        </p>
+      )}
     </Link>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Section header                                                    */
+/* ------------------------------------------------------------------ */
+function SectionHeader({
+  label,
+  sub,
+  href,
+  linkLabel,
+}: {
+  label: string;
+  sub: string;
+  href: string;
+  linkLabel: string;
+}) {
+  return (
+    <header className="flex items-center justify-between mb-6 sm:mb-8 md:mb-10">
+      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+        <h2 className="text-[11px] sm:text-xs font-mono tracking-[0.25em] uppercase text-white/50 shrink-0">
+          {label}
+        </h2>
+        <span className="hidden sm:block h-px w-8 bg-white/10 shrink-0" aria-hidden />
+        <span className="text-[11px] sm:text-xs font-mono tracking-wider text-white/25 truncate">
+          {sub}
+        </span>
+      </div>
+      <Link
+        href={href}
+        className="shrink-0 ml-4 text-[11px] sm:text-xs font-mono tracking-[0.18em] text-gold hover:text-gold/80 uppercase transition-colors"
+      >
+        {linkLabel}&nbsp;&rarr;
+      </Link>
+    </header>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page                                                              */
+/* ------------------------------------------------------------------ */
 export default async function HomePage() {
   const collections = await catalog.listCollections();
   const products = await catalog.listProducts();
 
-const featuredCollections = collections.slice(0, 4);
-const inStock = products.filter((p) => p.inStock).slice(0, 8);
+  const featuredCollections = collections.slice(0, 4);
+  const featuredProducts = products.filter((p) => p.inStock).slice(0, 8);
 
   return (
     <div className="animate-fade-in">
@@ -59,25 +81,38 @@ const inStock = products.filter((p) => p.inStock).slice(0, 8);
       <WelcomeBlock />
       <TeeIntroBlock />
 
-      <section className="mx-auto max-w-7xl px-6 mt-16">
-        <SectionHeader title="SECTORS" href="/collections" linkText="ALL COLLECTIONS" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ---- Секции каталога ---- */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-16 sm:pt-20 md:pt-28">
+        {/* Collections */}
+        <SectionHeader
+          label="SECTORS"
+          sub="ALL COLLECTIONS"
+          href="/collections"
+          linkLabel="ALL COLLECTIONS"
+        />
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-16 sm:mb-20 md:mb-28">
           {featuredCollections.map((col) => (
             <CollectionCard key={col.id} col={col} />
           ))}
         </div>
-      </section>
 
-      <section className="mx-auto max-w-7xl px-6 mt-16">
-        <SectionHeader title="IN STOCK" href="/catalog" linkText="FULL CATALOG" />
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {inStock.map((p) => (
+        {/* Products */}
+        <SectionHeader
+          label="IN STOCK"
+          sub="FULL CATALOG"
+          href="/catalog"
+          linkLabel="FULL CATALOG"
+        />
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
+          {featuredProducts.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </section>
 
-      <div className="h-24" />
+      <div className="h-16 md:h-24" />
     </div>
   );
 }

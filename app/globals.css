@@ -5,26 +5,41 @@
   color-scheme: dark;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
 body {
   margin: 0;
   background: #0b0d10;
-  color: rgba(255,255,255,.92);
+  color: rgba(255, 255, 255, 0.92);
 }
 
-/* если у тебя используется bg-noise в классах — добавим утилиту */
+/* анимации как в прошлом проекте */
 @layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .animate-scanline {
+    animation: scanline 3s linear infinite;
+  }
+
+  .animate-glint {
+    animation: glint 4s ease-in-out infinite;
+  }
+
+  .animate-stamp {
+    animation: stamp 1.2s ease-out forwards;
+  }
+
   .bg-noise {
-    /* если есть public/noise.png — отлично */
     background-image: url("/noise.png");
     background-repeat: repeat;
     background-size: 220px 220px;
   }
-}
-@layer utilities {
+
   .full-bleed {
     width: 100vw;
     position: relative;
@@ -32,5 +47,50 @@ body {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes glint {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(100%) skewX(-12deg);
+  }
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2) rotate(-12deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(-12deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-12deg);
   }
 }

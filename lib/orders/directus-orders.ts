@@ -24,7 +24,8 @@ type DirectusCreateResponse<T> = {
 };
 
 /**
- * Создание записи в Directus c корректным форматом body `{ data: {...} }`.
+ * Создание одной записи в Directus.
+ * REST API ожидает поля на верхнем уровне: { "field": "value" }, НЕ { "data": { ... } }.
  */
 async function directusCreateItem<TInput extends object, TOut>(
   client: ReturnType<typeof createDirectusClient>,
@@ -33,7 +34,7 @@ async function directusCreateItem<TInput extends object, TOut>(
 ): Promise<TOut> {
   const res = await client.request<DirectusCreateResponse<TOut>>(`/items/${collection}`, {
     method: "POST",
-    body: JSON.stringify({ data }),
+    body: JSON.stringify(data),
   });
   return res.data;
 }
@@ -62,7 +63,7 @@ export async function createOrderFromCart(payload: OrderPayload): Promise<Create
   const client = createDirectusClient({ url, token });
 
   const items = payload.cart.map((line) => ({
-    productId: line.product.id,
+    product: line.product.id,
     productSlug: line.product.slug,
     productName: line.product.name,
     size: line.size,
@@ -97,33 +98,37 @@ export async function createOrderFromCart(payload: OrderPayload): Promise<Create
 
   const orderId = createdOrder.id;
 
-  // 2) создаём позиции заказа (batch create)
+  // 2) создаём позиции заказа — ключи полей строго snake_case (как в DIRECTUS_ORDERS_SCHEMA.md)
   if (items.length > 0) {
-    const orderItemsPayload = items.map((item) => ({
-      order: orderId,
-      productId: item.productId,
-      productSlug: item.productSlug,
-      productName: item.productName,
-      size: item.size,
-      qty: item.qty,
-      price: item.price,
-    }));
+    const orderItemsPayload = items.map((item) => {
+      // product — Integer/M2O; мок-id вроде "p-tee-001" невалиден, отправляем null
+      const productId =
+        typeof item.product === "number" || /^\d+$/.test(String(item.product))
+          ? item.product
+          : null;
+      return {
+        order: Number(orderId),
+        product: productId,
+        product_slug: item.productSlug ?? "",
+        product_name: item.productName ?? "",
+        size: item.size ?? "",
+        qty: Number(item.qty) || 0,
+        price: Number(item.price) || 0,
+      };
+    });
 
-    try {
-      await client.request(`/items/${orderItemsCollection}`, {
-        method: "POST",
-        body: JSON.stringify({ data: orderItemsPayload }),
-      });
-    } catch (e) {
-      console.error("[orders] Failed to create order_items batch, trying sequentially:", e);
-
-      for (const item of orderItemsPayload) {
-        try {
-          // eslint-disable-next-line no-await-in-loop
-          await directusCreateItem(client, orderItemsCollection, item);
-        } catch (inner) {
-          console.error("[orders] Failed to create single order_item:", inner, "item:", item);
+    for (const item of orderItemsPayload) {
+      try {
+        if (process.env.NODE_ENV === "development") {
+          console.log("[orders] Creating order_item:", JSON.stringify(item, null, 2));
         }
+        const created = await directusCreateItem(client, orderItemsCollection, item);
+        if (process.env.NODE_ENV === "development") {
+          console.log("[orders] Created order_item response:", JSON.stringify(created));
+        }
+      } catch (e) {
+        console.error("[orders] Failed to create order_item:", e, "item:", item);
+        throw e;
       }
     }
   }

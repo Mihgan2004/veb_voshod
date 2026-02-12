@@ -80,12 +80,12 @@ export const WelcomeBlock: React.FC = () => {
         </div>
 
         <div
-          className="absolute left-1/2 -translate-x-1/2 text-center select-none"
+          className="absolute left-1/2 top-0 flex justify-center text-center select-none w-full max-w-full"
           style={{
             top: `${welcomeTop}%`,
             transform: `translateX(-50%) translateY(-50%) scale(${welcomeScale})`,
             opacity: welcomeOpacity,
-            willChange: "transform, opacity, top",
+            willChange: "transform, opacity",
           }}
         >
           <div className="text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase">
@@ -93,32 +93,32 @@ export const WelcomeBlock: React.FC = () => {
             <br />
             ПОЖАЛОВАТЬ
           </div>
-          <div className="mt-3 text-[10px] md:text-xs text-[#9FA3B0] font-mono tracking-widest opacity-60">
-            // VOSKHOD ACCESS NODE
+        </div>
+
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div
+            className="flex flex-col items-center"
+            style={{
+              opacity: logoOpacity,
+              transform: `translateY(${lerp(12, 0, logoIn)}px)`,
+              willChange: "transform, opacity",
+            }}
+          >
+            <img
+              src="/brand/project-voshod@2x.png"
+              alt="Проект Восход"
+              className="w-[260px] sm:w-[360px] md:w-[640px] select-none pointer-events-none"
+              draggable={false}
+              style={{ backfaceVisibility: "hidden" }}
+            />
           </div>
         </div>
 
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-          style={{
-            opacity: logoOpacity,
-            transform: `translate(-50%, -50%) translateY(${lerp(12, 0, logoIn)}px)`,
-            willChange: "transform, opacity",
-          }}
-        >
-          <img
-            src="/brand/project-voshod@2x.png"
-            alt="Проект Восход"
-            className="w-[260px] sm:w-[360px] md:w-[640px] select-none pointer-events-none"
-            draggable={false}
-          />
-        </div>
-
-        <div
-          className="absolute left-1/2 bottom-10 -translate-x-1/2 flex flex-col items-center gap-4"
+          className="absolute inset-x-0 bottom-10 flex justify-center"
           style={{
             opacity: ctaOpacity,
-            transform: `translateX(-50%) translateY(${ctaY}px)`,
+            transform: `translateY(${ctaY}px)`,
             willChange: "transform, opacity",
           }}
         >
