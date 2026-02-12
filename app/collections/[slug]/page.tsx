@@ -8,9 +8,10 @@ import { ProductCard } from "@/components/product/ProductCard";
 export default async function CollectionPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const collection = await catalog.getCollectionBySlug(params.slug);
+  const { slug } = await params;
+  const collection = await catalog.getCollectionBySlug(slug);
   if (!collection) notFound();
 
   const products = await catalog.getProductsByCollectionId(collection.id);

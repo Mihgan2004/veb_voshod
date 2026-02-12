@@ -3,47 +3,63 @@
 import { create } from "zustand";
 import type { Product } from "@/lib/catalog";
 
-// Убедитесь, что тип Product содержит `price: number`
-type CartItem = Product & { qty: number };
+export type CartLine = {
+  cartId: string;
+  product: Product;
+  size: string;
+  qty: number;
+};
 
 type CartStore = {
-  cart: CartItem[];
-  add: (product: Product, qty?: number) => void;
-  remove: (id: string) => void;
+  cart: CartLine[];
+  addToCart: (product: Product, size: string, qty?: number) => void;
+  removeFromCart: (cartId: string) => void;
   clear: () => void;
   total: () => number;
 };
 
-export const useCart = create<CartStore>((set, get) => ({
-  cart: [], // ✅ инициализирован как пустой массив
+function createCartId(productId: string, size: string) {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${productId}-${size}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
-  add: (product, qty = 1) =>
+export const useCart = create<CartStore>((set, get) => ({
+  cart: [],
+
+  addToCart: (product, size, qty = 1) =>
     set((state) => {
-      const existingIndex = state.cart.findIndex((item) => item.id === product.id);
+      const existingIndex = state.cart.findIndex(
+        (item) => item.product.id === product.id && item.size === size,
+      );
+
       if (existingIndex >= 0) {
-        const updatedCart = [...state.cart];
-        updatedCart[existingIndex] = {
-          ...updatedCart[existingIndex],
-          qty: updatedCart[existingIndex].qty + qty,
+        const updated = [...state.cart];
+        updated[existingIndex] = {
+          ...updated[existingIndex],
+          qty: updated[existingIndex].qty + qty,
         };
-        return { cart: updatedCart };
+        return { cart: updated };
       }
+
+      const cartId = createCartId(product.id, size);
+
       return {
-        cart: [...state.cart, { ...product, qty }],
+        cart: [...state.cart, { cartId, product, size, qty }],
       };
     }),
 
-  remove: (id) =>
+  removeFromCart: (cartId) =>
     set((state) => ({
-      cart: state.cart.filter((item) => item.id !== id),
+      cart: state.cart.filter((item) => item.cartId !== cartId),
     })),
 
   clear: () => set({ cart: [] }),
 
   total: () =>
-    get().cart.reduce((acc, item) => {
-      // Защита на случай, если price не определён
-      const price = typeof item.price === "number" ? item.price : 0;
-      return acc + price * item.qty;
+    get().cart.reduce((sum, item) => {
+      const price = typeof item.product.price === "number" ? item.product.price : 0;
+      return sum + price * item.qty;
     }, 0),
 }));

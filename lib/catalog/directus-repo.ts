@@ -20,6 +20,20 @@ function assetUrl(base: string, file: unknown): string | undefined {
   return id ? `${base}/assets/${id}` : undefined;
 }
 
+function normalizeCollectionTag(v: unknown): Collection["tag"] {
+  const raw = typeof v === "string" ? v : "";
+  const upper = raw.toUpperCase();
+
+  if (upper === "CORE") return "CORE";
+  if (upper === "DROP") return "DROP";
+  if (upper === "LIMITED") return "LIMITED";
+  if (upper === "ARCHIVE") return "ARCHIVE";
+  if (upper === "ACCESSORIES") return "ACCESSORIES";
+
+  // дефолт для некорректных значений
+  return "CORE";
+}
+
 function normalizeCategorySlug(v: unknown): Product["category"] {
   const slug =
     typeof v === "string"
@@ -67,15 +81,27 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
           const name = typeof r.name === "string" ? r.name : undefined;
           if (!id || !slug || !name) return null;
 
+          const tag = normalizeCollectionTag(r.tag);
+          const description = typeof r.description === "string" ? r.description : undefined;
+          const coverImage = assetUrl(client.base, r.coverImage);
+          const isFeatured = Boolean(r.isFeatured);
+          const sortRaw = r.sort;
+          const sort =
+            typeof sortRaw === "number"
+              ? sortRaw
+              : typeof sortRaw === "string"
+                ? Number.parseInt(sortRaw, 10) || 0
+                : 0;
+
           return {
             id,
             slug,
             name,
-            description: typeof r.description === "string" ? r.description : undefined,
-            tag: typeof r.tag === "string" ? (r.tag as any) : "CORE",
-            coverImage: assetUrl(client.base, r.coverImage),
-            isFeatured: Boolean(r.isFeatured),
-            sort: typeof r.sort === "number" ? r.sort : 0,
+            description,
+            tag,
+            coverImage,
+            isFeatured,
+            sort,
           };
         })
         .filter((x): x is Collection => Boolean(x));
@@ -119,6 +145,10 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
           const sizes =
             Array.isArray(r.sizes) ? r.sizes.filter((x): x is string => typeof x === "string") : [];
 
+          const inStock = Boolean(r.inStock);
+          const isFeatured = Boolean(r.isFeatured);
+          const status: Product["status"] = inStock ? "available" : "sold_out";
+
           return {
             id,
             slug,
@@ -126,14 +156,17 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
             price: Number.isFinite(priceNum) ? priceNum : 0,
             description: typeof r.description === "string" ? r.description : "",
             category: normalizeCategorySlug(r.category),
-            collectionId: toId(r.collection),
+            sizes,
+            inStock,
+            isFeatured,
+            status,
             image: assetUrl(client.base, r.image) ?? "",
             imagePlaceholder: typeof r.imagePlaceholder === "string" ? r.imagePlaceholder : undefined,
-            sizes,
-            inStock: Boolean(r.inStock),
-            code: typeof r.code === "string" ? r.code : undefined,
-            batch: typeof r.batch === "string" ? r.batch : undefined,
-            isFeatured: Boolean(r.isFeatured),
+            collectionId: toId(r.collection),
+            specs: {
+              code: typeof r.code === "string" ? r.code : undefined,
+              batch: typeof r.batch === "string" ? r.batch : undefined,
+            },
           };
         })
         .filter((x): x is Product => Boolean(x));

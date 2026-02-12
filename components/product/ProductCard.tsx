@@ -4,7 +4,7 @@ import Image from "next/image";
 import type { Product } from "@/lib/types";
 
 export function ProductCard({ product }: { product: Product }) {
-  const src = product.imagePlaceholder ?? product.image;
+  const src = product.imagePlaceholder || product.image || "/globe.svg";
   const isRemote = /^https?:\/\//.test(src);
 
   return (

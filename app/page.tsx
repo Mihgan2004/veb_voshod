@@ -50,8 +50,8 @@ export default async function HomePage() {
   const collections = await catalog.listCollections();
   const products = await catalog.listProducts();
 
-  const featuredCollections = collections.slice(0, 4);
-  const inStock = products.filter((p: Product) => p.status === "available").slice(0, 8);
+const featuredCollections = collections.slice(0, 4);
+const inStock = products.filter((p) => p.inStock).slice(0, 8);
 
   return (
     <div className="animate-fade-in">

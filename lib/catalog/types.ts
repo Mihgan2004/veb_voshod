@@ -1,38 +1,49 @@
 // lib/catalog/types.ts
+
 export type ProductStatus = "available" | "preorder" | "sold_out";
 
-export type Category = "tee" | "hoodie" | "patch" | "accessory" | "other";
+export type Category = "tee" | "hoodie" | "patch" | "cap" | "lanyard" | "accessory" | "other";
 
-export type CollectionTag = "CORE" | "DROP" | "LIMITED" | "ARCHIVE";
-
-export type Currency = "RUB" | "USD" | "EUR";
+export type CollectionTag = "CORE" | "DROP" | "LIMITED" | "ARCHIVE" | "ACCESSORIES";
 
 export type ProductSpecs = {
+  code?: string;
+  batch?: string;
+
+  // дополнительные поля для моков/витрины
   fabric?: string;
-  fit?: string;
+  density?: string;
   print?: string;
-  code?: string; // <- чтобы не падали mock.ts / mock-data.ts
+  color?: string;
 };
 
 export type Product = {
   id: string;
   slug: string;
 
-  title: string;
-  subtitle?: string;
+  name: string;
+  description: string;
 
   price: number;
-  currency: Currency;
 
   category: Category;
+
+  // твоя модель Directus:
+  inStock: boolean;
+  isFeatured: boolean;
+
+  // удобно оставить computed-поле для UI/моков
   status: ProductStatus;
 
-  image?: string; // url или directus file id → мы в repo приведём к url
+  // бейдж для витрины (например, NEW/SOLD OUT и т.п.)
   badge?: string;
 
+  image: string;
+  imagePlaceholder?: string;
+
+  sizes: string[];
+
   specs?: ProductSpecs;
-  colors?: string[];
-  sizes?: string[];
 
   collectionId?: string;
 };
@@ -41,10 +52,12 @@ export type Collection = {
   id: string;
   slug: string;
 
-  title: string;
+  name: string;
   description?: string;
 
   tag: CollectionTag;
 
   coverImage?: string;
+  isFeatured: boolean;
+  sort: number;
 };

@@ -1,19 +1,72 @@
 // components/cart/CartPageClient.tsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/lib/cart/cart-store";
 
 export function CartPageClient() {
-  const { cart, removeFromCart, clear } = useCart((s) => ({
-    cart: s.cart,
-    removeFromCart: s.removeFromCart,
-    clear: s.clear,
-  }));
+  const cart = useCart((s) => s.cart);
+  const removeFromCart = useCart((s) => s.removeFromCart);
+  const clear = useCart((s) => s.clear);
 
   const total = cart.reduce((sum, i) => sum + i.product.price * i.qty, 0);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  async function handleCheckout() {
+    if (!cart.length) return;
+    setSubmitting(true);
+    setSuccessMessage(null);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: { name, email, phone, comment },
+          cart,
+        }),
+      });
+
+      const json = (await res.json().catch(() => null)) as
+        | { orderId?: string | number; error?: string; message?: string }
+        | null;
+
+      if (!res.ok) {
+        const details = json?.message || json?.error || "ORDER_FAILED";
+        throw new Error(details);
+      }
+
+      setSuccessMessage(
+        json.orderId
+          ? `Заказ оформлен. Номер заявки: ${json.orderId}`
+          : "Заказ оформлен. Мы свяжемся с вами в ближайшее время.",
+      );
+      clear();
+      setName("");
+      setEmail("");
+      setPhone("");
+      setComment("");
+    } catch (e) {
+      console.error(e);
+      const message =
+        e instanceof Error && e.message && e.message !== "ORDER_FAILED"
+          ? e.message
+          : "Не удалось оформить заказ. Попробуйте ещё раз или напишите нам напрямую.";
+      setErrorMessage(message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="animate-fade-in min-h-screen">
@@ -43,7 +96,7 @@ export function CartPageClient() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 space-y-4">
             {cart.map((item) => {
-              const src = item.product.imagePlaceholder ?? item.product.image;
+              const src = item.product.imagePlaceholder || item.product.image || "/globe.svg";
               const isRemote = /^https?:\/\//.test(src);
 
               return (
@@ -89,21 +142,77 @@ export function CartPageClient() {
             })}
           </div>
 
-          <div className="bg-graphite-light border border-white/5 rounded-2xl p-6 h-fit">
-            <div className="text-xs font-mono uppercase tracking-widest text-gray-500">
-              SUMMARY
+          <div className="bg-graphite-light border border-white/5 rounded-2xl p-6 h-fit space-y-5">
+            <div>
+              <div className="text-xs font-mono uppercase tracking-widest text-gray-500">
+                SUMMARY
+              </div>
+              <div className="mt-4 flex justify-between text-sm">
+                <span className="text-gray-400">Total</span>
+                <span className="font-mono text-gold">
+                  {total.toLocaleString("ru-RU")} ₽
+                </span>
+              </div>
             </div>
-            <div className="mt-6 flex justify-between text-sm">
-              <span className="text-gray-400">Total</span>
-              <span className="font-mono text-gold">
-                {total.toLocaleString("ru-RU")} ₽
-              </span>
+
+            <div className="space-y-3">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500">
+                CONTACT
+              </div>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Имя"
+                className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm outline-none focus:border-white/30"
+              />
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                type="email"
+                className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm outline-none focus:border-white/30"
+              />
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Телефон"
+                className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm outline-none focus:border-white/30"
+              />
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Комментарий к заказу"
+                rows={3}
+                className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm outline-none focus:border-white/30 resize-none"
+              />
             </div>
-            <button className="mt-8 w-full py-4 rounded-2xl font-mono uppercase tracking-widest text-sm bg-gold/15 border border-gold/40 text-gold hover:bg-gold/20 transition-all">
-              CHECKOUT
+
+            {successMessage ? (
+              <div className="text-[11px] text-emerald-400 leading-relaxed bg-emerald-400/5 border border-emerald-400/30 rounded-xl px-3 py-2">
+                {successMessage}
+              </div>
+            ) : null}
+            {errorMessage ? (
+              <div className="text-[11px] text-crimson leading-relaxed bg-crimson/10 border border-crimson/40 rounded-xl px-3 py-2">
+                {errorMessage}
+              </div>
+            ) : null}
+
+            <button
+              disabled={!cart.length || !name || !email || submitting}
+              onClick={handleCheckout}
+              className={`mt-2 w-full py-4 rounded-2xl font-mono uppercase tracking-widest text-sm transition-all ${
+                !cart.length || !name || !email || submitting
+                  ? "bg-white/5 border border-white/10 text-gray-600 cursor-not-allowed"
+                  : "bg-gold/15 border border-gold/40 text-gold hover:bg-gold/20"
+              }`}
+            >
+              {submitting ? "SENDING…" : "CHECKOUT"}
             </button>
-            <div className="mt-4 text-[10px] text-gray-600 leading-relaxed">
-              Checkout подключим позже (ЮKassa/СДЭК).
+
+            <div className="mt-1 text-[10px] text-gray-600 leading-relaxed">
+              Оплата и доставка подключаются отдельно (ЮKassa / СДЭК). Сейчас заявка уходит как
+              заказ в систему.
             </div>
           </div>
         </div>

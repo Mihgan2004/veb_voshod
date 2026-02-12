@@ -8,6 +8,8 @@ export const collections: Collection[] = [
     description: "База и регулярный ассортимент.",
     tag: "CORE",
     coverImage: "https://picsum.photos/seed/voshod-core/1600/900",
+    isFeatured: true,
+    sort: 1,
   },
   {
     id: "col-drop-001",
@@ -16,6 +18,8 @@ export const collections: Collection[] = [
     description: "Лимитированный выпуск. Малый тираж.",
     tag: "DROP",
     coverImage: "https://picsum.photos/seed/voshod-drop/1600/900",
+    isFeatured: true,
+    sort: 2,
   },
   {
     id: "col-accessories",
@@ -24,6 +28,8 @@ export const collections: Collection[] = [
     description: "Патчи и аксессуары.",
     tag: "ACCESSORIES",
     coverImage: "https://picsum.photos/seed/voshod-acc/1600/900",
+    isFeatured: false,
+    sort: 3,
   },
 ];
 
@@ -38,6 +44,7 @@ export const products: Product[] = [
     image: "https://picsum.photos/seed/tee1/800/1000",
     sizes: ["S", "M", "L", "XL"],
     inStock: true,
+    isFeatured: true,
     status: "available",
     badge: "NEW",
     collectionId: "col-core",
@@ -59,6 +66,7 @@ export const products: Product[] = [
     image: "https://picsum.photos/seed/patch1/800/1000",
     sizes: ["ONE SIZE"],
     inStock: true,
+    isFeatured: false,
     status: "available",
     collectionId: "col-accessories",
     specs: {
@@ -77,7 +85,8 @@ export const products: Product[] = [
     image: "https://picsum.photos/seed/cap1/800/1000",
     sizes: ["ONE SIZE"],
     inStock: false,
-    status: "sold out",
+    isFeatured: false,
+    status: "sold_out",
     badge: "SOLD OUT",
     collectionId: "col-drop-001",
     specs: {

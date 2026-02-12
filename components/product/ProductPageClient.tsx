@@ -10,7 +10,7 @@ export function ProductPageClient({ product }: { product: Product }) {
   const addToCart = useCart((s) => s.addToCart);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? "ONE SIZE");
 
-  const src = product.image;
+  const src = product.image || product.imagePlaceholder || "/globe.svg";
   const isRemote = /^https?:\/\//.test(src);
 
   return (
