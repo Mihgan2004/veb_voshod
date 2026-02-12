@@ -1,31 +1,39 @@
-export function directusBaseUrl(): string {
-  const url = process.env.DIRECTUS_URL;
-  if (!url) throw new Error("DIRECTUS_URL is not set");
-  return url.replace(/\/$/, "");
-}
+// lib/directus/client.ts
+type DirectusClientConfig = {
+  url: string;
+  token?: string;
+};
 
-export async function directusGet<T>(path: string, init?: RequestInit): Promise<T> {
-  const base = directusBaseUrl();
-  const res = await fetch(`${base}${path}`, {
-    ...init,
-    headers: {
-      ...(init?.headers ?? {}),
-      // если ты выдашь public read права — токен не нужен
-      ...(process.env.DIRECTUS_TOKEN ? { Authorization: `Bearer ${process.env.DIRECTUS_TOKEN}` } : {}),
-    },
-    // для Next server components:
-    cache: "no-store",
-  });
+type DirectusError = {
+  errors?: Array<{ message?: string }>;
+};
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Directus GET ${path} failed: ${res.status} ${res.statusText}. ${text}`);
+export function createDirectusClient({ url, token }: DirectusClientConfig) {
+  const base = url.replace(/\/+$/, "");
+
+  async function request<T>(path: string, init?: RequestInit): Promise<T> {
+    const headers = new Headers(init?.headers);
+
+    if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+
+    const res = await fetch(`${base}${path}`, { ...init, headers, cache: "no-store" });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      let message = `Directus request failed: ${res.status} ${res.statusText}`;
+      try {
+        const parsed = JSON.parse(text) as DirectusError;
+        const apiMsg = parsed?.errors?.[0]?.message;
+        if (apiMsg) message = `${message}: ${apiMsg}`;
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+
+    return (await res.json()) as T;
   }
 
-  return res.json() as Promise<T>;
-}
-
-export function directusAssetUrl(fileId: string): string {
-  const base = directusBaseUrl();
-  return `${base}/assets/${fileId}`;
+  return { request, base };
 }

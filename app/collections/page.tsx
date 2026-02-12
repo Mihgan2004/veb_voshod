@@ -1,32 +1,33 @@
-import Link from 'next/link';
-import { catalog } from '@/lib/catalog';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { catalog } from "@/lib/catalog";
+import { ProductCard } from "@/components/product/ProductCard";
+import type { Product } from "@/lib/catalog";
 
-export default async function CollectionsPage() {
-  const collections = await catalog.getCollections();
+export default async function CollectionSlugPage({ params }: { params: { slug: string } }) {
+  const col = await catalog.getCollectionBySlug(params.slug);
+  if (!col) notFound();
+
+  // используем стабильный метод (алиас тоже есть)
+  const products = await catalog.getProductsByCollectionId(col.id);
 
   return (
-    <div className="pt-2 max-w-7xl mx-auto px-4 sm:px-6 animate-fade-in min-h-screen">
-      <h1 className="text-3xl sm:text-4xl font-light mb-10 sm:mb-16">COLLECTIONS</h1>
+    <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mb-8 flex items-end justify-between gap-4">
+        <div>
+          <div className="text-[10px] tracking-[0.35em] uppercase text-white/55">{col.tag}</div>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">{col.name}</h1>
+          {col.description ? <p className="mt-2 text-sm text-white/60">{col.description}</p> : null}
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-        {collections.map(col => (
-          <Link
-            key={col.id}
-            href={`/collections/${col.slug}`}
-            className="group relative h-56 sm:h-64 bg-graphite-light rounded-2xl border border-white/5 overflow-hidden flex items-center justify-center hover:border-gold/20 transition-all duration-500"
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative z-10 text-center px-6">
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-widest text-gray-400 group-hover:text-white transition-colors uppercase">
-                {col.name}
-              </h2>
-              <div className="h-0 overflow-hidden group-hover:h-auto group-hover:mt-4 transition-all duration-300">
-                <span className="inline-block px-3 py-1 border border-gold/50 text-gold text-[10px] font-mono rounded-full">
-                  {col.tag} / {col.id.toUpperCase()}
-                </span>
-              </div>
-            </div>
-          </Link>
+        <Link href="/collections" className="text-[10px] tracking-[0.35em] uppercase text-white/45 hover:text-white/80">
+          ALL COLLECTIONS
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {products.map((p: Product) => (
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
     </div>

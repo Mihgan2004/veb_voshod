@@ -1,31 +1,28 @@
-import type { CatalogRepo, ListProductsParams } from "./repo";
-import type { Collection, Product } from "./types";
-import { COLLECTIONS, PRODUCTS } from "./mock-data";
+import type { CatalogRepo } from "./repo";
+import { collections, products } from "./mock-data";
 
-export function createMockCatalogRepo(): CatalogRepo {
+export function createMockRepo(): CatalogRepo {
   return {
-    async listCollections(): Promise<Collection[]> {
-      return COLLECTIONS;
+    async listCollections() {
+      return collections;
     },
-
-    async getCollectionBySlug(slug: string): Promise<Collection | null> {
-      return COLLECTIONS.find((c) => c.slug === slug) ?? null;
+    async listProducts() {
+      return products;
     },
-
-    async listProducts(params?: ListProductsParams): Promise<Product[]> {
-      const { collectionId, limit } = params ?? {};
-      const filtered = collectionId ? PRODUCTS.filter((p) => p.collectionId === collectionId) : PRODUCTS;
-      return typeof limit === "number" ? filtered.slice(0, limit) : filtered;
+    async getCollectionBySlug(slug: string) {
+      return collections.find((c) => c.slug === slug) ?? null;
     },
-
-    async getProductBySlug(slug: string): Promise<Product | null> {
-      return PRODUCTS.find((p) => p.slug === slug) ?? null;
+    async getProductBySlug(slug: string) {
+      return products.find((p) => p.slug === slug) ?? null;
     },
-
-    async listProductsByCollectionSlug(collectionSlug: string): Promise<Product[]> {
-      const col = COLLECTIONS.find((c) => c.slug === collectionSlug);
-      if (!col) return [];
-      return PRODUCTS.filter((p) => p.collectionId === col.id);
+    async getProductsByCollectionId(collectionId: string) {
+      return products.filter((p) => p.collectionId === collectionId);
+    },
+    async listProductsByCollectionId(collectionId: string) {
+      return products.filter((p) => p.collectionId === collectionId);
     },
   };
 }
+
+// Для обратной совместимости (опционально)
+export const mockRepo = createMockRepo();

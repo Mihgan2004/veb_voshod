@@ -1,108 +1,89 @@
-// lib/catalog/mock-data.ts
-import type { Collection, Product, ProductSpecs } from "./types";
-
-const img = (path: string) => path;
-
-const teeSizes = ["S", "M", "L", "XL"];
-const hoodieSizes = ["S", "M", "L", "XL"];
-const oneSize = ["ONE SIZE"];
-
-const specs = (s: Partial<ProductSpecs>): ProductSpecs => ({
-  code: s.code ?? "—",
-  batch: s.batch ?? "—",
-  material: s.material,
-  gsm: s.gsm,
-});
+import type { Collection, Product } from "./types";
 
 export const collections: Collection[] = [
   {
     id: "col-core",
     slug: "core",
-    name: "CORE LINE",
+    name: "CORE",
+    description: "База и регулярный ассортимент.",
     tag: "CORE",
-    description: "База бренда. Тихо. Точно. Надолго.",
+    coverImage: "https://picsum.photos/seed/voshod-core/1600/900",
   },
   {
     id: "col-drop-001",
     slug: "drop-001",
     name: "DROP 001",
-    tag: "LIMITED",
-    description: "Ограниченный выпуск. Номерной дроп.",
+    description: "Лимитированный выпуск. Малый тираж.",
+    tag: "DROP",
+    coverImage: "https://picsum.photos/seed/voshod-drop/1600/900",
   },
   {
-    id: "col-acc",
+    id: "col-accessories",
     slug: "accessories",
     name: "ACCESSORIES",
+    description: "Патчи и аксессуары.",
     tag: "ACCESSORIES",
-    description: "Снаряжение и аксессуары.",
+    coverImage: "https://picsum.photos/seed/voshod-acc/1600/900",
   },
 ];
 
 export const products: Product[] = [
   {
     id: "p-tee-001",
-    slug: "tee-voshod-core",
-    name: "TEE / VOSKHOD CORE",
-    price: 4900,
-    collectionId: "col-core",
+    slug: "tee-voshod-black",
+    name: "Футболка ВОСХОД Black",
     category: "tee",
+    price: 6900,
+    description: "Плотный хлопок, минималистичный крой.",
+    image: "https://picsum.photos/seed/tee1/800/1000",
+    sizes: ["S", "M", "L", "XL"],
+    inStock: true,
     status: "available",
-    limitedCount: undefined,
-    description: "Плотная футболка. Минимализм. Акцент на фактуре.",
-    specs: specs({ code: "VSH-TEE-001", batch: "CORE-2026", material: "100% cotton", gsm: "240" }),
-    image: img("/mock/products/tee-1.jpg"),
-    imagePlaceholder: "https://picsum.photos/800/1000?random=11",
-    inStock: true,
-    sizes: teeSizes,
-  },
-  {
-    id: "p-hood-001",
-    slug: "hoodie-drop-001",
-    name: "HOODIE / DROP 001",
-    price: 10900,
-    collectionId: "col-drop-001",
-    category: "hoodie",
-    status: "limited",
-    limitedCount: 200,
-    description: "Лимитированный худи. Номерной дроп.",
-    specs: specs({ code: "VSH-HOOD-001", batch: "DROP-001", material: "cotton blend", gsm: "420" }),
-    image: img("/mock/products/hood-1.jpg"),
-    imagePlaceholder: "https://picsum.photos/800/1000?random=12",
-    inStock: true,
-    sizes: hoodieSizes,
+    badge: "NEW",
+    collectionId: "col-core",
+    specs: {
+      code: "VS-TEE-001",
+      fabric: "100% хлопок",
+      density: "240 г/м²",
+      print: "Шелкография",
+      color: "Black",
+    },
   },
   {
     id: "p-patch-001",
-    slug: "patch-core",
-    name: "PATCH / CORE",
-    price: 900,
-    collectionId: "col-acc",
+    slug: "patch-voshod-ember",
+    name: "Патч ВОСХОД EMBER",
     category: "patch",
-    status: "available",
-    description: "Патч на липучке. Точная геометрия.",
-    specs: specs({ code: "VSH-PATCH-001", batch: "ACC-2026" }),
-    image: img("/mock/products/patch-1.jpg"),
-    imagePlaceholder: "https://picsum.photos/800/1000?random=13",
+    price: 1900,
+    description: "ПВХ патч на липучке.",
+    image: "https://picsum.photos/seed/patch1/800/1000",
+    sizes: ["ONE SIZE"],
     inStock: true,
-    sizes: oneSize,
+    status: "available",
+    collectionId: "col-accessories",
+    specs: {
+      code: "VS-PATCH-001",
+      color: "EMBER",
+      print: "3D PVC",
+    },
   },
   {
-    id: "p-acc-001",
-    slug: "lanyard-voshod",
-    name: "LANYARD / VOSKHOD",
-    price: 700,
-    collectionId: "col-acc",
-    category: "accessory",
-    status: "available",
-    description: "Стропа, фурнитура, минималистичный брендинг.",
-    specs: specs({ code: "VSH-ACC-001", batch: "ACC-2026" }),
-    image: img("/mock/products/lanyard-1.jpg"),
-    imagePlaceholder: "https://picsum.photos/800/1000?random=14",
-    inStock: true,
-    sizes: oneSize,
+    id: "p-cap-001",
+    slug: "cap-voshod-graphite",
+    name: "Кепка ВОСХОД Graphite",
+    category: "cap",
+    price: 4900,
+    description: "Лаконичная кепка с вышивкой.",
+    image: "https://picsum.photos/seed/cap1/800/1000",
+    sizes: ["ONE SIZE"],
+    inStock: false,
+    status: "sold out",
+    badge: "SOLD OUT",
+    collectionId: "col-drop-001",
+    specs: {
+      code: "VS-CAP-001",
+      color: "Graphite",
+      print: "Вышивка",
+    },
   },
 ];
-
-// mock-repo.ts у тебя импортит uppercase — даём алиасы, НО ВНИЗУ файла:
-export const COLLECTIONS = collections;
-export const PRODUCTS = products;

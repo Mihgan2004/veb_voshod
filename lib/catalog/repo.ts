@@ -1,16 +1,14 @@
+// lib/catalog/repo.ts
 import type { Collection, Product } from "./types";
 
-export type ListProductsParams = {
-  collectionId?: string;
-  limit?: number;
-};
-
-export interface CatalogRepo {
+export type CatalogRepo = {
   listCollections(): Promise<Collection[]>;
-  getCollectionBySlug(slug: string): Promise<Collection | null>;
+  listProducts(): Promise<Product[]>;
 
-  listProducts(params?: ListProductsParams): Promise<Product[]>;
+  getCollectionBySlug(slug: string): Promise<Collection | null>;
   getProductBySlug(slug: string): Promise<Product | null>;
 
-  listProductsByCollectionSlug(collectionSlug: string): Promise<Product[]>;
-}
+  // чтобы не ловить “то есть/то нет” по всему проекту:
+  listProductsByCollectionId(collectionId: string): Promise<Product[]>;
+  getProductsByCollectionId(collectionId: string): Promise<Product[]>;
+};

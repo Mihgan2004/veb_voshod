@@ -1,15 +1,29 @@
-// lib/catalog/index.ts
 import type { CatalogRepo } from "./repo";
-import { createMockCatalogRepo } from "./mock-repo";
-import { createDirectusCatalogRepo } from "./directus-repo";
+import { createMockRepo } from "./mock-repo"; // ✅ теперь это функция
+import { createDirectusRepo } from "./directus-repo";
 
-// чтобы в dev без env не падало — по умолчанию mock
-const source = process.env.NEXT_PUBLIC_CATALOG_SOURCE ?? "mock";
+// ... остальной код без изменений
 
-const repo: CatalogRepo = source === "mock" ? createMockCatalogRepo() : createDirectusCatalogRepo();
+function pickRepo(): CatalogRepo {
+  const source = (
+    process.env.CATALOG_SOURCE ??
+    process.env.NEXT_PUBLIC_CATALOG_SOURCE ??
+    "mock"
+  ).toLowerCase();
 
-export const catalog = repo;
+  const mock = createMockRepo(); // ✅ теперь работает
 
-// важно: чтобы `import { Product } from "@/lib/catalog"` работал
-export type * from "./types";
-export type * from "./repo";
+  if (source === "directus") {
+    const url = process.env.DIRECTUS_URL ?? "";
+    const token = process.env.DIRECTUS_TOKEN;
+
+    if (url) {
+      const directus = createDirectusRepo({ url, token });
+      return withFallback(directus, mock);
+    }
+  }
+
+  return mock;
+}
+
+export const catalog: CatalogRepo = pickRepo();

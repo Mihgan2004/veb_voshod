@@ -1,58 +1,49 @@
-'use client';
+"use client";
 
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { Product } from '@/lib/types';
+import { create } from "zustand";
+import type { Product } from "@/lib/catalog";
 
-export type CartItem = {
-  cartId: string;
-  product: Product;
-  size: string;
-  qty: number;
-};
+// Убедитесь, что тип Product содержит `price: number`
+type CartItem = Product & { qty: number };
 
-type CartState = {
+type CartStore = {
   cart: CartItem[];
-  stampVisible: boolean;
-
-  addToCart: (product: Product, size: string) => void;
-  removeFromCart: (cartId: string) => void;
+  add: (product: Product, qty?: number) => void;
+  remove: (id: string) => void;
   clear: () => void;
+  total: () => number;
 };
 
-const makeId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+export const useCart = create<CartStore>((set, get) => ({
+  cart: [], // ✅ инициализирован как пустой массив
 
-let stampTimer: ReturnType<typeof setTimeout> | null = null;
-
-export const useCart = create<CartState>()(
-  persist(
-    (set, get) => ({
-      cart: [],
-      stampVisible: false,
-
-      addToCart: (product, size) => {
-        const { cart } = get();
-        const idx = cart.findIndex(i => i.product.id === product.id && i.size === size);
-
-        let next = cart;
-        if (idx >= 0) {
-          next = cart.map((i, k) => (k === idx ? { ...i, qty: i.qty + 1 } : i));
-        } else {
-          next = [...cart, { cartId: makeId(), product, size, qty: 1 }];
-        }
-
-        set({ cart: next, stampVisible: true });
-
-        if (stampTimer) clearTimeout(stampTimer);
-        stampTimer = setTimeout(() => set({ stampVisible: false }), 650);
-      },
-
-      removeFromCart: (cartId) => {
-        set({ cart: get().cart.filter(i => i.cartId !== cartId) });
-      },
-
-      clear: () => set({ cart: [] }),
+  add: (product, qty = 1) =>
+    set((state) => {
+      const existingIndex = state.cart.findIndex((item) => item.id === product.id);
+      if (existingIndex >= 0) {
+        const updatedCart = [...state.cart];
+        updatedCart[existingIndex] = {
+          ...updatedCart[existingIndex],
+          qty: updatedCart[existingIndex].qty + qty,
+        };
+        return { cart: updatedCart };
+      }
+      return {
+        cart: [...state.cart, { ...product, qty }],
+      };
     }),
-    { name: 'voshod-cart-v1' }
-  )
-);
+
+  remove: (id) =>
+    set((state) => ({
+      cart: state.cart.filter((item) => item.id !== id),
+    })),
+
+  clear: () => set({ cart: [] }),
+
+  total: () =>
+    get().cart.reduce((acc, item) => {
+      // Защита на случай, если price не определён
+      const price = typeof item.price === "number" ? item.price : 0;
+      return acc + price * item.qty;
+    }, 0),
+}));
