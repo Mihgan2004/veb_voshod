@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { catalog } from "@/lib/catalog";
+import { PageShell } from "@/components/site/PageShell";
 
 export default async function CollectionsPage() {
   const collections = await catalog.listCollections();
@@ -15,54 +16,72 @@ export default async function CollectionsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-20 sm:pt-24 md:pt-32 pb-20 sm:pb-24">
+    <PageShell>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8 sm:mb-10 md:mb-14">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-          <h1 className="text-[11px] sm:text-xs font-mono tracking-[0.25em] uppercase text-white/50 shrink-0">
+          <h1 className="text-[11px] font-mono uppercase tracking-[0.32em] text-white/45 shrink-0">
             SECTORS
           </h1>
           <span className="h-px w-8 sm:w-16 bg-white/10 shrink-0" />
-          <span className="text-[11px] sm:text-xs font-mono tracking-wider text-white/25 truncate">
+          <span className="text-[11px] font-mono tracking-[0.32em] uppercase text-white/25 truncate">
             ALL COLLECTIONS
           </span>
         </div>
         <Link
           href="/catalog"
-          className="shrink-0 ml-4 text-[11px] sm:text-xs font-mono tracking-[0.18em] text-gold hover:text-gold/80 uppercase transition-colors"
+          className="shrink-0 ml-4 text-[11px] font-mono tracking-[0.32em] text-white/45 hover:text-white/70 uppercase transition-colors duration-300"
         >
           FULL CATALOG&nbsp;&rarr;
         </Link>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {collections.map((col) => {
           const itemsCount = countByCollection.get(col.id) ?? 0;
           return (
             <Link
               key={col.id}
               href={`/collections/${col.slug}`}
-              className="group relative flex flex-col justify-end rounded-xl sm:rounded-2xl border border-white/5 bg-graphite-light p-4 sm:p-6 min-h-[120px] sm:min-h-[160px] transition-all duration-300 hover:border-white/15 hover:bg-white/[0.02]"
+              className="group relative aspect-video overflow-hidden rounded-sm border border-white/[0.06] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.14]"
             >
-              <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.2em] uppercase text-white/45">
-                {col.tag}
-              </span>
-              <h2 className="mt-1.5 sm:mt-2 text-base sm:text-lg md:text-xl font-semibold tracking-tight text-white uppercase leading-tight">
-                {col.name}
-              </h2>
-              {col.description && (
-                <p className="mt-1.5 text-[11px] sm:text-xs leading-relaxed text-white/45 max-w-[44ch] line-clamp-2">
-                  {col.description}
-                </p>
-              )}
-              <div className="mt-2.5 sm:mt-3 text-[10px] sm:text-[11px] text-white/35 font-mono tracking-wider">
-                {itemsCount} ITEM{itemsCount === 1 ? "" : "S"}
+              {/* Diagonal accent */}
+              <div className="absolute -top-[1px] -right-[1px] w-16 h-16">
+                <div className="absolute top-0 right-0 w-full h-full overflow-hidden">
+                  <div className="absolute top-0 right-0 w-[1px] h-full bg-white/10 origin-top-right rotate-[-45deg] translate-x-[22px]" />
+                </div>
+              </div>
+
+              {/* Tag — top left */}
+              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-3">
+                <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-white/40">
+                  {col.tag}
+                </span>
+              </div>
+
+              {/* Item count — top right */}
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+                <span className="text-[10px] font-mono tracking-[0.2em] text-white/25">
+                  {itemsCount} ITEM{itemsCount === 1 ? "" : "S"}
+                </span>
+              </div>
+
+              {/* Name — bottom left */}
+              <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
+                <h2 className="text-[18px] sm:text-[22px] md:text-[26px] font-bold tracking-tight text-white uppercase leading-[1.1]">
+                  {col.name}
+                </h2>
+                {col.description && (
+                  <p className="mt-1 text-[11px] leading-relaxed text-white/35 line-clamp-1 max-w-[36ch]">
+                    {col.description}
+                  </p>
+                )}
               </div>
             </Link>
           );
         })}
       </div>
-    </div>
+    </PageShell>
   );
 }

@@ -113,13 +113,11 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
         slug: unknown;
         name: unknown;
         price: unknown;
-        description?: unknown;
 
         category?: unknown; // M2O -> categories (нам нужен slug)
         collection?: unknown; // M2O -> collections (нам нужен id)
         image?: unknown; // M2O -> directus_files
 
-        imagePlaceholder?: unknown;
         sizes?: unknown;
         inStock?: unknown;
         code?: unknown;
@@ -127,9 +125,9 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
         isFeatured?: unknown;
       };
 
-      // Важно: просим вложенные поля у связей
+      // Поля строго по схеме Directus (description и imagePlaceholder нет в Products)
       const res = await client.request<DirectusListResponse<Row>>(
-        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,price,description,image,imagePlaceholder,sizes,inStock,code,batch,isFeatured,category.slug,collection.id`
+        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,price,image,sizes,inStock,code,batch,isFeatured,category.slug,collection.id`
       );
 
       return res.data
@@ -154,14 +152,13 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
             slug,
             name,
             price: Number.isFinite(priceNum) ? priceNum : 0,
-            description: typeof r.description === "string" ? r.description : "",
+            description: "",
             category: normalizeCategorySlug(r.category),
             sizes,
             inStock,
             isFeatured,
             status,
             image: assetUrl(client.base, r.image) ?? "",
-            imagePlaceholder: typeof r.imagePlaceholder === "string" ? r.imagePlaceholder : undefined,
             collectionId: toId(r.collection),
             specs: {
               code: typeof r.code === "string" ? r.code : undefined,

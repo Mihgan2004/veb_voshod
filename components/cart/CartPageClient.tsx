@@ -72,9 +72,9 @@ export function CartPageClient() {
     <div className="animate-fade-in min-h-screen">
       <div className="flex items-center justify-between mb-10">
         <div className="flex items-center gap-4">
-          <span className="text-[18px] font-mono tracking-widest text-[#9FA3B0]">CART</span>
-          <span className="h-px w-24 bg-white/10" />
-          <h1 className="text-2xl font-light text-white">{cart.length} item{cart.length === 1 ? "" : "s"}</h1>
+          <h1 className="text-[28px] sm:text-[40px] font-medium tracking-[-0.02em] text-white">CART</h1>
+          <span className="h-px flex-1 max-w-24 bg-white/10" />
+          <span className="text-[11px] font-mono tracking-[0.32em] uppercase text-white/45">{cart.length} ITEM{cart.length === 1 ? "" : "S"}</span>
         </div>
         {cart.length > 0 && (
           <button
@@ -87,7 +87,7 @@ export function CartPageClient() {
       </div>
 
       {cart.length === 0 ? (
-        <div className="bg-graphite-light border border-white/5 rounded-2xl p-10 text-center">
+        <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-10 text-center">
           <div className="text-gray-400">Cart is empty.</div>
           <Link
             href="/catalog"
@@ -106,7 +106,7 @@ export function CartPageClient() {
               return (
                 <div
                   key={item.cartId}
-                  className="flex gap-4 bg-graphite-light border border-white/5 rounded-2xl p-4"
+                  className="flex gap-4 bg-white/[0.02] border border-white/10 rounded-2xl p-4"
                 >
                   <div className="relative w-24 h-28 overflow-hidden rounded-xl border border-white/5">
                     <Image
@@ -122,14 +122,14 @@ export function CartPageClient() {
                   <div className="flex-1">
                     <div className="flex justify-between gap-4">
                       <div>
-                        <div className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
+                        <div className="text-[11px] font-mono tracking-[0.32em] uppercase text-white/45">
                           {item.product.category} / {item.size} / QTY {item.qty}
                         </div>
-                        <div className="mt-2 text-sm text-gray-200">
+                        <div className="mt-2 text-[14px] font-medium text-gray-200">
                           {item.product.name}
                         </div>
                       </div>
-                      <div className="text-sm font-mono text-gold whitespace-nowrap">
+                      <div className="text-[14px] font-semibold text-white whitespace-nowrap">
                         {(item.product.price * item.qty).toLocaleString("ru-RU")} ₽
                       </div>
                     </div>
@@ -146,21 +146,21 @@ export function CartPageClient() {
             })}
           </div>
 
-          <div className="bg-graphite-light border border-white/5 rounded-2xl p-6 h-fit space-y-5">
+          <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 h-fit space-y-5">
             <div>
-              <div className="text-xs font-mono uppercase tracking-widest text-gray-500">
+              <div className="text-[11px] font-mono tracking-[0.32em] uppercase text-white/45">
                 SUMMARY
               </div>
-              <div className="mt-4 flex justify-between text-sm">
-                <span className="text-gray-400">Total</span>
-                <span className="font-mono text-gold">
+              <div className="mt-4 flex justify-between text-[14px]">
+                <span className="text-white/60">Total</span>
+                <span className="font-semibold text-white">
                   {total.toLocaleString("ru-RU")} ₽
                 </span>
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500">
+              <div className="text-[11px] font-mono tracking-[0.32em] uppercase text-white/45">
                 CONTACT
               </div>
               <input

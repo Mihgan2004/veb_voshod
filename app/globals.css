@@ -48,6 +48,31 @@ body {
     margin-left: -50vw;
     margin-right: -50vw;
   }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  .animate-gold-shimmer {
+    animation: gold-shimmer 3.5s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes fadeIn {
@@ -77,6 +102,18 @@ body {
   50% {
     opacity: 1;
     transform: translateX(100%) skewX(-12deg);
+  }
+}
+
+@keyframes gold-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
   }
 }
 

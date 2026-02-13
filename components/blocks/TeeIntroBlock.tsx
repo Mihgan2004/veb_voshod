@@ -227,7 +227,7 @@ export const TeeIntroBlock: React.FC = () => {
                   className="text-2xl sm:text-3xl md:text-5xl font-light tracking-wide"
                   style={mkStyle(e1, 32)}
                 >
-                  КОНЦЕРН <span className="text-gold">ВОСХОД</span>
+                  КОНЦЕРН <span className="bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">ВОСХОД</span>
                 </h2>
 
                 {/* Описание */}

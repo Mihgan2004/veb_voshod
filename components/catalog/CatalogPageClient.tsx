@@ -4,6 +4,15 @@ import { useMemo, useState } from "react";
 import type { Product, Category } from "@/lib/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
 
+const CATEGORIES: { value: Category | "all"; label: string }[] = [
+  { value: "all", label: "ALL" },
+  { value: "tee", label: "TEE" },
+  { value: "hoodie", label: "HOODIE" },
+  { value: "patch", label: "PATCH" },
+  { value: "lanyard", label: "LANYARD" },
+  { value: "accessory", label: "ACC" },
+];
+
 export function CatalogPageClient({ products }: { products: Product[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
@@ -21,39 +30,45 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
     <div>
       {/* Header */}
       <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <h1 className="text-[11px] sm:text-xs font-mono tracking-[0.25em] uppercase text-white/50 shrink-0">
-          FULL CATALOG
+        <h1 className="text-[28px] sm:text-[40px] font-medium tracking-[-0.02em] text-white">
+          CATALOG
         </h1>
-        <span className="h-px w-8 sm:w-16 bg-white/10 shrink-0" />
-        <span className="text-[11px] sm:text-xs font-mono tracking-wider text-white/25">
-          {filtered.length} items
+        <span className="h-px flex-1 bg-white/10 shrink-0" />
+        <span className="text-[11px] font-mono tracking-[0.32em] uppercase text-white/45">
+          {filtered.length} ITEMS
         </span>
       </div>
 
-      {/* Filters */}
-      <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row gap-2.5 sm:gap-3 sm:items-center">
+      {/* Filters + search */}
+      <div className="mb-10 sm:mb-12 space-y-4">
+        {/* Category pills — horizontal scroll on mobile */}
+        <div className="flex gap-2 sm:gap-2.5 overflow-x-auto scrollbar-none pb-0.5">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => setCategory(cat.value)}
+              className={`shrink-0 px-4 sm:px-5 py-2 sm:py-2.5 rounded-md text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.18em] whitespace-nowrap transition-all duration-300 ${
+                category === cat.value
+                  ? "bg-white text-black"
+                  : "border border-white/[0.08] bg-transparent text-white/40 hover:text-white/70 hover:border-white/[0.16]"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Search */}
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search..."
-          className="h-10 w-full sm:w-64 rounded-lg sm:rounded-xl border border-white/10 bg-graphite-light px-3 text-sm text-gray-200 outline-none placeholder:text-white/25 focus:border-gold/40 transition-colors"
+          className="h-10 w-full sm:w-56 rounded-md border border-white/[0.08] bg-transparent px-4 text-[13px] text-gray-200 outline-none placeholder:text-white/20 focus:border-white/20 transition-colors duration-300"
         />
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as Category | "all")}
-          className="h-10 w-full sm:w-44 rounded-lg sm:rounded-xl border border-white/10 bg-graphite-light px-3 text-sm text-gray-200 outline-none focus:border-gold/40 transition-colors"
-        >
-          <option value="all">All</option>
-          <option value="tee">TEE</option>
-          <option value="hoodie">HOODIE</option>
-          <option value="patch">PATCH</option>
-          <option value="lanyard">LANYARD</option>
-          <option value="accessory">ACCESSORY</option>
-        </select>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-3 sm:gap-x-4 gap-y-6 sm:gap-y-8">
         {filtered.map((p) => (
           <ProductCard key={p.id} product={p} />
         ))}
