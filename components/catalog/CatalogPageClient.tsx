@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { Product, Category } from "@/lib/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
 
@@ -13,18 +13,26 @@ const CATEGORIES: { value: Category | "all"; label: string }[] = [
   { value: "accessory", label: "ACC" },
 ];
 
+const SEARCH_DEBOUNCE_MS = 200;
+
 export function CatalogPageClient({ products }: { products: Product[] }) {
-  const [query, setQuery] = useState("");
+  const [queryInput, setQueryInput] = useState("");
+  const [queryDebounced, setQueryDebounced] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
 
+  useEffect(() => {
+    const t = setTimeout(() => setQueryDebounced(queryInput.trim()), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [queryInput]);
+
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = queryDebounced.toLowerCase();
     return products.filter((p) => {
       const okCategory = category === "all" ? true : p.category === category;
       const okQuery = q ? p.name.toLowerCase().includes(q) : true;
       return okCategory && okQuery;
     });
-  }, [products, query, category]);
+  }, [products, queryDebounced, category]);
 
   return (
     <div>
@@ -60,8 +68,8 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
 
         {/* Search */}
         <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={queryInput}
+          onChange={(e) => setQueryInput(e.target.value)}
           placeholder="Search..."
           className="h-10 w-full sm:w-56 rounded-md border border-white/[0.08] bg-transparent px-4 text-[13px] text-gray-200 outline-none placeholder:text-white/20 focus:border-white/20 transition-colors duration-300"
         />

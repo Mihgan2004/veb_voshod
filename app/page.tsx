@@ -3,29 +3,30 @@ import { WelcomeBlock } from "@/components/blocks/WelcomeBlock";
 import { TeeIntroBlock } from "@/components/blocks/TeeIntroBlock";
 import { HighlightsCollections } from "@/components/sections/HighlightsCollections";
 import { LookbookSlider } from "@/components/sections/LookbookSlider";
-import { catalog } from "@/lib/catalog";
+import { STATIC_COLLECTIONS } from "@/lib/catalog";
+import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
 
 /* ------------------------------------------------------------------ */
-/*  Home page                                                          */
+/*  Home page: статичные коллекции в Highlights; /collections — Directus */
 /* ------------------------------------------------------------------ */
 export const revalidate = 60;
 
-export default async function HomePage() {
-  const collections = await catalog.listCollections();
-
+export default function HomePage() {
   return (
-    <div className="animate-fade-in">
-      <Hero />
-      <WelcomeBlock />
-      <TeeIntroBlock />
+    <HomeScrollProvider>
+      <div className="animate-fade-in">
+        <Hero />
+        <WelcomeBlock />
+        <TeeIntroBlock />
 
-      {/* ---- Highlights: коллекции (горизонтальный скролл) ---- */}
-      <HighlightsCollections collections={collections} />
+        {/* ---- Highlights: статичные карточки (Коллекция №1–3) ---- */}
+        <HighlightsCollections collections={STATIC_COLLECTIONS} />
 
-      {/* ---- Lookbook: фото-слайдер ---- */}
-      <LookbookSlider />
+        {/* ---- Lookbook: фото-слайдер ---- */}
+        <LookbookSlider />
 
-      <div className="h-4" />
-    </div>
+        <div className="h-4" />
+      </div>
+    </HomeScrollProvider>
   );
 }

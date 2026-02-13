@@ -1,9 +1,10 @@
 // components/product/ProductCard.tsx
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@/lib/types";
 
-export function ProductCard({ product }: { product: Product }) {
+function ProductCardInner({ product }: { product: Product }) {
   const src = product.imagePlaceholder || product.image || "/globe.svg";
   const isRemote = /^https?:\/\//.test(src);
 
@@ -40,3 +41,5 @@ export function ProductCard({ product }: { product: Product }) {
     </Link>
   );
 }
+
+export const ProductCard = React.memo(ProductCardInner);

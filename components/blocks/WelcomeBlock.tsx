@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ASSETS } from "@/lib/assets";
+import { useHomeScrollCompact } from "@/components/home/HomeScrollContext";
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const smoothstep = (e0: number, e1: number, x: number) => {
@@ -15,8 +16,13 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const WelcomeBlock: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [p, setP] = useState(0);
+  const { compact } = useHomeScrollCompact();
 
   useEffect(() => {
+    if (compact) {
+      setP(1);
+      return;
+    }
     const el = sectionRef.current;
     if (!el) return;
 
@@ -44,7 +50,7 @@ export const WelcomeBlock: React.FC = () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, []);
+  }, [compact]);
 
   // ФАЗЫ (регулируешь только числа)
   const welcomeIn = smoothstep(0.05, 0.18, p);     // появление
@@ -69,7 +75,7 @@ export const WelcomeBlock: React.FC = () => {
     <section
       ref={sectionRef as any}
       className="relative w-full bg-[#0B0D10]"
-      style={{ height: "300vh" }}
+      style={{ height: compact ? "100vh" : "300vh" }}
     >
       <div className="sticky top-0 h-[100vh] overflow-hidden">
         <div className="pointer-events-none absolute inset-0">

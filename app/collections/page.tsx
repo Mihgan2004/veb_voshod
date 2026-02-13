@@ -46,6 +46,7 @@ export default async function CollectionsPage() {
             <Link
               key={col.id}
               href={`/collections/${col.slug}`}
+              prefetch={false}
               className="group relative aspect-video overflow-hidden rounded-sm border border-white/[0.06] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.14]"
             >
               {/* Diagonal accent */}
@@ -58,7 +59,7 @@ export default async function CollectionsPage() {
               {/* Tag — top left */}
               <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-3">
                 <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-white/40">
-                  {col.tag}
+                  {col.label ?? col.tag}
                 </span>
               </div>
 

@@ -2,6 +2,10 @@
 import type { CatalogRepo } from "./repo";
 import { createMockRepo } from "./mock-repo";
 import { createDirectusRepo } from "./directus-repo";
+import {
+  STATIC_COLLECTIONS,
+  getStaticCollectionBySlug,
+} from "./static-collections";
 
 export * from "./types";
 export type { CatalogRepo } from "./repo";
@@ -65,7 +69,19 @@ function withFallback(primary: CatalogRepo, fallback: CatalogRepo): CatalogRepo 
   };
 }
 
-/** Каталог: Directus при CATALOG_SOURCE=directus и DIRECTUS_URL в .env; иначе mock */
+/** getCollectionBySlug: сначала статика (ссылки с главной), иначе Directus/mock */
+function withStaticCollectionFallback(repo: CatalogRepo): CatalogRepo {
+  return {
+    ...repo,
+    async getCollectionBySlug(slug: string) {
+      const staticCol = getStaticCollectionBySlug(slug);
+      if (staticCol) return staticCol;
+      return repo.getCollectionBySlug(slug);
+    },
+  };
+}
+
+/** Каталог: коллекции и товары из Directus при CATALOG_SOURCE=directus; иначе mock. Ссылки с главной (статика) резолвятся через getCollectionBySlug. */
 function pickRepo(): CatalogRepo {
   const source = (
     process.env.CATALOG_SOURCE ??
@@ -75,17 +91,18 @@ function pickRepo(): CatalogRepo {
 
   const mock = createMockRepo();
 
+  let repo: CatalogRepo = mock;
   if (source === "directus") {
     const url = process.env.DIRECTUS_URL ?? "";
     const token = process.env.DIRECTUS_TOKEN;
-
     if (url) {
       const directus = createDirectusRepo({ url, token });
-      return withFallback(directus, mock);
+      repo = withFallback(directus, mock);
     }
   }
 
-  return mock;
+  return withStaticCollectionFallback(repo);
 }
 
 export const catalog: CatalogRepo = pickRepo();
+export { STATIC_COLLECTIONS } from "./static-collections";

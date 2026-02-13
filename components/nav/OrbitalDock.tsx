@@ -35,10 +35,15 @@ export const OrbitalDock: React.FC = () => {
     updateTime();
     const t = setInterval(updateTime, 1000);
     let rafId = 0;
+    let prev = false;
     const onScroll = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        setScrolled(window.scrollY > 50);
+        const next = window.scrollY > 50;
+        if (next !== prev) {
+          prev = next;
+          setScrolled(next);
+        }
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });

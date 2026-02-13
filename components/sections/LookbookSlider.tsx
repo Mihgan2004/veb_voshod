@@ -186,7 +186,7 @@ export function LookbookSlider() {
               @VOSHOD
             </span>
             <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90">
-              LOOKBOOK
+              Галлерея
             </h2>
           </div>
 

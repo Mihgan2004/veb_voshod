@@ -56,6 +56,8 @@ export type Collection = {
   description?: string;
 
   tag: CollectionTag;
+  /** Подпись вместо тега (например «Коллекция №1») */
+  label?: string;
 
   coverImage?: string;
   isFeatured: boolean;

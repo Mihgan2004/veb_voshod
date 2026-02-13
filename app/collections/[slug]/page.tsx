@@ -23,7 +23,7 @@ export default async function CollectionPage({
     <PageShell>
       <div className="mb-14">
         <div className="text-[11px] font-mono tracking-[0.32em] uppercase text-white/45 mb-3">
-          {collection.tag} / {collection.slug.toUpperCase()}
+          {collection.label ?? collection.tag} / {collection.slug.toUpperCase()}
         </div>
         <h1 className="text-[28px] sm:text-[40px] font-medium tracking-[-0.02em] text-white">
           {collection.name}

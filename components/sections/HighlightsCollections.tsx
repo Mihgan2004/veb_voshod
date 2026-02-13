@@ -107,7 +107,7 @@ export function HighlightsCollections({
         {/* ---- Header ---- */}
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
           <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90 text-center">
-            HIGHLIGHTS
+            КОЛЛЕКЦИИ
           </h2>
         </div>
 
@@ -121,34 +121,21 @@ export function HighlightsCollections({
               key={col.id}
               href={`/collections/${col.slug}`}
               prefetch={false}
-              className="group shrink-0 snap-start w-[78vw] max-w-[520px] sm:w-[520px] lg:w-[560px] outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded-2xl"
+              className="group shrink-0 snap-start w-[78vw] max-w-[520px] sm:w-[520px] lg:w-[560px] outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded-2xl flex flex-col"
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition-all duration-300 group-hover:border-white/[0.18] group-hover:bg-white/[0.03]">
-                {/* Image */}
                 <FadeImage
                   src={col.coverImage || "/globe.svg"}
-                  alt={col.name}
+                  alt={col.label ?? col.tag}
                   sizes="(max-width:640px) 78vw, (max-width:1024px) 520px, 560px"
                 />
-
-                {/* Gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
-
-                {/* Centered text overlay */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-                  <span className="text-[11px] font-mono uppercase tracking-[0.32em] text-white/50 mb-2">
-                    {col.tag}
-                  </span>
-                  <h3 className="text-[20px] sm:text-[24px] font-semibold tracking-[0.08em] uppercase text-white leading-tight">
-                    {col.name}
-                  </h3>
-                  {col.description && (
-                    <p className="mt-2 text-[13px] leading-relaxed text-white/60 line-clamp-2 max-w-[36ch]">
-                      {col.description}
-                    </p>
-                  )}
-                </div>
+                {col.id === "col-1" && (
+                  <div className="absolute inset-0 bg-black/35 pointer-events-none rounded-2xl" aria-hidden />
+                )}
               </div>
+              <span className="mt-3 text-[11px] font-mono uppercase tracking-[0.32em] text-white/50 text-center block">
+                {col.label ?? col.tag}
+              </span>
             </Link>
           ))}
 

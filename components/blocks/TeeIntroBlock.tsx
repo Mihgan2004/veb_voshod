@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ASSETS } from '@/lib/assets';
+import { useHomeScrollCompact } from '@/components/home/HomeScrollContext';
 
 // ========== НАСТРОЙКИ РАЗМЕРОВ ==========
 const TEE_INTRO = {
@@ -35,8 +36,13 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const TeeIntroBlock: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [p, setP] = useState(0.15);
+  const { compact } = useHomeScrollCompact();
 
   useEffect(() => {
+    if (compact) {
+      setP(0.85);
+      return;
+    }
     const el = sectionRef.current;
     if (!el) return;
 
@@ -68,7 +74,7 @@ export const TeeIntroBlock: React.FC = () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, []);
+  }, [compact]);
 
   const out = smoothstep(0.78, 0.98, p);
   const fadeOut = lerp(1, 0.35, out);
@@ -91,7 +97,7 @@ export const TeeIntroBlock: React.FC = () => {
     <section
       ref={sectionRef}
       className="relative w-full border-t border-white/5"
-      style={{ height: '220vh' }}
+      style={{ height: compact ? '100vh' : '220vh' }}
     >
       {/* Keyframes */}
       <style>{`
