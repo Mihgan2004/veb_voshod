@@ -6,6 +6,8 @@ import type { Product } from "@/lib/types";
 import { ProductCard } from "@/components/product/ProductCard";
 import { PageShell } from "@/components/site/PageShell";
 
+export const revalidate = 60;
+
 export default async function CollectionPage({
   params,
 }: {

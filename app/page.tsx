@@ -8,6 +8,8 @@ import { catalog } from "@/lib/catalog";
 /* ------------------------------------------------------------------ */
 /*  Home page                                                          */
 /* ------------------------------------------------------------------ */
+export const revalidate = 60;
+
 export default async function HomePage() {
   const collections = await catalog.listCollections();
 

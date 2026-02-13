@@ -47,7 +47,7 @@ export function CartPageClient() {
       }
 
       setSuccessMessage(
-        json.orderId
+        json?.orderId
           ? `Заказ оформлен. Номер заявки: ${json.orderId}`
           : "Заказ оформлен. Мы свяжемся с вами в ближайшее время.",
       );

@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Link from "next/link"; // ✅ исправлено: next/link вместо react-router-dom
+import Image from "next/image";
+import Link from "next/link";
+import { ASSETS } from "@/lib/assets";
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const smoothstep = (e0: number, e1: number, x: number) => {
@@ -104,12 +106,16 @@ export const WelcomeBlock: React.FC = () => {
               willChange: "transform, opacity",
             }}
           >
-            <img
-              src="/brand/project-voshod@2x.png"
+            <Image
+              src={ASSETS.brand.logoDesktop}
               alt="Проект Восход"
+              width={640}
+              height={184}
+              sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, 640px"
               className="w-[260px] sm:w-[360px] md:w-[640px] select-none pointer-events-none"
               draggable={false}
               style={{ backfaceVisibility: "hidden" }}
+              priority
             />
           </div>
         </div>
@@ -130,8 +136,8 @@ export const WelcomeBlock: React.FC = () => {
               px-8 md:px-10
               rounded-full
               border border-white/10
-              bg-white/5
-              backdrop-blur-md
+              bg-[#141821]/85 sm:bg-white/5
+              sm:backdrop-blur-md
               text-[11px] md:text-xs
               uppercase tracking-[0.22em]
               text-[#F5F5F5]

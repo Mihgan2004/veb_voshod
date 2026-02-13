@@ -1,39 +1,31 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
+import Image from "next/image";
+import { ASSETS } from "@/lib/assets";
 
 /* ================================================================== */
-/*  Lookbook images from /public/lookbook                              */
+/*  Lookbook images — source of truth in lib/assets.ts                 */
 /* ================================================================== */
 
-const LOOKBOOK_IMAGES: string[] = [
-  "/lookbook/ChatGPT Image 3 февр. 2026 г., 17_47_41.png",
-  "/lookbook/ChatGPT Image 3 февр. 2026 г., 18_29_58.png",
-  "/lookbook/ChatGPT Image 4 февр. 2026 г., 17_21_34.png",
-  "/lookbook/ChatGPT Image 13 февр. 2026 г., 04_49_22.png",
-  "/lookbook/ChatGPT Image 13 февр. 2026 г., 04_50_10.png",
-  "/lookbook/photo_2026-02-04_00-28-36.jpg",
-  "/lookbook/photo_2026-02-04_00-45-31.jpg",
-  "/lookbook/photo_2026-02-04_01-13-41.jpg",
-  "/lookbook/photo_2026-02-13_05-00-26.jpg",
-];
+const LOOKBOOK_IMAGES: readonly string[] = ASSETS.lookbook;
 
 /* ================================================================== */
-/*  Fade-in image with skeleton shimmer                                */
+/*  Fade-in image: next/image + lazy, чтобы не грузить все 9 сразу     */
 /* ================================================================== */
 
 function FadeImage({
   src,
   alt,
   sizes,
+  priority = false,
 }: {
   src: string;
   alt: string;
   sizes: string;
+  priority?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
-  /* Encode URI for local files with Cyrillic / spaces */
-  const safeSrc = src.startsWith("/") ? encodeURI(src) : src;
 
   return (
     <>
@@ -46,12 +38,16 @@ function FadeImage({
         <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       </div>
 
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={safeSrc}
+      <Image
+        src={src}
         alt={alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        unoptimized
+        loading={priority ? undefined : "lazy"}
         onLoad={() => setLoaded(true)}
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+        className={`object-cover transition-opacity duration-300 ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -207,7 +203,7 @@ export function LookbookSlider() {
         >
           {LOOKBOOK_IMAGES.map((src, i) => (
             <div
-              key={i}
+              key={src}
               data-frame
               className="shrink-0 snap-start w-[78vw] sm:w-[45vw] lg:w-[25vw]"
             >
@@ -216,6 +212,7 @@ export function LookbookSlider() {
                   src={src}
                   alt={`Lookbook ${i + 1}`}
                   sizes="(max-width:640px) 78vw, (max-width:1024px) 45vw, 25vw"
+                  priority={i === 0}
                 />
               </div>
             </div>

@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { ASSETS } from '@/lib/assets';
 
 // ========== НАСТРОЙКИ РАЗМЕРОВ ==========
 const TEE_INTRO = {
@@ -141,8 +143,9 @@ export const TeeIntroBlock: React.FC = () => {
               className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
             >
               <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/assets/tee/tee-cutout.png"
+                  src={ASSETS.tee.cutout}
                   alt="VOSKHOD tee"
                   className={`absolute left-1/2 -translate-x-[calc(50%+90px)] md:left-[-80vw] md:translate-x-0 top-1/2 -translate-y-1/2 w-auto max-w-none pointer-events-none select-none object-contain
                     scale-[1.75] sm:scale-[1.5] md:scale-[1.2] origin-[50%_40%]
@@ -245,7 +248,7 @@ export const TeeIntroBlock: React.FC = () => {
                   style={mkStyle(e3, 36)}
                 >
                   <div
-                    className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-3 sm:p-4"
+                    className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md p-3 sm:p-4"
                     style={{ animation: 'teeCardFloat1 6s ease-in-out infinite' }}
                   >
                     <div className="text-[10px] font-mono text-white/35">CODE</div>
@@ -255,7 +258,7 @@ export const TeeIntroBlock: React.FC = () => {
                   </div>
 
                   <div
-                    className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-3 sm:p-4"
+                    className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md p-3 sm:p-4"
                     style={{ animation: 'teeCardFloat2 7s ease-in-out infinite 0.5s' }}
                   >
                     <div className="text-[10px] font-mono text-white/35">MATERIAL</div>
@@ -269,7 +272,7 @@ export const TeeIntroBlock: React.FC = () => {
                 <div className="mt-6 sm:mt-8" style={mkStyle(e4, 24)}>
                   <Link
                     href="/catalog"
-                    className="inline-flex items-center justify-center h-11 sm:h-12 md:h-14 px-6 sm:px-8 md:px-10 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.2em] sm:tracking-[0.22em] text-[#F5F5F5] transition-all duration-300 hover:border-[#C6902E]/35 hover:bg-white/10"
+                    className="inline-flex items-center justify-center h-11 sm:h-12 md:h-14 px-6 sm:px-8 md:px-10 rounded-full border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.2em] sm:tracking-[0.22em] text-[#F5F5F5] transition-all duration-300 hover:border-[#C6902E]/35 hover:bg-white/10"
                   >
                     СМОТРЕТЬ КАТАЛОГ →
                   </Link>

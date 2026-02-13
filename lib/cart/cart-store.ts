@@ -12,6 +12,7 @@ export type CartLine = {
 
 type CartStore = {
   cart: CartLine[];
+  stampVisible: boolean;
   addToCart: (product: Product, size: string, qty?: number) => void;
   removeFromCart: (cartId: string) => void;
   clear: () => void;
@@ -27,8 +28,11 @@ function createCartId(productId: string, size: string) {
 
 export const useCart = create<CartStore>((set, get) => ({
   cart: [],
+  stampVisible: false,
 
-  addToCart: (product, size, qty = 1) =>
+  addToCart: (product, size, qty = 1) => {
+    set({ stampVisible: true });
+    setTimeout(() => set({ stampVisible: false }), 2200);
     set((state) => {
       const existingIndex = state.cart.findIndex(
         (item) => item.product.id === product.id && item.size === size,
@@ -48,7 +52,8 @@ export const useCart = create<CartStore>((set, get) => ({
       return {
         cart: [...state.cart, { cartId, product, size, qty }],
       };
-    }),
+    });
+  },
 
   removeFromCart: (cartId) =>
     set((state) => ({

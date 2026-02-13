@@ -120,6 +120,7 @@ export function HighlightsCollections({
             <Link
               key={col.id}
               href={`/collections/${col.slug}`}
+              prefetch={false}
               className="group shrink-0 snap-start w-[78vw] max-w-[520px] sm:w-[520px] lg:w-[560px] outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded-2xl"
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition-all duration-300 group-hover:border-white/[0.18] group-hover:bg-white/[0.03]">

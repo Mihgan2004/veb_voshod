@@ -65,6 +65,7 @@ function withFallback(primary: CatalogRepo, fallback: CatalogRepo): CatalogRepo 
   };
 }
 
+/** Каталог: Directus при CATALOG_SOURCE=directus и DIRECTUS_URL в .env; иначе mock */
 function pickRepo(): CatalogRepo {
   const source = (
     process.env.CATALOG_SOURCE ??

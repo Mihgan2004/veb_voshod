@@ -8,7 +8,7 @@ export function ProductCard({ product }: { product: Product }) {
   const isRemote = /^https?:\/\//.test(src);
 
   return (
-    <Link href={`/product/${product.slug}`} className="group relative flex flex-col">
+    <Link href={`/product/${product.slug}`} prefetch={false} className="group relative flex flex-col">
       {/* --- Изображение --- */}
       <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-white/[0.03] border border-white/[0.06] transition-all duration-300 group-hover:border-white/[0.14]">
         <Image

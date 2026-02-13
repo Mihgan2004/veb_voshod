@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart/cart-store";
+import { ASSETS } from "@/lib/assets";
 
 const NAV_LINKS = [
   { href: "/collections", label: "КОЛЛЕКЦИИ" },
@@ -33,11 +34,18 @@ export const OrbitalDock: React.FC = () => {
     };
     updateTime();
     const t = setInterval(updateTime, 1000);
-    const onScroll = () => setScrolled(window.scrollY > 50);
+    let rafId = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 50);
+      });
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => {
       clearInterval(t);
+      cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
@@ -64,14 +72,15 @@ export const OrbitalDock: React.FC = () => {
         }`}
       >
         <div className="relative rounded-full">
-          <div className="relative overflow-hidden rounded-full bg-graphite/60 backdrop-blur-md border border-white/10 px-3 sm:px-5 py-1.5 sm:py-2 flex items-center gap-3 sm:gap-6 shadow-[0_12px_40px_rgba(0,0,0,0.4)]">
+          <div className="relative overflow-hidden rounded-full bg-[#141821]/90 sm:bg-graphite/60 sm:backdrop-blur-md border border-white/10 px-3 sm:px-5 py-1.5 sm:py-2 flex items-center gap-3 sm:gap-6 shadow-[0_12px_40px_rgba(0,0,0,0.4)]">
             {/* Logo — rendered at 20px, source should be 80px+ for retina */}
             <Link href="/" className="shrink-0 flex items-center">
               <Image
-                src="/header/лого.png"
+                src={ASSETS.header.logo}
                 alt="VOSKHOD"
-                width={80}
-                height={80}
+                width={59}
+                height={32}
+                sizes="59px"
                 className="h-5 w-auto"
                 priority
               />

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { catalog } from "@/lib/catalog";
 import { PageShell } from "@/components/site/PageShell";
 
+export const revalidate = 60;
+
 export default async function CollectionsPage() {
   const collections = await catalog.listCollections();
   const products = await catalog.listProducts();

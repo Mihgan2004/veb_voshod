@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { catalog } from "@/lib/catalog";
 import { ProductPageClient } from "@/components/product/ProductPageClient";
 
+export const revalidate = 60;
+
 export default async function ProductSlugPage({
   params,
 }: {
