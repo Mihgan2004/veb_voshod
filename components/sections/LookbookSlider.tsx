@@ -181,49 +181,51 @@ export function LookbookSlider() {
   };
 
   return (
-    <section className="py-16 sm:py-20">
-      {/* ---- Header + Arrows ---- */}
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 flex items-end justify-between">
-        <div>
-          <span className="text-[11px] font-mono uppercase tracking-[0.32em] text-white/35 block mb-1.5">
-            @VOSHOD
-          </span>
-          <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90">
-            LOOKBOOK
-          </h2>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <ArrowButton direction="left" disabled={!canLeft} onClick={() => scroll(-1)} />
-          <ArrowButton direction="right" disabled={!canRight} onClick={() => scroll(1)} />
-        </div>
-      </div>
-
-      {/* ---- Photo strip (seamless / слитные фото) ---- */}
-      <div
-        ref={scrollRef}
-        className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory"
-      >
-        {LOOKBOOK_IMAGES.map((src, i) => (
-          <div
-            key={i}
-            data-frame
-            className="shrink-0 snap-start w-[78vw] sm:w-[45vw] lg:w-[25vw]"
-          >
-            <div className="relative aspect-square overflow-hidden bg-white/[0.02]">
-              <FadeImage
-                src={src}
-                alt={`Lookbook ${i + 1}`}
-                sizes="(max-width:640px) 78vw, (max-width:1024px) 45vw, 25vw"
-              />
-            </div>
+    <section className="vx-section-seams py-16 sm:py-20">
+      <div className="relative z-10">
+        {/* ---- Header + Arrows ---- */}
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 flex items-end justify-between">
+          <div>
+            <span className="text-[11px] font-mono uppercase tracking-[0.32em] block mb-1.5 bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
+              @VOSHOD
+            </span>
+            <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90">
+              LOOKBOOK
+            </h2>
           </div>
-        ))}
-      </div>
 
-      {/* ---- Progress indicator ---- */}
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-5">
-        <ScrollProgress scrollRef={scrollRef} />
+          <div className="flex items-center gap-2">
+            <ArrowButton direction="left" disabled={!canLeft} onClick={() => scroll(-1)} />
+            <ArrowButton direction="right" disabled={!canRight} onClick={() => scroll(1)} />
+          </div>
+        </div>
+
+        {/* ---- Photo strip (seamless / слитные фото) ---- */}
+        <div
+          ref={scrollRef}
+          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory"
+        >
+          {LOOKBOOK_IMAGES.map((src, i) => (
+            <div
+              key={i}
+              data-frame
+              className="shrink-0 snap-start w-[78vw] sm:w-[45vw] lg:w-[25vw]"
+            >
+              <div className="relative aspect-square overflow-hidden bg-white/[0.02]">
+                <FadeImage
+                  src={src}
+                  alt={`Lookbook ${i + 1}`}
+                  sizes="(max-width:640px) 78vw, (max-width:1024px) 45vw, 25vw"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ---- Progress indicator ---- */}
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-5">
+          <ScrollProgress scrollRef={scrollRef} />
+        </div>
       </div>
     </section>
   );

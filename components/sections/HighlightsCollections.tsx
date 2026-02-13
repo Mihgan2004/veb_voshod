@@ -102,61 +102,63 @@ export function HighlightsCollections({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="py-16 sm:py-20">
-      {/* ---- Header ---- */}
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
-        <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90 text-center">
-          HIGHLIGHTS
-        </h2>
-      </div>
+    <section className="vx-section-seams py-16 sm:py-20">
+      <div className="relative z-10">
+        {/* ---- Header ---- */}
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
+          <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90 text-center">
+            HIGHLIGHTS
+          </h2>
+        </div>
 
-      {/* ---- Carousel ---- */}
-      <div
-        ref={scrollRef}
-        className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-5 sm:gap-6 px-4 sm:px-6 min-[1288px]:px-[calc((100vw-1240px)/2+24px)]"
-      >
-        {collections.map((col) => (
-          <Link
-            key={col.id}
-            href={`/collections/${col.slug}`}
-            className="group shrink-0 snap-start w-[78vw] max-w-[520px] sm:w-[520px] lg:w-[560px] outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded-2xl"
-          >
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition-all duration-300 group-hover:border-white/[0.18] group-hover:bg-white/[0.03]">
-              {/* Image */}
-              <FadeImage
-                src={col.coverImage || "/globe.svg"}
-                alt={col.name}
-                sizes="(max-width:640px) 78vw, (max-width:1024px) 520px, 560px"
-              />
+        {/* ---- Carousel ---- */}
+        <div
+          ref={scrollRef}
+          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-5 sm:gap-6 px-4 sm:px-6 min-[1288px]:px-[calc((100vw-1240px)/2+24px)]"
+        >
+          {collections.map((col) => (
+            <Link
+              key={col.id}
+              href={`/collections/${col.slug}`}
+              className="group shrink-0 snap-start w-[78vw] max-w-[520px] sm:w-[520px] lg:w-[560px] outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded-2xl"
+            >
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition-all duration-300 group-hover:border-white/[0.18] group-hover:bg-white/[0.03]">
+                {/* Image */}
+                <FadeImage
+                  src={col.coverImage || "/globe.svg"}
+                  alt={col.name}
+                  sizes="(max-width:640px) 78vw, (max-width:1024px) 520px, 560px"
+                />
 
-              {/* Gradient overlay for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+                {/* Gradient overlay for text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
 
-              {/* Centered text overlay */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-                <span className="text-[11px] font-mono uppercase tracking-[0.32em] text-white/50 mb-2">
-                  {col.tag}
-                </span>
-                <h3 className="text-[20px] sm:text-[24px] font-semibold tracking-[0.08em] uppercase text-white leading-tight">
-                  {col.name}
-                </h3>
-                {col.description && (
-                  <p className="mt-2 text-[13px] leading-relaxed text-white/60 line-clamp-2 max-w-[36ch]">
-                    {col.description}
-                  </p>
-                )}
+                {/* Centered text overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+                  <span className="text-[11px] font-mono uppercase tracking-[0.32em] text-white/50 mb-2">
+                    {col.tag}
+                  </span>
+                  <h3 className="text-[20px] sm:text-[24px] font-semibold tracking-[0.08em] uppercase text-white leading-tight">
+                    {col.name}
+                  </h3>
+                  {col.description && (
+                    <p className="mt-2 text-[13px] leading-relaxed text-white/60 line-clamp-2 max-w-[36ch]">
+                      {col.description}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
 
-        {/* trailing spacer */}
-        <div className="shrink-0 w-px" aria-hidden />
-      </div>
+          {/* trailing spacer */}
+          <div className="shrink-0 w-px" aria-hidden />
+        </div>
 
-      {/* ---- Progress indicator ---- */}
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-5">
-        <ScrollProgress scrollRef={scrollRef} />
+        {/* ---- Progress indicator ---- */}
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-5">
+          <ScrollProgress scrollRef={scrollRef} />
+        </div>
       </div>
     </section>
   );
