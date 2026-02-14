@@ -29,14 +29,12 @@ function FadeImage({
 
   return (
     <>
-      <div
-        className={`absolute inset-0 transition-opacity duration-300 ${
-          loaded ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
-      >
-        <div className="absolute inset-0 bg-white/[0.04]" />
-        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-      </div>
+      {!loaded && (
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-white/[0.04]" />
+          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        </div>
+      )}
 
       <Image
         src={src}
@@ -44,12 +42,10 @@ function FadeImage({
         fill
         sizes={sizes}
         priority={priority}
-        unoptimized
-        loading={priority ? undefined : "lazy"}
+        loading={priority ? "eager" : "lazy"}
+        quality={70}
         onLoad={() => setLoaded(true)}
-        className={`object-cover transition-opacity duration-300 ${
-          loaded ? "opacity-100" : "opacity-0"
-        }`}
+        className="object-cover"
       />
     </>
   );

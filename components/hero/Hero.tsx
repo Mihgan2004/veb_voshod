@@ -6,11 +6,16 @@ import { ASSETS } from "@/lib/assets";
 function Hero() {
   const [videoError, setVideoError] = useState(false);
   const [loadVideo, setLoadVideo] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   /* ---- Determine which video source to use based on viewport ---- */
   const [videoSrc, setVideoSrc] = useState<string>("");
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 640);
+  }, []);
 
   useEffect(() => {
     // Respect prefers-reduced-motion
@@ -72,9 +77,9 @@ function Hero() {
           poster={ASSETS.brand.logoDesktop}
           disablePictureInPicture
           disableRemotePlayback
-          className="absolute inset-0 w-full h-full object-cover z-0 [contain:paint]"
+          className="absolute inset-0 w-full h-full object-cover z-0"
           onError={() => setVideoError(true)}
-          style={{ filter: "contrast(1.05) saturate(0.85) brightness(0.65)" }}
+          style={isMobile ? undefined : { filter: "contrast(1.05) saturate(0.85) brightness(0.65)" }}
         />
       )}
 
