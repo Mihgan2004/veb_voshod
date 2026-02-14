@@ -52,15 +52,22 @@ export const TeeIntroBlock: React.FC = () => {
     let raf = 0;
     let lastP = 0.15;
 
+    let cachedStart = 0;
+    let cachedEnd = 0;
+    const updateCache = () => {
+      const vh = window.innerHeight;
+      cachedStart = el.offsetTop;
+      cachedEnd = cachedStart + el.offsetHeight - vh;
+    };
+
     const calc = () => {
       const vh = window.innerHeight;
-      const rect = el.getBoundingClientRect();
-      const start = rect.top + window.scrollY;
-      const end = start + el.offsetHeight - vh;
+      const start = cachedStart;
+      const end = cachedEnd;
       const y = window.scrollY;
       const t = (y - start) / Math.max(1, end - start);
       const rawP = clamp01(t);
-      const inViewport = rect.top < vh * 0.9;
+      const inViewport = y <= start + vh * 0.9;
       const effectiveP = inViewport && rawP < 0.1 ? Math.max(rawP, 0.15) : rawP;
       if (Math.abs(effectiveP - lastP) > 0.01) {
         lastP = effectiveP;
@@ -74,9 +81,13 @@ export const TeeIntroBlock: React.FC = () => {
       raf = requestAnimationFrame(calc);
     };
 
+    updateCache();
     calc();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', () => {
+      updateCache();
+      calc();
+    });
     return () => {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('scroll', onScroll);
@@ -97,7 +108,7 @@ export const TeeIntroBlock: React.FC = () => {
   const mkStyle = (enter: number, slideFrom = 28): React.CSSProperties => ({
     opacity: enter * fadeOut,
     transform: `translateY(${lerp(slideFrom, 0, enter)}px)`,
-    transition: 'opacity 0.1s, transform 0.1s',
+    /* Без transition — мгновенный отклик на скролл, без лагов */
     ...(animationsDisabled ? {} : { willChange: 'opacity, transform' }),
   });
 
@@ -140,7 +151,7 @@ export const TeeIntroBlock: React.FC = () => {
         }
       `}</style>
 
-      <div className="sticky top-0 min-h-[100vh] sm:min-h-screen overflow-hidden [contain:paint] [transform:translateZ(0)]">
+      <div className="sticky top-0 min-h-[100vh] sm:min-h-screen overflow-hidden" style={{ transform: 'translateZ(0)' }}>
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[#0B0D10]" />
           <div

@@ -15,7 +15,7 @@ function ProductCardInner({ product }: { product: Product }) {
     <Link
       href={`/product/${product.slug}`}
       prefetch={false}
-      className="group relative flex flex-col [content-visibility:auto] [contain-intrinsic-size:auto_280px]"
+      className="group relative flex flex-col"
     >
       {/* --- Изображение --- */}
       <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-white/[0.03] border border-white/[0.06] transition-[border-color] duration-200 sm:duration-300 group-hover:border-white/[0.14]">

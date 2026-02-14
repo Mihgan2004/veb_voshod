@@ -38,13 +38,13 @@ function Accordion({
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
-          className={`text-white/40 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          className={`text-white/40 sm:transition-transform sm:duration-300 ${open ? "rotate-180" : ""}`}
         >
           <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
       <div
-        className={`overflow-hidden transition-all duration-300 ${
+        className={`overflow-hidden sm:transition-all sm:duration-300 ${
           open ? "max-h-[500px] opacity-100 pb-5" : "max-h-0 opacity-0"
         }`}
       >

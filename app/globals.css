@@ -30,10 +30,7 @@ body {
   .welcome-mobile-height {
     height: 150vh !important;
   }
-  .vx-section-seams {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 350px;
-  }
+  /* content-visibility убрано — вызывает серые прямоугольники при быстром скролле */
   /* Сокращаем shimmer скелетона — меньше нагрузки при скролле */
   .animate-shimmer {
     animation-duration: 0.8s;

@@ -10,63 +10,71 @@ import {
 export * from "./types";
 export type { CatalogRepo } from "./repo";
 
-function withFallback(primary: CatalogRepo, fallback: CatalogRepo): CatalogRepo {
+/** При ошибке Directus возвращаем пустые данные (без mock) и пробрасываем ошибку вверх */
+function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
   return {
     async listCollections() {
       try {
         const res = await primary.listCollections();
-        return Array.isArray(res) ? res : await fallback.listCollections();
+        return Array.isArray(res) ? res : [];
       } catch (e) {
-        console.error("[catalog] listCollections failed, fallback to mock:", e);
-        return fallback.listCollections();
+        console.error("[catalog] listCollections failed:", e);
+        throw new CatalogUnavailableError();
       }
     },
     async listProducts() {
       try {
         const res = await primary.listProducts();
-        return Array.isArray(res) ? res : await fallback.listProducts();
+        return Array.isArray(res) ? res : [];
       } catch (e) {
-        console.error("[catalog] listProducts failed, fallback to mock:", e);
-        return fallback.listProducts();
+        console.error("[catalog] listProducts failed:", e);
+        throw new CatalogUnavailableError();
       }
     },
     async getCollectionBySlug(slug: string) {
       try {
         const res = await primary.getCollectionBySlug(slug);
-        return res ?? fallback.getCollectionBySlug(slug);
+        return res ?? null;
       } catch (e) {
-        console.error("[catalog] getCollectionBySlug failed, fallback:", e);
-        return fallback.getCollectionBySlug(slug);
+        console.error("[catalog] getCollectionBySlug failed:", e);
+        throw new CatalogUnavailableError();
       }
     },
     async getProductBySlug(slug: string) {
       try {
         const res = await primary.getProductBySlug(slug);
-        return res ?? fallback.getProductBySlug(slug);
+        return res ?? null;
       } catch (e) {
-        console.error("[catalog] getProductBySlug failed, fallback:", e);
-        return fallback.getProductBySlug(slug);
+        console.error("[catalog] getProductBySlug failed:", e);
+        throw new CatalogUnavailableError();
       }
     },
     async listProductsByCollectionId(collectionId: string) {
       try {
         const res = await primary.listProductsByCollectionId(collectionId);
-        return Array.isArray(res) ? res : await fallback.listProductsByCollectionId(collectionId);
+        return Array.isArray(res) ? res : [];
       } catch (e) {
-        console.error("[catalog] listProductsByCollectionId failed, fallback:", e);
-        return fallback.listProductsByCollectionId(collectionId);
+        console.error("[catalog] listProductsByCollectionId failed:", e);
+        throw new CatalogUnavailableError();
       }
     },
     async getProductsByCollectionId(collectionId: string) {
       try {
         const res = await primary.getProductsByCollectionId(collectionId);
-        return Array.isArray(res) ? res : await fallback.getProductsByCollectionId(collectionId);
+        return Array.isArray(res) ? res : [];
       } catch (e) {
-        console.error("[catalog] getProductsByCollectionId failed, fallback:", e);
-        return fallback.getProductsByCollectionId(collectionId);
+        console.error("[catalog] getProductsByCollectionId failed:", e);
+        throw new CatalogUnavailableError();
       }
     },
   };
+}
+
+export class CatalogUnavailableError extends Error {
+  constructor() {
+    super("Catalog unavailable");
+    this.name = "CatalogUnavailableError";
+  }
 }
 
 /** getCollectionBySlug: сначала статика (ссылки с главной), иначе Directus/mock */
@@ -81,7 +89,7 @@ function withStaticCollectionFallback(repo: CatalogRepo): CatalogRepo {
   };
 }
 
-/** Каталог: коллекции и товары из Directus при CATALOG_SOURCE=directus; иначе mock. Ссылки с главной (статика) резолвятся через getCollectionBySlug. */
+/** Каталог: коллекции и товары из Directus при CATALOG_SOURCE=directus; иначе mock. При ошибке Directus — throw CatalogUnavailableError. */
 function pickRepo(): CatalogRepo {
   const source = (
     process.env.CATALOG_SOURCE ??
@@ -97,7 +105,7 @@ function pickRepo(): CatalogRepo {
     const token = process.env.DIRECTUS_TOKEN;
     if (url) {
       const directus = createDirectusRepo({ url, token });
-      repo = withFallback(directus, mock);
+      repo = withErrorInsteadOfMock(directus);
     }
   }
 

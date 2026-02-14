@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ASSETS } from "@/lib/assets";
@@ -15,30 +15,76 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 export const WelcomeBlock: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const [p, setP] = useState(0);
-  const { compact, animationsDisabled, isMobile } = useHomeScrollCompact();
+  const welcomeRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const { compact, isMobile } = useHomeScrollCompact();
 
   useEffect(() => {
     if (compact) {
-      setP(1);
+      if (welcomeRef.current) {
+        welcomeRef.current.style.transform = "translateX(-50%) translateY(-50%) scale(0.78)";
+        welcomeRef.current.style.opacity = "0.35";
+      }
+      if (logoRef.current) {
+        logoRef.current.style.opacity = "1";
+        logoRef.current.style.transform = "translateY(0px)";
+      }
+      if (ctaRef.current) {
+        ctaRef.current.style.opacity = "1";
+        ctaRef.current.style.transform = "translateY(0px)";
+      }
       return;
     }
+
     const el = sectionRef.current;
-    if (!el) return;
+    if (!el || !welcomeRef.current || !logoRef.current || !ctaRef.current) return;
 
     let raf = 0;
-    let lastT = 0;
+    let cachedStart = 0;
+    let cachedEnd = 0;
+    let cacheValid = false;
+
+    const updateCache = () => {
+      const vh = window.innerHeight;
+      cachedStart = el.offsetTop;
+      cachedEnd = cachedStart + el.offsetHeight - vh;
+      cacheValid = true;
+    };
+
+    const applyP = (p: number) => {
+      const welcomeIn = smoothstep(0.05, 0.18, p);
+      const welcomeMove = smoothstep(0.18, 0.46, p);
+      const logoIn = smoothstep(0.4, 0.7, p);
+      const ctaIn = smoothstep(0.78, 0.96, p);
+
+      const welcomeTop = lerp(50, 16, welcomeMove);
+      const welcomeScale = lerp(1, 0.78, welcomeMove);
+      const welcomeOpacity = lerp(1, 0.35, welcomeMove) * welcomeIn;
+
+      welcomeRef.current!.style.top = `${welcomeTop}%`;
+      welcomeRef.current!.style.transform = `translateX(-50%) translateY(-50%) scale(${welcomeScale})`;
+      welcomeRef.current!.style.opacity = String(welcomeOpacity);
+
+      logoRef.current!.style.opacity = String(logoIn);
+      logoRef.current!.style.transform = `translateY(${lerp(12, 0, logoIn)}px)`;
+
+      ctaRef.current!.style.opacity = String(ctaIn);
+      ctaRef.current!.style.transform = `translateY(${lerp(16, 0, ctaIn)}px)`;
+    };
 
     const calc = () => {
       const vh = window.innerHeight;
-      const start = el.offsetTop;
-      const end = start + el.offsetHeight - vh;
-      const y = window.scrollY;
-      const t = clamp01((y - start) / Math.max(1, end - start));
-      if (Math.abs(t - lastT) > 0.008) {
-        lastT = t;
-        setP(t);
+      if (!cacheValid || el.offsetTop !== cachedStart) {
+        updateCache();
       }
+      if (cachedEnd <= cachedStart) {
+        raf = 0;
+        return;
+      }
+      const y = window.scrollY;
+      const p = clamp01((y - cachedStart) / (cachedEnd - cachedStart));
+      applyP(p);
       raf = 0;
     };
 
@@ -47,44 +93,35 @@ export const WelcomeBlock: React.FC = () => {
       raf = requestAnimationFrame(calc);
     };
 
-    calc();
+    const onResize = () => {
+      cacheValid = false;
+      calc();
+    };
+
+    updateCache();
+    applyP(0);
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
     return () => {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, [compact]);
 
-  // ФАЗЫ (регулируешь только числа)
-  const welcomeIn = smoothstep(0.05, 0.18, p);     // появление
-  const welcomeMove = smoothstep(0.18, 0.46, p);   // уход вверх + уменьшение
-
-  const logoIn = smoothstep(0.40, 0.70, p);        // лого в центре
-  const ctaIn = smoothstep(0.78, 0.96, p);         // кнопка в самом конце
-
-  // WELCOME: центр -> вверх
-  const welcomeTop = lerp(50, 16, welcomeMove);     // 50% -> 16% экрана
-  const welcomeScale = lerp(1, 0.78, welcomeMove);
-  const welcomeOpacity = lerp(1, 0.35, welcomeMove) * welcomeIn;
-
-  // LOGO: всегда центр
-  const logoOpacity = logoIn;
-
-  // CTA: низ экрана, появляется почти в финале
-  const ctaOpacity = ctaIn;
-  const ctaY = lerp(16, 0, ctaIn);
-
   return (
     <section
-      ref={sectionRef as any}
+      ref={sectionRef as React.RefObject<HTMLElement>}
       className="relative w-full bg-[#0B0D10] welcome-mobile-height"
       style={
-        compact ? { height: "100vh" } : isMobile ? undefined : { height: "300vh" }
+        compact
+          ? { height: "100vh" }
+          : isMobile
+            ? undefined
+            : { height: "300vh" }
       }
     >
-      <div className="sticky top-0 h-[100vh] overflow-hidden [contain:paint] [transform:translateZ(0)]">
+      <div className="sticky top-0 h-[100vh] overflow-hidden" style={{ transform: "translateZ(0)" }}>
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[#0B0D10]" />
           <div className="absolute inset-0 bg-[radial-gradient(1200px_520px_at_50%_0%,rgba(198,144,46,0.28),transparent_60%)]" />
@@ -95,13 +132,9 @@ export const WelcomeBlock: React.FC = () => {
         </div>
 
         <div
-          className="absolute left-1/2 top-0 flex justify-center text-center select-none w-full max-w-full"
-          style={{
-            top: `${welcomeTop}%`,
-            transform: `translateX(-50%) translateY(-50%) scale(${welcomeScale})`,
-            opacity: welcomeOpacity,
-            ...(animationsDisabled ? {} : { willChange: "transform, opacity" }),
-          }}
+          ref={welcomeRef}
+          className="absolute left-1/2 top-0 flex justify-center text-center select-none w-full max-w-full -translate-x-1/2 -translate-y-1/2"
+          style={{ top: "50%", willChange: "transform, opacity" }}
         >
           <div className="text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase">
             ДОБРО
@@ -112,12 +145,9 @@ export const WelcomeBlock: React.FC = () => {
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
+            ref={logoRef}
             className="flex flex-col items-center"
-            style={{
-              opacity: logoOpacity,
-              transform: `translateY(${lerp(12, 0, logoIn)}px)`,
-              ...(animationsDisabled ? {} : { willChange: "transform, opacity" }),
-            }}
+            style={{ willChange: "transform, opacity" }}
           >
             <Image
               src={ASSETS.brand.logoDesktop}
@@ -134,12 +164,9 @@ export const WelcomeBlock: React.FC = () => {
         </div>
 
         <div
+          ref={ctaRef}
           className="absolute inset-x-0 bottom-10 flex justify-center"
-          style={{
-            opacity: ctaOpacity,
-            transform: `translateY(${ctaY}px)`,
-            ...(animationsDisabled ? {} : { willChange: "transform, opacity" }),
-          }}
+          style={{ willChange: "transform, opacity" }}
         >
           <Link
             href="/catalog"
@@ -154,23 +181,17 @@ export const WelcomeBlock: React.FC = () => {
               text-[11px] md:text-xs
               uppercase tracking-[0.22em]
               text-[#F5F5F5]
-              transition-all duration-300
+              transition-colors duration-200
               hover:border-[#C6902E]/35 hover:bg-white/7
             "
           >
             <span className="relative">
               В КАТАЛОГ
-              <span className="absolute -bottom-2 left-0 h-px w-full bg-[#C6902E]/0 group-hover:bg-[#C6902E]/40 transition-all duration-300" />
+              <span className="absolute -bottom-2 left-0 h-px w-full bg-[#C6902E]/0 group-hover:bg-[#C6902E]/40 transition-colors duration-200" />
             </span>
           </Link>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (max-width: 768px) {
-          /* меньше подъем welcome и чуть меньше лого */
-        }
-      `}</style>
     </section>
   );
 };
