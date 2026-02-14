@@ -13,20 +13,18 @@ export const revalidate = 60;
 
 export default function HomePage() {
   return (
-    <HomeScrollProvider>
-      <div className="animate-fade-in">
-        <Hero />
+    <div className="animate-fade-in">
+      <Hero />
+      <HomeScrollProvider>
         <WelcomeBlock />
         <TeeIntroBlock />
+      </HomeScrollProvider>
 
-        {/* ---- Highlights: статичные карточки (Коллекция №1–3) ---- */}
-        <HighlightsCollections collections={STATIC_COLLECTIONS} />
+      {/* ---- Highlights и Lookbook вне scroll-context — не ре-рендерятся при скролле ---- */}
+      <HighlightsCollections collections={STATIC_COLLECTIONS} />
+      <LookbookSlider />
 
-        {/* ---- Lookbook: фото-слайдер ---- */}
-        <LookbookSlider />
-
-        <div className="h-4" />
-      </div>
-    </HomeScrollProvider>
+      <div className="h-4" />
+    </div>
   );
 }

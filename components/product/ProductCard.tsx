@@ -12,16 +12,21 @@ function ProductCardInner({ product }: { product: Product }) {
     "/globe.svg";
 
   return (
-    <Link href={`/product/${product.slug}`} prefetch={false} className="group relative flex flex-col">
+    <Link
+      href={`/product/${product.slug}`}
+      prefetch={false}
+      className="group relative flex flex-col [content-visibility:auto] [contain-intrinsic-size:auto_280px]"
+    >
       {/* --- Изображение --- */}
-      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-white/[0.03] border border-white/[0.06] transition-all duration-300 group-hover:border-white/[0.14]">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-white/[0.03] border border-white/[0.06] transition-[border-color] duration-200 sm:duration-300 group-hover:border-white/[0.14]">
         <Image
           src={src}
           alt={product.name}
           fill
           unoptimized={false}
           sizes="(max-width: 479px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover transition-all duration-500 group-hover:scale-[1.03]"
+          loading="lazy"
+          className="object-cover transition-transform duration-200 sm:duration-300 ease-out group-hover:scale-[1.02] sm:group-hover:scale-[1.03]"
         />
 
         {/* Статус-бейдж */}

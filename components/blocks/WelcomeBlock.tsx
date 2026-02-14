@@ -27,18 +27,23 @@ export const WelcomeBlock: React.FC = () => {
     if (!el) return;
 
     let raf = 0;
+    let lastT = 0;
 
     const calc = () => {
       const vh = window.innerHeight;
       const start = el.offsetTop;
       const end = start + el.offsetHeight - vh;
       const y = window.scrollY;
-      const t = (y - start) / Math.max(1, end - start);
-      setP(clamp01(t));
+      const t = clamp01((y - start) / Math.max(1, end - start));
+      if (Math.abs(t - lastT) > 0.008) {
+        lastT = t;
+        setP(t);
+      }
+      raf = 0;
     };
 
     const onScroll = () => {
-      cancelAnimationFrame(raf);
+      if (raf) return;
       raf = requestAnimationFrame(calc);
     };
 
@@ -46,7 +51,7 @@ export const WelcomeBlock: React.FC = () => {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
@@ -79,7 +84,7 @@ export const WelcomeBlock: React.FC = () => {
         compact ? { height: "100vh" } : isMobile ? undefined : { height: "300vh" }
       }
     >
-      <div className="sticky top-0 h-[100vh] overflow-hidden">
+      <div className="sticky top-0 h-[100vh] overflow-hidden [contain:paint] [transform:translateZ(0)]">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[#0B0D10]" />
           <div className="absolute inset-0 bg-[radial-gradient(1200px_520px_at_50%_0%,rgba(198,144,46,0.28),transparent_60%)]" />

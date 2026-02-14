@@ -34,6 +34,15 @@ body {
     content-visibility: auto;
     contain-intrinsic-size: auto 350px;
   }
+  /* Сокращаем shimmer скелетона — меньше нагрузки при скролле */
+  .animate-shimmer {
+    animation-duration: 0.8s;
+  }
+  /* feTurbulence в bg-noise дорог — на мобилке упрощаем */
+  .bg-noise {
+    background-image: none;
+    background-color: rgba(255,255,255,.02);
+  }
 }
 
 /* prefers-reduced-motion: отключаем тяжёлые анимации */
@@ -106,10 +115,9 @@ body {
     radial-gradient(900px 600px at 50% 120%,
       rgba(0,0,0,.72), transparent 58%),
     linear-gradient(180deg, #07090c 0%, #050607 55%, #07090c 100%);
-  /* НЕ overflow:hidden — иначе ломает sticky в WelcomeBlock/TeeIntroBlock */
 }
 
-/* Grain — грубее, контрастнее, но без "грязи" */
+/* Grain — на мобилке отключаем feTurbulence (очень дорого), используем простой паттерн */
 .vx-page-ambient::before {
   content: "";
   position: absolute;
@@ -119,6 +127,15 @@ body {
   opacity: .14;
   mix-blend-mode: soft-light;
   filter: contrast(135%);
+}
+
+@media (max-width: 768px) {
+  .vx-page-ambient::before {
+    /* feTurbulence убивает FPS — заменяем на статичный полупрозрачный слой */
+    background-image: none;
+    background-color: rgba(255,255,255,.02);
+    filter: none;
+  }
 }
 
 /* Редкие "пылинки" */

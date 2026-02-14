@@ -50,6 +50,7 @@ export const TeeIntroBlock: React.FC = () => {
     if (!el) return;
 
     let raf = 0;
+    let lastP = 0.15;
 
     const calc = () => {
       const vh = window.innerHeight;
@@ -61,11 +62,15 @@ export const TeeIntroBlock: React.FC = () => {
       const rawP = clamp01(t);
       const inViewport = rect.top < vh * 0.9;
       const effectiveP = inViewport && rawP < 0.1 ? Math.max(rawP, 0.15) : rawP;
-      setP(effectiveP);
+      if (Math.abs(effectiveP - lastP) > 0.01) {
+        lastP = effectiveP;
+        setP(effectiveP);
+      }
+      raf = 0;
     };
 
     const onScroll = () => {
-      cancelAnimationFrame(raf);
+      if (raf) return;
       raf = requestAnimationFrame(calc);
     };
 
@@ -73,7 +78,7 @@ export const TeeIntroBlock: React.FC = () => {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     return () => {
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
@@ -135,7 +140,7 @@ export const TeeIntroBlock: React.FC = () => {
         }
       `}</style>
 
-      <div className="sticky top-0 min-h-[100vh] sm:min-h-screen overflow-hidden">
+      <div className="sticky top-0 min-h-[100vh] sm:min-h-screen overflow-hidden [contain:paint] [transform:translateZ(0)]">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[#0B0D10]" />
           <div

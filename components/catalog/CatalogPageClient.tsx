@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useDeferredValue } from "react";
 import type { Product, Category } from "@/lib/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
 
@@ -20,19 +20,22 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
   const [queryDebounced, setQueryDebounced] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
 
+  const deferredCategory = useDeferredValue(category);
+  const deferredQuery = useDeferredValue(queryDebounced);
+
   useEffect(() => {
     const t = setTimeout(() => setQueryDebounced(queryInput.trim()), SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(t);
   }, [queryInput]);
 
   const filtered = useMemo(() => {
-    const q = queryDebounced.toLowerCase();
+    const q = deferredQuery.toLowerCase();
     return products.filter((p) => {
-      const okCategory = category === "all" ? true : p.category === category;
+      const okCategory = deferredCategory === "all" ? true : p.category === deferredCategory;
       const okQuery = q ? p.name.toLowerCase().includes(q) : true;
       return okCategory && okQuery;
     });
-  }, [products, queryDebounced, category]);
+  }, [products, deferredQuery, deferredCategory]);
 
   return (
     <div>
@@ -49,8 +52,8 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
 
       {/* Filters + search */}
       <div className="mb-10 sm:mb-12 space-y-4">
-        {/* Category pills — horizontal scroll on mobile */}
-        <div className="flex gap-2 sm:gap-2.5 overflow-x-auto scrollbar-none pb-0.5">
+        {/* Category pills — horizontal scroll on mobile, contain для плавности */}
+        <div className="flex gap-2 sm:gap-2.5 overflow-x-auto scrollbar-none pb-0.5 [contain:paint] [-webkit-overflow-scrolling:touch]">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.value}
@@ -75,7 +78,7 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
         />
       </div>
 
-      {/* Grid */}
+      {/* Grid — content-visibility на карточках снижает фризы при скролле */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-3 sm:gap-x-4 gap-y-6 sm:gap-y-8">
         {filtered.map((p) => (
           <ProductCard key={p.id} product={p} />

@@ -70,7 +70,9 @@ function Hero() {
           playsInline
           preload="none"
           poster={ASSETS.brand.logoDesktop}
-          className="absolute inset-0 w-full h-full object-cover z-0"
+          disablePictureInPicture
+          disableRemotePlayback
+          className="absolute inset-0 w-full h-full object-cover z-0 [contain:paint]"
           onError={() => setVideoError(true)}
           style={{ filter: "contrast(1.05) saturate(0.85) brightness(0.65)" }}
         />

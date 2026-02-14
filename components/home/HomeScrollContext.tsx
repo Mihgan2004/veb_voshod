@@ -34,18 +34,31 @@ export function HomeScrollProvider({ children }: { children: React.ReactNode }) 
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
   const lastUpdate = useRef(0);
+  const prevAnimDisabled = useRef(false);
+  const prevMobile = useRef(false);
 
   const update = useCallback(() => {
     if (typeof window === "undefined") return;
-    const now = Date.now();
     const isMobileNow = window.innerWidth <= MOBILE_MAX_WIDTH;
-    setIsMobile(isMobileNow);
 
     if (!isMobileNow) {
-      setAnimationsDisabled(false);
+      if (prevAnimDisabled.current) {
+        setAnimationsDisabled(false);
+        prevAnimDisabled.current = false;
+      }
+      if (prevMobile.current) {
+        setIsMobile(false);
+        prevMobile.current = false;
+      }
       lastScrollY.current = window.scrollY;
+      lastUpdate.current = Date.now();
       ticking.current = false;
       return;
+    }
+
+    if (!prevMobile.current) {
+      setIsMobile(true);
+      prevMobile.current = true;
     }
 
     const scrollY = window.scrollY;
@@ -57,11 +70,10 @@ export function HomeScrollProvider({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // Отключаем анимации, если пролистали вниз
-    if (scrollY > vh * ANIMATIONS_DISABLE_SCROLL_VH) {
-      setAnimationsDisabled(true);
-    } else {
-      setAnimationsDisabled(false);
+    const animDisabled = scrollY > vh * ANIMATIONS_DISABLE_SCROLL_VH;
+    if (animDisabled !== prevAnimDisabled.current) {
+      setAnimationsDisabled(animDisabled);
+      prevAnimDisabled.current = animDisabled;
     }
 
     if (scrollY + BOTTOM_THRESHOLD >= scrollHeight) {
@@ -73,13 +85,13 @@ export function HomeScrollProvider({ children }: { children: React.ReactNode }) 
     }
 
     lastScrollY.current = scrollY;
-    lastUpdate.current = now;
+    lastUpdate.current = Date.now();
     ticking.current = false;
   }, []);
 
   useEffect(() => {
-    // Throttle: не чаще 1 раз в 100ms для плавности и снижения нагрузки
-    const throttleMs = 100;
+    // Throttle: 150ms — меньше обновлений = плавнее скролл, меньше дёрганий
+    const throttleMs = 150;
     const onScroll = () => {
       if (ticking.current) return;
       ticking.current = true;
