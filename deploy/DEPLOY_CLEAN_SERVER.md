@@ -101,7 +101,7 @@ sudo apt install -y git
 sudo mkdir -p /home/ubuntu/voshod
 sudo chown ubuntu:ubuntu /home/ubuntu/voshod
 cd /home/ubuntu/voshod
-git clone https://github.com/ТВОЙ_USER/voshod-web.git
+git clone https://github.com/Mihgan2004/veb_voshod.git voshod-web
 cd voshod-web
 ```
 
