@@ -5,8 +5,11 @@ import Image from "next/image";
 import type { Product } from "@/lib/types";
 
 function ProductCardInner({ product }: { product: Product }) {
-  const src = product.imagePlaceholder || product.image || "/globe.svg";
-  const isRemote = /^https?:\/\//.test(src);
+  const src =
+    product.imagePlaceholder ||
+    (product.images?.length ? product.images[0] : null) ||
+    product.image ||
+    "/globe.svg";
 
   return (
     <Link href={`/product/${product.slug}`} prefetch={false} className="group relative flex flex-col">
@@ -16,7 +19,7 @@ function ProductCardInner({ product }: { product: Product }) {
           src={src}
           alt={product.name}
           fill
-          unoptimized={isRemote}
+          unoptimized={false}
           sizes="(max-width: 479px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-cover transition-all duration-500 group-hover:scale-[1.03]"
         />
@@ -29,8 +32,13 @@ function ProductCardInner({ product }: { product: Product }) {
         )}
       </div>
 
-      {/* --- Инфо под фото: название + цена --- */}
+      {/* --- Инфо под фото: цвет, название, цена --- */}
       <div className="mt-3 sm:mt-4 space-y-1">
+        {product.specs?.color && (
+          <span className="text-[10px] font-mono uppercase tracking-wider text-white/45">
+            {product.specs.color}
+          </span>
+        )}
         <h3 className="text-[13px] sm:text-[14px] font-medium leading-tight tracking-[0.01em] text-white/85 group-hover:text-white transition-colors duration-300 line-clamp-1">
           {product.name}
         </h3>

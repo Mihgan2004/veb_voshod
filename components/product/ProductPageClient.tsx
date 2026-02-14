@@ -98,15 +98,24 @@ function QuantitySelector({
 /*  Product page                                                       */
 /* ================================================================== */
 
+/** Все URL изображений товара: главное + галерея без дубликатов. */
+function productImageList(product: Product): string[] {
+  const main = product.image || product.imagePlaceholder;
+  const list = product.images?.length ? product.images : main ? [main] : [];
+  if (main && !list.includes(main)) return [main, ...list];
+  return list.length ? list : ["/globe.svg"];
+}
+
 export function ProductPageClient({ product }: { product: Product }) {
   const addToCart = useCart((s) => s.addToCart);
 
+  const imageList = productImageList(product);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? "ONE SIZE");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const src = product.image || product.imagePlaceholder || "/globe.svg";
-  const isRemote = /^https?:\/\//.test(src);
+  const src = imageList[selectedImageIndex] ?? product.image || "/globe.svg";
 
   const statusLabel =
     product.status === "available"
@@ -136,21 +145,49 @@ export function ProductPageClient({ product }: { product: Product }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
 
           {/* ============================================================ */}
-          {/*  LEFT: Image                                                  */}
+          {/*  LEFT: Gallery + main image                                   */}
           {/* ============================================================ */}
-          <div className="relative bg-white/[0.02] rounded-sm border border-white/[0.06] overflow-hidden aspect-[3/4] min-h-[400px] lg:min-h-[640px] lg:sticky lg:top-28">
-            <Image
-              src={src}
-              alt={product.name}
-              fill
-              unoptimized={isRemote}
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-            />
-            {/* Status badge */}
-            {product.status !== "available" && (
-              <div className="absolute top-0 left-0 px-3 py-1.5 bg-black/80 text-[10px] font-mono uppercase tracking-widest text-white/90">
-                {statusLabel}
+          <div className="lg:sticky lg:top-28 space-y-3">
+            <div className="relative bg-white/[0.02] rounded-sm border border-white/[0.06] overflow-hidden aspect-[3/4] min-h-[400px] lg:min-h-[640px]">
+              <Image
+                key={selectedImageIndex}
+                src={src}
+                alt={product.name}
+                fill
+                unoptimized={false}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+              {product.status !== "available" && (
+                <div className="absolute top-0 left-0 px-3 py-1.5 bg-black/80 text-[10px] font-mono uppercase tracking-widest text-white/90">
+                  {statusLabel}
+                </div>
+              )}
+            </div>
+            {imageList.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
+                {imageList.map((url, i) => {
+                  const active = i === selectedImageIndex;
+                  return (
+                    <button
+                      key={`${url}-${i}`}
+                      type="button"
+                      onClick={() => setSelectedImageIndex(i)}
+                      className={`relative shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                        active ? "border-white ring-1 ring-white/30" : "border-white/20 hover:border-white/40"
+                      }`}
+                    >
+                      <Image
+                        src={url}
+                        alt=""
+                        fill
+                        unoptimized={false}
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -172,8 +209,8 @@ export function ProductPageClient({ product }: { product: Product }) {
               {product.name}
             </h1>
 
-            {/* Price + status */}
-            <div className="mt-4 flex items-baseline gap-4">
+            {/* Price + status + артикул */}
+            <div className="mt-4 flex flex-wrap items-baseline gap-4">
               <span className="text-[22px] sm:text-[26px] font-bold text-white tabular-nums">
                 {product.price.toLocaleString("ru-RU")}&nbsp;₽
               </span>
@@ -182,9 +219,14 @@ export function ProductPageClient({ product }: { product: Product }) {
               }`}>
                 {statusLabel}
               </span>
+              {product.specs?.code && (
+                <span className="text-[11px] font-mono text-white/40 tracking-wider">
+                  Артикул: {product.specs.code}
+                </span>
+              )}
             </div>
 
-            {/* Short description (may be empty if Directus doesn't have this field) */}
+            {/* Описание товара */}
             {product.description ? (
               <p className="mt-5 text-[14px] leading-[1.7] text-white/55 max-w-[52ch]">
                 {product.description}

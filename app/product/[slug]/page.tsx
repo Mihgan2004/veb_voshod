@@ -4,6 +4,11 @@ import { ProductPageClient } from "@/components/product/ProductPageClient";
 
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  const products = await catalog.listProducts();
+  return products.map((p) => ({ slug: p.slug }));
+}
+
 export default async function ProductSlugPage({
   params,
 }: {

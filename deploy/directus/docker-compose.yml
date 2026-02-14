@@ -1,0 +1,60 @@
+# Directus + PostgreSQL для VOSKHOD
+# Запуск: cd deploy/directus && docker compose up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: directus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-directus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-directus}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - directus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U directus"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  directus:
+    image: directus/directus:11
+    container_name: directus
+    restart: unless-stopped
+    ports:
+      - "${DIRECTUS_PORT:-8055}:8055"
+    environment:
+      KEY: ${KEY}
+      SECRET: ${SECRET}
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB:-directus}
+      DB_USER: ${POSTGRES_USER:-directus}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      # Публичный URL — нужен для CORS и ссылок на файлы
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8055}
+      # Опционально: Redis для кэша (при 6+ ГБ RAM)
+      # CACHE_ENABLED: "true"
+      # CACHE_STORE: redis
+      # REDIS: redis://redis:6379
+    volumes:
+      - directus_uploads:/directus/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - directus-network
+
+volumes:
+  postgres_data:
+  directus_uploads:
+
+networks:
+  directus-network:
+    driver: bridge

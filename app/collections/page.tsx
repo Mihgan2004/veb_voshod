@@ -5,8 +5,10 @@ import { PageShell } from "@/components/site/PageShell";
 export const revalidate = 60;
 
 export default async function CollectionsPage() {
-  const collections = await catalog.listCollections();
-  const products = await catalog.listProducts();
+  const [collections, products] = await Promise.all([
+    catalog.listCollections(),
+    catalog.listProducts(),
+  ]);
 
   const countByCollection = new Map<string, number>();
   for (const p of products) {

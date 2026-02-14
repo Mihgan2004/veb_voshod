@@ -20,6 +20,18 @@ function assetUrl(base: string, file: unknown): string | undefined {
   return id ? `${base}/assets/${id}` : undefined;
 }
 
+/** Массив файлов из Directus (M2M или JSON) → массив URL. */
+function assetUrls(base: string, value: unknown): string[] {
+  if (!value) return [];
+  const arr = Array.isArray(value) ? value : [value];
+  const urls: string[] = [];
+  for (const item of arr) {
+    const url = assetUrl(base, item);
+    if (url) urls.push(url);
+  }
+  return urls;
+}
+
 function normalizeCollectionTag(v: unknown): Collection["tag"] {
   const raw = typeof v === "string" ? v : "";
   const upper = raw.toUpperCase();
@@ -64,14 +76,14 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
         name: unknown;
         description?: unknown;
         tag?: unknown;
-        coverImage?: unknown; // M2O -> directus_files
+        label?: unknown;
+        coverImage?: unknown;
         isFeatured?: unknown;
         sort?: unknown;
       };
 
-      // Важно: вытягиваем связи, но нам достаточно coverImage
       const res = await client.request<DirectusListResponse<Row>>(
-        `/items/${COLLECTIONS}?limit=-1&fields=id,slug,name,description,tag,coverImage,isFeatured,sort`
+        `/items/${COLLECTIONS}?limit=-1&fields=id,slug,name,description,tag,label,coverImage,isFeatured,sort`
       );
 
       return res.data
@@ -83,6 +95,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
 
           const tag = normalizeCollectionTag(r.tag);
           const description = typeof r.description === "string" ? r.description : undefined;
+          const label = typeof r.label === "string" ? r.label : undefined;
           const coverImage = assetUrl(client.base, r.coverImage);
           const isFeatured = Boolean(r.isFeatured);
           const sortRaw = r.sort;
@@ -99,6 +112,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
             name,
             description,
             tag,
+            label,
             coverImage,
             isFeatured,
             sort,
@@ -112,22 +126,26 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
         id: unknown;
         slug: unknown;
         name: unknown;
+        description?: unknown;
         price: unknown;
-
-        category?: unknown; // M2O -> categories (нам нужен slug)
-        collection?: unknown; // M2O -> collections (нам нужен id)
-        image?: unknown; // M2O -> directus_files
-
+        category?: unknown;
+        collection?: unknown;
+        image?: unknown;
+        /** Галерея: M2M к directus_files — в API массив объектов с id */
+        images?: unknown;
         sizes?: unknown;
         inStock?: unknown;
         code?: unknown;
         batch?: unknown;
         isFeatured?: unknown;
+        color?: unknown;
+        fabric?: unknown;
+        density?: unknown;
+        print?: unknown;
       };
 
-      // Поля строго по схеме Directus (description и imagePlaceholder нет в Products)
       const res = await client.request<DirectusListResponse<Row>>(
-        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,price,image,sizes,inStock,code,batch,isFeatured,category.slug,collection.id`
+        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images.id,sizes,inStock,code,batch,isFeatured,color,fabric,density,print,category.slug,collection.id`
       );
 
       return res.data
@@ -147,22 +165,33 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
           const isFeatured = Boolean(r.isFeatured);
           const status: Product["status"] = inStock ? "available" : "sold_out";
 
+          const mainImage = assetUrl(client.base, r.image);
+          const galleryUrls = assetUrls(client.base, r.images);
+          const allImages = mainImage
+            ? [mainImage, ...galleryUrls.filter((u) => u !== mainImage)]
+            : galleryUrls;
+
           return {
             id,
             slug,
             name,
             price: Number.isFinite(priceNum) ? priceNum : 0,
-            description: "",
+            description: typeof r.description === "string" ? r.description : "",
             category: normalizeCategorySlug(r.category),
             sizes,
             inStock,
             isFeatured,
             status,
-            image: assetUrl(client.base, r.image) ?? "",
+            image: mainImage ?? galleryUrls[0] ?? "",
+            images: allImages.length > 0 ? allImages : undefined,
             collectionId: toId(r.collection),
             specs: {
               code: typeof r.code === "string" ? r.code : undefined,
               batch: typeof r.batch === "string" ? r.batch : undefined,
+              fabric: typeof r.fabric === "string" ? r.fabric : undefined,
+              density: typeof r.density === "string" ? r.density : undefined,
+              print: typeof r.print === "string" ? r.print : undefined,
+              color: typeof r.color === "string" ? r.color : undefined,
             },
           };
         })

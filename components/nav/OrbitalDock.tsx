@@ -108,7 +108,7 @@ export const OrbitalDock: React.FC = () => {
             </div>
 
             {/* Time + Cart (desktop) */}
-            <div className="hidden sm:flex items-center gap-3 text-[11px] font-mono text-gray-400 z-10">
+            <div className="hidden md:flex items-center gap-3 text-[11px] font-mono text-gray-400 z-10">
               {time ? (
                 <span className="border-r border-white/10 pr-3" suppressHydrationWarning>
                   MSC {time}
@@ -118,6 +118,24 @@ export const OrbitalDock: React.FC = () => {
                 CART <span className="text-white">[{cartCount}]</span>
               </Link>
             </div>
+
+            {/* Mobile: иконка корзины с бейджем (видна при добавлении товара) */}
+            <Link
+              href="/cart"
+              aria-label={`Корзина${cartCount > 0 ? `, товаров: ${cartCount}` : ""}`}
+              className="md:hidden relative shrink-0 w-9 h-9 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/[0.06] transition-all duration-200 z-10"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                <path d="M3 6h18" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              {cartCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-gold text-graphite text-[10px] font-bold tabular-nums">
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
+            </Link>
 
             {/* Burger button */}
             <button

@@ -19,7 +19,7 @@ function FadeImage({
   sizes: string;
 }) {
   const [loaded, setLoaded] = useState(false);
-  const isRemote = /^https?:\/\//.test(src);
+  // Next.js оптимизирует изображения из remotePatterns (admin.voshod.shop, picsum.photos)
 
   return (
     <>
@@ -37,7 +37,7 @@ function FadeImage({
         src={src}
         alt={alt}
         fill
-        unoptimized={isRemote}
+        unoptimized={false}
         sizes={sizes}
         onLoad={() => setLoaded(true)}
         className={`object-cover transition-opacity duration-300 ${

@@ -8,6 +8,11 @@ import { PageShell } from "@/components/site/PageShell";
 
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  const collections = await catalog.listCollections();
+  return collections.map((c) => ({ slug: c.slug }));
+}
+
 export default async function CollectionPage({
   params,
 }: {
