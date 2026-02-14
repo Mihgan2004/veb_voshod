@@ -26,6 +26,18 @@ function FadeImage({
   priority?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  if (error) {
+    return (
+      <div
+        className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[0.06] to-white/[0.02]"
+        aria-hidden
+      >
+        <span className="text-[10px] font-mono text-white/25 uppercase">VOSHOD</span>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -45,6 +57,7 @@ function FadeImage({
         loading={priority ? "eager" : "lazy"}
         quality={70}
         onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
         className="object-cover"
       />
     </>
@@ -196,7 +209,7 @@ export function LookbookSlider() {
     <section className="vx-section-seams py-16 sm:py-20">
       <div className="relative z-10">
         {/* ---- Header + Arrows ---- */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 flex items-end justify-between">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 flex items-end justify-between opacity-0 md:opacity-100 animate-mobile-enter">
           <div>
             <span className="text-[11px] font-mono uppercase tracking-[0.32em] block mb-1.5 bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
               @VOSHOD
@@ -215,7 +228,7 @@ export function LookbookSlider() {
         {/* ---- Photo strip (seamless / слитные фото) ---- */}
         <div
           ref={scrollRef}
-          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory"
+          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {LOOKBOOK_IMAGES.map((src, i) => (
             <div

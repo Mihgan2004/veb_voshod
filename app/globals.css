@@ -22,14 +22,22 @@ body {
   touch-action: pan-y;
 }
 
-/* На мобилке TeeIntroBlock и WelcomeBlock — меньше скролла, сразу 100vh (до гидрации) */
+/* На мобилке TeeIntroBlock и WelcomeBlock — без скролла, 100vh (до гидрации) */
+/* Мобильные анимации появления для секций */
 @media (max-width: 768px) {
   .tee-intro-mobile-height {
     height: 100vh !important;
   }
   .welcome-mobile-height {
-    height: 150vh !important;
+    height: 100vh !important;
   }
+  .animate-mobile-enter {
+    animation: mobileEnter 0.5s ease-out forwards;
+    animation-fill-mode: both;
+  }
+  .animate-mobile-enter-delay-1 { animation-delay: 0.08s; }
+  .animate-mobile-enter-delay-2 { animation-delay: 0.16s; }
+  .animate-mobile-enter-delay-3 { animation-delay: 0.24s; }
 }
 
 /* prefers-reduced-motion: отключаем тяжёлые анимации */
@@ -291,5 +299,16 @@ body {
   100% {
     opacity: 1;
     transform: scale(1) rotate(-12deg);
+  }
+}
+
+@keyframes mobileEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -5,6 +5,37 @@ import Link from 'next/link';
 import { ASSETS } from '@/lib/assets';
 import { useHomeScrollCompact } from '@/components/home/HomeScrollContext';
 
+// ========== ПЕЧАТНАЯ МАШИНКА ==========
+const TYPEWRITER_TEXT = '// PROJECT VOSKHOD / DROP';
+const TYPEWRITER_MS = 55;
+
+function TypewriterLine({ disabled }: { disabled: boolean }) {
+  const [visible, setVisible] = useState(0);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (disabled) return;
+    if (visible >= TYPEWRITER_TEXT.length) {
+      setDone(true);
+      return;
+    }
+    const t = setTimeout(() => setVisible((v) => v + 1), TYPEWRITER_MS);
+    return () => clearTimeout(t);
+  }, [visible, disabled]);
+
+  if (disabled) return <>{TYPEWRITER_TEXT}</>;
+
+  return (
+    <>
+      {TYPEWRITER_TEXT.slice(0, visible)}
+      <span
+        className="inline-block w-[6px] h-[1.1em] bg-white/40 ml-1 align-middle"
+        style={{ animation: done ? 'teeCursorBlink 1.1s step-end infinite' : 'none' }}
+      />
+    </>
+  );
+}
+
 // ========== НАСТРОЙКИ РАЗМЕРОВ ==========
 const TEE_INTRO = {
   mobile: {
@@ -81,17 +112,18 @@ export const TeeIntroBlock: React.FC = () => {
       raf = requestAnimationFrame(calc);
     };
 
+    const onResize = () => {
+      updateCache();
+      calc();
+    };
     updateCache();
     calc();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', () => {
-      updateCache();
-      calc();
-    });
+    window.addEventListener('resize', onResize);
     return () => {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
     };
   }, [effectiveCompact]);
 
@@ -239,18 +271,12 @@ export const TeeIntroBlock: React.FC = () => {
 
               {/* ===== Контент с staggered entrance ===== */}
               <div className="relative z-10">
-                {/* // COMMENT — с мигающим курсором */}
+                {/* // COMMENT — печатная машинка + мигающий курсор */}
                 <div
                   className="text-[10px] sm:text-xs font-mono tracking-widest text-white/40 mb-2 sm:mb-3"
                   style={mkStyle(e0, 20)}
                 >
-                  {'// PROJECT VOSKHOD / DROP'}
-                  {!animationsDisabled && (
-                    <span
-                      className="inline-block w-[6px] h-[1.1em] bg-white/40 ml-1 align-middle"
-                      style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }}
-                    />
-                  )}
+                  <TypewriterLine disabled={animationsDisabled} />
                 </div>
 
                 {/* Заголовок */}

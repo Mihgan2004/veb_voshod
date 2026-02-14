@@ -19,6 +19,18 @@ function FadeImage({
   sizes: string;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  if (error) {
+    return (
+      <div
+        className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[0.06] to-white/[0.02]"
+        aria-hidden
+      >
+        <span className="text-[10px] font-mono text-white/25 uppercase">VOSHOD</span>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -35,6 +47,7 @@ function FadeImage({
         fill
         sizes={sizes}
         onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
         className="object-cover"
       />
     </>
@@ -108,7 +121,7 @@ export function HighlightsCollections({
     <section className="vx-section-seams py-16 sm:py-20">
       <div className="relative z-10">
         {/* ---- Header ---- */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 opacity-0 md:opacity-100 animate-mobile-enter">
           <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90 text-center">
             КОЛЛЕКЦИИ
           </h2>
@@ -117,7 +130,7 @@ export function HighlightsCollections({
         {/* ---- Carousel ---- */}
         <div
           ref={scrollRef}
-          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-5 sm:gap-6 px-4 sm:px-6 min-[1288px]:px-[calc((100vw-1240px)/2+24px)]"
+          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-5 sm:gap-6 px-4 sm:px-6 min-[1288px]:px-[calc((100vw-1240px)/2+24px)] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {collections.map((col) => (
             <Link

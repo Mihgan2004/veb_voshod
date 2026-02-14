@@ -20,19 +20,53 @@ export const WelcomeBlock: React.FC = () => {
   const ctaRef = useRef<HTMLDivElement>(null);
   const { compact, isMobile } = useHomeScrollCompact();
 
+  /* На мобилке — без скролла, только анимация появления */
+  const noScroll = isMobile;
+
   useEffect(() => {
+    if (noScroll) {
+      /* Мобильная анимация появления: staggered fade-in + slide-up */
+      const els = [welcomeRef.current, logoRef.current, ctaRef.current];
+      const delays = [0, 180, 360];
+      const fromY = [28, 20, 24];
+      els.forEach((el, i) => {
+        if (!el) return;
+        el.style.opacity = "0";
+        el.style.transform = el === welcomeRef.current
+          ? "translateX(-50%) translateY(calc(-50% + 28px))"
+          : `translateY(${fromY[i]}px)`;
+      });
+      const t = setTimeout(() => {
+        els.forEach((el, i) => {
+          if (!el) return;
+          el.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+          setTimeout(() => {
+            if (!el) return;
+            el.style.opacity = "1";
+            el.style.transform = el === welcomeRef.current
+              ? "translateX(-50%) translateY(-50%)"
+              : "translateY(0)";
+          }, delays[i]);
+        });
+      }, 80);
+      return () => clearTimeout(t);
+    }
+
     if (compact) {
       if (welcomeRef.current) {
         welcomeRef.current.style.transform = "translateX(-50%) translateY(-50%) scale(0.78)";
         welcomeRef.current.style.opacity = "0.35";
+        welcomeRef.current.style.transition = "";
       }
       if (logoRef.current) {
         logoRef.current.style.opacity = "1";
         logoRef.current.style.transform = "translateY(0px)";
+        logoRef.current.style.transition = "";
       }
       if (ctaRef.current) {
         ctaRef.current.style.opacity = "1";
         ctaRef.current.style.transform = "translateY(0px)";
+        ctaRef.current.style.transition = "";
       }
       return;
     }
@@ -62,13 +96,16 @@ export const WelcomeBlock: React.FC = () => {
       const welcomeScale = lerp(1, 0.78, welcomeMove);
       const welcomeOpacity = lerp(1, 0.35, welcomeMove) * welcomeIn;
 
+      welcomeRef.current!.style.transition = "";
       welcomeRef.current!.style.top = `${welcomeTop}%`;
       welcomeRef.current!.style.transform = `translateX(-50%) translateY(-50%) scale(${welcomeScale})`;
       welcomeRef.current!.style.opacity = String(welcomeOpacity);
 
+      logoRef.current!.style.transition = "";
       logoRef.current!.style.opacity = String(logoIn);
       logoRef.current!.style.transform = `translateY(${lerp(12, 0, logoIn)}px)`;
 
+      ctaRef.current!.style.transition = "";
       ctaRef.current!.style.opacity = String(ctaIn);
       ctaRef.current!.style.transform = `translateY(${lerp(16, 0, ctaIn)}px)`;
     };
@@ -107,21 +144,22 @@ export const WelcomeBlock: React.FC = () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, [compact]);
+  }, [compact, noScroll]);
 
   return (
     <section
       ref={sectionRef as React.RefObject<HTMLElement>}
       className="relative w-full bg-[#0B0D10] welcome-mobile-height"
       style={
-        compact
+        noScroll || compact
           ? { height: "100vh" }
-          : isMobile
-            ? undefined
-            : { height: "300vh" }
+          : { height: "300vh" }
       }
     >
-      <div className="sticky top-0 h-[100vh] overflow-hidden" style={{ transform: "translateZ(0)" }}>
+      <div
+        className="sticky top-0 h-[100svh] overflow-hidden"
+        style={isMobile ? undefined : { transform: "translateZ(0)" }}
+      >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[#0B0D10]" />
           <div className="absolute inset-0 bg-[radial-gradient(1200px_520px_at_50%_0%,rgba(198,144,46,0.28),transparent_60%)]" />
