@@ -152,7 +152,34 @@ sudo systemctl reload nginx
 
 ---
 
-## 5. Полезные команды
+## 5. Обновление проекта (учёт локальных правок на сервере)
+
+Если вносил правки на сервере, перед обновлением:
+
+```bash
+# Сохранить локальные правки (если нужны)
+git stash push -m "server edits"
+
+# Подтянуть из репо
+git pull origin main
+
+# Сборка
+npm install   # или npm ci, если lock file синхронизирован
+npm run build
+pm2 restart voshod-web
+```
+
+Или сбросить локальные правки и взять версию из репо:
+
+```bash
+git fetch origin
+git reset --hard origin/main
+npm install && npm run build && pm2 restart voshod-web
+```
+
+---
+
+## 6. Полезные команды
 
 | Действие | Команда |
 |----------|---------|
@@ -160,11 +187,11 @@ sudo systemctl reload nginx
 | Перезапуск Next.js | `pm2 restart voshod-web` |
 | Статус Directus | `cd deploy/directus && docker compose ps` |
 | Логи Directus | `docker compose logs -f directus` |
-| Обновление Next.js | `git pull && npm ci && npm run build && pm2 restart voshod-web` |
+| Обновление (без локальных правок) | `git reset --hard origin/main && npm install && npm run build && pm2 restart voshod-web` |
 
 ---
 
-## 6. Структура портов
+## 7. Структура портов
 
 | Сервис | Порт | Внутренний адрес |
 |--------|------|------------------|
@@ -174,7 +201,7 @@ sudo systemctl reload nginx
 
 ---
 
-## 7. Бэкапы Directus
+## 8. Бэкапы Directus
 
 ```bash
 # Бэкап PostgreSQL

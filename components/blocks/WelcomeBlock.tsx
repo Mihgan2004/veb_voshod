@@ -16,7 +16,7 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const WelcomeBlock: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [p, setP] = useState(0);
-  const { compact } = useHomeScrollCompact();
+  const { compact, animationsDisabled, isMobile } = useHomeScrollCompact();
 
   useEffect(() => {
     if (compact) {
@@ -74,8 +74,10 @@ export const WelcomeBlock: React.FC = () => {
   return (
     <section
       ref={sectionRef as any}
-      className="relative w-full bg-[#0B0D10]"
-      style={{ height: compact ? "100vh" : "300vh" }}
+      className="relative w-full bg-[#0B0D10] welcome-mobile-height"
+      style={
+        compact ? { height: "100vh" } : isMobile ? undefined : { height: "300vh" }
+      }
     >
       <div className="sticky top-0 h-[100vh] overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
@@ -93,7 +95,7 @@ export const WelcomeBlock: React.FC = () => {
             top: `${welcomeTop}%`,
             transform: `translateX(-50%) translateY(-50%) scale(${welcomeScale})`,
             opacity: welcomeOpacity,
-            willChange: "transform, opacity",
+            ...(animationsDisabled ? {} : { willChange: "transform, opacity" }),
           }}
         >
           <div className="text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase">
@@ -109,7 +111,7 @@ export const WelcomeBlock: React.FC = () => {
             style={{
               opacity: logoOpacity,
               transform: `translateY(${lerp(12, 0, logoIn)}px)`,
-              willChange: "transform, opacity",
+              ...(animationsDisabled ? {} : { willChange: "transform, opacity" }),
             }}
           >
             <Image
@@ -131,7 +133,7 @@ export const WelcomeBlock: React.FC = () => {
           style={{
             opacity: ctaOpacity,
             transform: `translateY(${ctaY}px)`,
-            willChange: "transform, opacity",
+            ...(animationsDisabled ? {} : { willChange: "transform, opacity" }),
           }}
         >
           <Link

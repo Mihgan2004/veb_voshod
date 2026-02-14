@@ -28,8 +28,9 @@ export function createDirectusClient({
     if (token) headers.set("Authorization", `Bearer ${token}`);
 
     const isGet = method === "GET";
+    const { next: _initNext, ...restInit } = init ?? {};
     const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
-      ...init,
+      ...restInit,
       headers,
       ...(isGet
         ? { next: { revalidate } }

@@ -58,6 +58,7 @@ function ScrollProgress({
   scrollRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const [thumb, setThumb] = useState({ w: 30, x: 0 });
+  const rafRef = useRef<number | null>(null);
 
   const sync = useCallback(() => {
     const el = scrollRef.current;
@@ -68,17 +69,26 @@ function ScrollProgress({
     setThumb({ w, x: pos * (100 - w) });
   }, [scrollRef]);
 
+  const throttledSync = useCallback(() => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      sync();
+      rafRef.current = null;
+    });
+  }, [sync]);
+
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     sync();
-    el.addEventListener("scroll", sync, { passive: true });
+    el.addEventListener("scroll", throttledSync, { passive: true });
     window.addEventListener("resize", sync);
     return () => {
-      el.removeEventListener("scroll", sync);
+      el.removeEventListener("scroll", throttledSync);
       window.removeEventListener("resize", sync);
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [sync, scrollRef]);
+  }, [sync, throttledSync, scrollRef]);
 
   return (
     <div className="h-[2px] bg-white/10 rounded-full overflow-hidden">

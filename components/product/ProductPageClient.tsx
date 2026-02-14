@@ -115,7 +115,7 @@ export function ProductPageClient({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const src = imageList[selectedImageIndex] ?? product.image || "/globe.svg";
+  const src = (imageList[selectedImageIndex] ?? product.image) || "/globe.svg";
 
   const statusLabel =
     product.status === "available"

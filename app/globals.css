@@ -5,15 +5,46 @@
   color-scheme: dark;
 }
 
-html,
-body {
+html {
   height: 100%;
+  /* Снижаем «галлюцинации» при быстром скролле на мобилке */
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
+  height: 100%;
   margin: 0;
   background: #0b0d10;
   color: rgba(255, 255, 255, 0.92);
+  /* Оптимизация touch-скролла на мобилке */
+  touch-action: pan-y;
+}
+
+/* На мобилке TeeIntroBlock и WelcomeBlock — меньше скролла, сразу 100vh (до гидрации) */
+@media (max-width: 768px) {
+  .tee-intro-mobile-height {
+    height: 100vh !important;
+  }
+  .welcome-mobile-height {
+    height: 150vh !important;
+  }
+  .vx-section-seams {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 350px;
+  }
+}
+
+/* prefers-reduced-motion: отключаем тяжёлые анимации */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* анимации как в прошлом проекте */

@@ -65,6 +65,7 @@ function ScrollProgress({
   scrollRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const [thumb, setThumb] = useState({ w: 30, x: 0 });
+  const rafRef = useRef<number | null>(null);
 
   const sync = useCallback(() => {
     const el = scrollRef.current;
@@ -75,17 +76,26 @@ function ScrollProgress({
     setThumb({ w, x: pos * (100 - w) });
   }, [scrollRef]);
 
+  const throttledSync = useCallback(() => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      sync();
+      rafRef.current = null;
+    });
+  }, [sync]);
+
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     sync();
-    el.addEventListener("scroll", sync, { passive: true });
+    el.addEventListener("scroll", throttledSync, { passive: true });
     window.addEventListener("resize", sync);
     return () => {
-      el.removeEventListener("scroll", sync);
+      el.removeEventListener("scroll", throttledSync);
       window.removeEventListener("resize", sync);
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [sync, scrollRef]);
+  }, [sync, throttledSync, scrollRef]);
 
   return (
     <div className="h-[2px] bg-white/10 rounded-full overflow-hidden">
@@ -146,7 +156,7 @@ export function LookbookSlider() {
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
 
-  /* ---- Sync arrow states ---- */
+  /* ---- Sync arrow states (throttled for mobile) ---- */
   const syncArrows = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -154,17 +164,27 @@ export function LookbookSlider() {
     setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
   }, []);
 
+  const rafArrows = useRef<number | null>(null);
+  const throttledSyncArrows = useCallback(() => {
+    if (rafArrows.current != null) return;
+    rafArrows.current = requestAnimationFrame(() => {
+      syncArrows();
+      rafArrows.current = null;
+    });
+  }, [syncArrows]);
+
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     syncArrows();
-    el.addEventListener("scroll", syncArrows, { passive: true });
+    el.addEventListener("scroll", throttledSyncArrows, { passive: true });
     window.addEventListener("resize", syncArrows);
     return () => {
-      el.removeEventListener("scroll", syncArrows);
+      el.removeEventListener("scroll", throttledSyncArrows);
       window.removeEventListener("resize", syncArrows);
+      if (rafArrows.current != null) cancelAnimationFrame(rafArrows.current);
     };
-  }, [syncArrows]);
+  }, [syncArrows, throttledSyncArrows]);
 
   /* ---- Scroll by one frame ---- */
   const scroll = (dir: 1 | -1) => {

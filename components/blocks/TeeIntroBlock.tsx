@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ASSETS } from '@/lib/assets';
 import { useHomeScrollCompact } from '@/components/home/HomeScrollContext';
@@ -36,10 +35,14 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const TeeIntroBlock: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [p, setP] = useState(0.15);
-  const { compact } = useHomeScrollCompact();
+  const { compact, animationsDisabled, isMobile } = useHomeScrollCompact();
+
+  // На мобилке — убираем scroll-through, используем статичное состояние
+  const noScrollOnMobile = isMobile;
+  const effectiveCompact = compact || noScrollOnMobile;
 
   useEffect(() => {
-    if (compact) {
+    if (effectiveCompact) {
       setP(0.85);
       return;
     }
@@ -74,7 +77,7 @@ export const TeeIntroBlock: React.FC = () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, [compact]);
+  }, [effectiveCompact]);
 
   const out = smoothstep(0.78, 0.98, p);
   const fadeOut = lerp(1, 0.35, out);
@@ -89,15 +92,19 @@ export const TeeIntroBlock: React.FC = () => {
   const mkStyle = (enter: number, slideFrom = 28): React.CSSProperties => ({
     opacity: enter * fadeOut,
     transform: `translateY(${lerp(slideFrom, 0, enter)}px)`,
-    willChange: 'opacity, transform',
     transition: 'opacity 0.1s, transform 0.1s',
+    ...(animationsDisabled ? {} : { willChange: 'opacity, transform' }),
   });
 
   return (
     <section
       ref={sectionRef}
-      className="relative w-full border-t border-white/5"
-      style={{ height: compact ? '100vh' : '220vh' }}
+      className="relative w-full border-t border-white/5 tee-intro-mobile-height"
+      style={
+        isMobile
+          ? undefined
+          : { height: effectiveCompact ? '100vh' : '220vh' }
+      }
     >
       {/* Keyframes */}
       <style>{`
@@ -166,16 +173,15 @@ export const TeeIntroBlock: React.FC = () => {
             <div className="col-span-12 md:col-span-8 order-2 md:order-none flex flex-col justify-center items-center md:items-start -mt-10 sm:-mt-4 md:mt-0 pt-0 pb-6 sm:py-0 relative">
               {/* === Мобильный градиент: многослойный, анимированный === */}
 
-              {/* Слой 1 — основной радиальный градиент с дыханием */}
+              {/* Слой 1 — основной радиальный градиент с дыханием (на мобилке при скролле — без анимации и с меньшим blur) */}
               <div
                 className="absolute md:hidden pointer-events-none"
                 style={{
                   inset: '-35% -25% -20% -25%',
                   background:
                     'radial-gradient(ellipse 88% 72% at 50% 36%, rgba(11,13,16,0.97) 0%, rgba(11,13,16,0.88) 25%, rgba(11,13,16,0.55) 50%, rgba(11,13,16,0.18) 72%, transparent 92%)',
-                  filter: 'blur(24px)',
-                  animation: 'teeGlowBreathe 7s ease-in-out infinite',
-                  willChange: 'opacity, transform',
+                  filter: animationsDisabled ? 'blur(12px)' : 'blur(24px)',
+                  animation: animationsDisabled ? 'none' : 'teeGlowBreathe 7s ease-in-out infinite',
                 }}
                 aria-hidden
               />
@@ -187,9 +193,8 @@ export const TeeIntroBlock: React.FC = () => {
                   inset: '-15% -12% -8% -12%',
                   background:
                     'radial-gradient(ellipse 55% 40% at 52% 28%, rgba(198,144,46,0.08) 0%, rgba(198,144,46,0.03) 45%, transparent 75%)',
-                  filter: 'blur(32px)',
-                  animation: 'teeGoldShimmer 9s ease-in-out infinite',
-                  willChange: 'opacity, transform',
+                  filter: animationsDisabled ? 'blur(16px)' : 'blur(32px)',
+                  animation: animationsDisabled ? 'none' : 'teeGoldShimmer 9s ease-in-out infinite',
                 }}
                 aria-hidden
               />
@@ -201,9 +206,8 @@ export const TeeIntroBlock: React.FC = () => {
                   inset: '-10% -8% -5% -8%',
                   background:
                     'radial-gradient(ellipse 95% 85% at 50% 45%, transparent 30%, rgba(11,13,16,0.4) 65%, rgba(11,13,16,0.7) 90%)',
-                  filter: 'blur(14px)',
-                  animation: 'teeVignettePulse 11s ease-in-out infinite',
-                  willChange: 'opacity',
+                  filter: animationsDisabled ? 'blur(8px)' : 'blur(14px)',
+                  animation: animationsDisabled ? 'none' : 'teeVignettePulse 11s ease-in-out infinite',
                 }}
                 aria-hidden
               />
@@ -225,10 +229,12 @@ export const TeeIntroBlock: React.FC = () => {
                   style={mkStyle(e0, 20)}
                 >
                   {'// PROJECT VOSKHOD / DROP'}
-                  <span
-                    className="inline-block w-[6px] h-[1.1em] bg-white/40 ml-1 align-middle"
-                    style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }}
-                  />
+                  {!animationsDisabled && (
+                    <span
+                      className="inline-block w-[6px] h-[1.1em] bg-white/40 ml-1 align-middle"
+                      style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }}
+                    />
+                  )}
                 </div>
 
                 {/* Заголовок */}
@@ -236,7 +242,16 @@ export const TeeIntroBlock: React.FC = () => {
                   className="text-2xl sm:text-3xl md:text-5xl font-light tracking-wide"
                   style={mkStyle(e1, 32)}
                 >
-                  КОНЦЕРН <span className="bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">ВОСХОД</span>
+                  КОНЦЕРН{' '}
+                  <span
+                    className={
+                      animationsDisabled
+                        ? 'bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-clip-text text-transparent'
+                        : 'bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent'
+                    }
+                  >
+                    ВОСХОД
+                  </span>
                 </h2>
 
                 {/* Описание */}
@@ -255,7 +270,7 @@ export const TeeIntroBlock: React.FC = () => {
                 >
                   <div
                     className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md p-3 sm:p-4"
-                    style={{ animation: 'teeCardFloat1 6s ease-in-out infinite' }}
+                    style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat1 6s ease-in-out infinite' }}
                   >
                     <div className="text-[10px] font-mono text-white/35">CODE</div>
                     <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">VSHD-TEE</div>
@@ -265,7 +280,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                   <div
                     className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md p-3 sm:p-4"
-                    style={{ animation: 'teeCardFloat2 7s ease-in-out infinite 0.5s' }}
+                    style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat2 7s ease-in-out infinite 0.5s' }}
                   >
                     <div className="text-[10px] font-mono text-white/35">MATERIAL</div>
                     <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">GRAPHITE</div>

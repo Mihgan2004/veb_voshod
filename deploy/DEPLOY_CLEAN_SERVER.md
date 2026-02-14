@@ -278,6 +278,87 @@ sudo systemctl reload nginx
 
 ---
 
+## Обновление задеплоенного проекта
+
+> Ты вносил локальные правки на сервере (nano, sed и т.д.), поэтому перед `git pull` нужно решить судьбу этих изменений.
+
+### Вариант A: Локальные правки уже есть в Git (запушил с компа)
+
+Подтягиваешь изменения и собираешь:
+
+```bash
+cd /home/ubuntu/voshod/voshod-web
+
+# Сбросить локальные правки и взять версию из репо
+git fetch origin
+git reset --hard origin/main
+
+# Сборка и перезапуск
+npm install
+npm run build
+pm2 restart voshod-web
+```
+
+> Если ветка не `main`, замени на `origin/master` или нужную ветку.
+
+### Вариант B: Локальные правки нужны — сохрани их перед обновлением
+
+```bash
+cd /home/ubuntu/voshod/voshod-web
+
+# Сохранить локальные правки в stash
+git stash push -m "server local edits"
+
+# Подтянуть из репо
+git pull origin main
+
+# Собрать и перезапустить
+npm install
+npm run build
+pm2 restart voshod-web
+
+# При необходимости вернуть свои правки поверх
+# git stash pop
+```
+
+### Вариант C: Обновление копированием с локальной машины
+
+Полностью перезаписывает код на сервере (`.env.local` и `node_modules` не трогает):
+
+**На своём компьютере** (WSL):
+
+```bash
+rsync -avz --exclude 'node_modules' --exclude '.next' --exclude '.env.local' --exclude '.git' \
+  -e "ssh -i /mnt/c/Users/alant/Downloads/ТВОЙ_КЛЮЧ.pem" \
+  /home/alantrei/projects/voshod-web/ \
+  ubuntu@146.185.210.216:/home/ubuntu/voshod/voshod-web/
+```
+
+**На сервере**:
+
+```bash
+cd /home/ubuntu/voshod/voshod-web
+npm install
+npm run build
+pm2 restart voshod-web
+```
+
+### Вариант D: Сбросить всё и взять свежую версию из Git
+
+Локальные правки будут потеряны:
+
+```bash
+cd /home/ubuntu/voshod/voshod-web
+git fetch origin
+git reset --hard origin/main
+git clean -fd
+npm install
+npm run build
+pm2 restart voshod-web
+```
+
+---
+
 ## Полезные команды
 
 | Задача              | Команда                                                        |
@@ -286,4 +367,4 @@ sudo systemctl reload nginx
 | Перезапуск Next.js  | `pm2 restart voshod-web`                                       |
 | Статус Directus     | `cd /home/ubuntu/voshod/voshod-web/deploy/directus && sudo docker compose ps` |
 | Логи Directus       | `sudo docker compose logs -f directus`                         |
-| Обновить проект     | `cd /home/ubuntu/voshod/voshod-web && git pull && npm ci && npm run build && pm2 restart voshod-web` |
+| Обновить (без локальных правок) | `cd /home/ubuntu/voshod/voshod-web && git reset --hard origin/main && npm install && npm run build && pm2 restart voshod-web` |
