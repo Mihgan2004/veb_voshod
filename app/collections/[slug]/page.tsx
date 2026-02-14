@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { PageShell } from "@/components/site/PageShell";
 
 export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   try {

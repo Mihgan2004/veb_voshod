@@ -3,6 +3,7 @@ import { catalog } from "@/lib/catalog";
 import { PageShell } from "@/components/site/PageShell";
 
 export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function CollectionsPage() {
   const [collections, products] = await Promise.all([
