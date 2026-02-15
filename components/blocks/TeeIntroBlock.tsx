@@ -190,6 +190,11 @@ export const TeeIntroBlock: React.FC = () => {
       <div className="sticky top-0 min-h-[100vh] sm:min-h-screen overflow-hidden" style={{ transform: 'translateZ(0)' }}>
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[#0B0D10]" />
+          {/* Плавный переход в цвет фона секций (vx-page-ambient #07090c) */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-b from-transparent to-[#07090c] pointer-events-none"
+            aria-hidden
+          />
           <div
             className="absolute inset-0 opacity-[0.22]"
             style={{

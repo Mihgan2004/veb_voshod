@@ -205,7 +205,7 @@ export const WelcomeBlock: React.FC = () => {
         {/* 1. Верх — «Добро пожаловать» (фиксированно наверху) */}
         <div
           ref={welcomeRef}
-          className="relative z-10 flex-shrink-0 pt-[12%] sm:pt-[10%] flex justify-center items-start select-none welcome-entrance"
+          className="relative z-10 flex-shrink-0 pt-[16%] sm:pt-[14%] flex justify-center items-start select-none welcome-entrance"
           style={{ willChange: "transform, opacity" }}
         >
           <div className="text-[26px] sm:text-[32px] md:text-[48px] font-light tracking-[0.08em] text-white/90 uppercase text-center whitespace-pre-line">
