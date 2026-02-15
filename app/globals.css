@@ -301,6 +301,61 @@ body {
   }
 }
 
+/* ========== LogoDraw: отрисовка лого (stroke-dash) ========== */
+.vx-logo-draw {
+  width: 160px;
+  height: auto;
+  display: block;
+}
+
+.vx-logo-draw path,
+.vx-logo-draw line,
+.vx-logo-draw polyline,
+.vx-logo-draw polygon,
+.vx-logo-draw circle,
+.vx-logo-draw rect {
+  fill: transparent;
+  stroke: #fff;
+  stroke-width: 15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: vx-draw 1.4s ease forwards;
+}
+
+.vx-logo-draw.is-fill path {
+  animation:
+    vx-draw 1.4s ease forwards,
+    vx-fill 0.6s ease forwards 1.2s;
+}
+
+@keyframes vx-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes vx-fill {
+  to {
+    fill: currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vx-logo-draw path,
+  .vx-logo-draw line,
+  .vx-logo-draw polyline,
+  .vx-logo-draw polygon,
+  .vx-logo-draw circle,
+  .vx-logo-draw rect {
+    animation: none !important;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    fill: currentColor;
+  }
+}
+
 /* Preloader: полукруг — отрисовка → заливка → вспышка */
 @keyframes preloader-stroke {
   0% {
