@@ -7,10 +7,12 @@
 
 html {
   height: 100%;
-  /* Снижаем «галлюцинации» при быстром скролле на мобилке */
+  scroll-behavior: smooth;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  /* Лёгкий snap для премиального ощущения при остановке прокрутки */
+  scroll-snap-type: y proximity;
 }
 
 body {
@@ -18,7 +20,6 @@ body {
   margin: 0;
   background: #0b0d10;
   color: rgba(255, 255, 255, 0.92);
-  /* Оптимизация touch-скролла на мобилке */
   touch-action: pan-y;
 }
 
@@ -90,6 +91,10 @@ body {
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  .scroll-snap-start {
+    scroll-snap-align: start;
   }
 
   .animate-shimmer {

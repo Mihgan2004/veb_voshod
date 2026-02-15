@@ -118,7 +118,7 @@ export function HighlightsCollections({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="vx-section-seams py-16 sm:py-20">
+    <section className="vx-section-seams py-16 sm:py-20 scroll-snap-start">
       <div className="relative z-10">
         {/* ---- Header ---- */}
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 opacity-0 md:opacity-100 animate-mobile-enter">

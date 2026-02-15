@@ -65,7 +65,7 @@ function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[100vh] overflow-hidden mb-0 bg-[#0B0D10]"
+      className="relative h-[100vh] overflow-hidden mb-0 bg-[#0B0D10] scroll-snap-start"
     >
       {!videoError && (
         <video
@@ -91,6 +91,27 @@ function Hero() {
 
       <div className="absolute inset-0 z-[1] bg-black/40" />
       <div className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.5)_85%)]" />
+
+      {/* Узкая кнопка "вниз" в овале */}
+      <a
+        href="#welcome"
+        aria-label="Вниз"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[3] flex items-center justify-center w-10 h-14 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-white/10 active:scale-95"
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-white/80"
+        >
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </a>
     </section>
   );
 }

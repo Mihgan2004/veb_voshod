@@ -14,12 +14,16 @@ function TypewriterLine({ disabled }: { disabled: boolean }) {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (disabled) return;
+    if (disabled) {
+      setVisible(TYPEWRITER_TEXT.length);
+      setDone(true);
+      return;
+    }
     if (visible >= TYPEWRITER_TEXT.length) {
       setDone(true);
       return;
     }
-    const t = setTimeout(() => setVisible((v) => v + 1), TYPEWRITER_MS);
+    const t = setTimeout(() => setVisible((v) => Math.min(v + 1, TYPEWRITER_TEXT.length)), TYPEWRITER_MS);
     return () => clearTimeout(t);
   }, [visible, disabled]);
 
@@ -147,7 +151,7 @@ export const TeeIntroBlock: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full border-t border-white/5 tee-intro-mobile-height"
+      className="relative w-full border-t border-white/5 tee-intro-mobile-height scroll-snap-start"
       style={
         isMobile
           ? undefined
@@ -271,12 +275,12 @@ export const TeeIntroBlock: React.FC = () => {
 
               {/* ===== Контент с staggered entrance ===== */}
               <div className="relative z-10">
-                {/* // COMMENT — печатная машинка + мигающий курсор */}
+                {/* // COMMENT — печатная машинка + мигающий курсор (всегда включана) */}
                 <div
                   className="text-[10px] sm:text-xs font-mono tracking-widest text-white/40 mb-2 sm:mb-3"
                   style={mkStyle(e0, 20)}
                 >
-                  <TypewriterLine disabled={animationsDisabled} />
+                  <TypewriterLine disabled={false} />
                 </div>
 
                 {/* Заголовок */}
@@ -286,11 +290,7 @@ export const TeeIntroBlock: React.FC = () => {
                 >
                   КОНЦЕРН{' '}
                   <span
-                    className={
-                      animationsDisabled
-                        ? 'bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-clip-text text-transparent'
-                        : 'bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent'
-                    }
+                    className="bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] bg-clip-text text-transparent animate-gold-shimmer"
                   >
                     ВОСХОД
                   </span>

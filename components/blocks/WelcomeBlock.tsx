@@ -1,10 +1,48 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ASSETS } from "@/lib/assets";
 import { useHomeScrollCompact } from "@/components/home/HomeScrollContext";
+
+const WELCOME_TEXT = "ДОБРО\nПОЖАЛОВАТЬ";
+const TYPEWRITER_MS = 65;
+
+function WelcomeTypewriter({ disabled }: { disabled: boolean }) {
+  const [visible, setVisible] = useState(0);
+  const [done, setDone] = useState(false);
+  const fullLen = WELCOME_TEXT.length;
+
+  useEffect(() => {
+    if (disabled) {
+      setVisible(fullLen);
+      setDone(true);
+      return;
+    }
+    if (visible >= fullLen) {
+      setDone(true);
+      return;
+    }
+    const t = setTimeout(() => setVisible((v) => v + 1), TYPEWRITER_MS);
+    return () => clearTimeout(t);
+  }, [visible, disabled, fullLen]);
+
+  if (disabled) return <>{WELCOME_TEXT}</>;
+
+  const display = WELCOME_TEXT.slice(0, visible);
+  return (
+    <>
+      {display}
+      {!done && (
+        <span
+          className="inline-block w-[3px] h-[0.9em] bg-white/50 ml-0.5 align-middle animate-pulse"
+          aria-hidden
+        />
+      )}
+    </>
+  );
+}
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const smoothstep = (e0: number, e1: number, x: number) => {
@@ -148,8 +186,9 @@ export const WelcomeBlock: React.FC = () => {
 
   return (
     <section
+      id="welcome"
       ref={sectionRef as React.RefObject<HTMLElement>}
-      className="relative w-full bg-[#0B0D10] welcome-mobile-height"
+      className="relative w-full bg-[#0B0D10] welcome-mobile-height scroll-snap-start"
       style={
         noScroll || compact
           ? { height: "100vh" }
@@ -171,22 +210,25 @@ export const WelcomeBlock: React.FC = () => {
 
         <div
           ref={welcomeRef}
-          className="absolute left-1/2 top-0 flex justify-center text-center select-none w-full max-w-full -translate-x-1/2 -translate-y-1/2"
-          style={{ top: "50%", willChange: "transform, opacity" }}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-full flex justify-center items-center select-none"
+          style={{ willChange: "transform, opacity" }}
         >
-          <div className="text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase">
-            ДОБРО
-            <br />
-            ПОЖАЛОВАТЬ
+          <div className="text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase text-center whitespace-pre-line">
+            <WelcomeTypewriter disabled={!noScroll} />
           </div>
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
             ref={logoRef}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center relative"
             style={{ willChange: "transform, opacity" }}
           >
+            {/* Подсветка «Восход» — золотой ореол */}
+            <div
+              className="absolute -inset-12 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(198,144,46,0.25)_0%,transparent_65%)] blur-2xl pointer-events-none select-none"
+              aria-hidden
+            />
             <Image
               src={ASSETS.brand.logoDesktop}
               alt="Проект Восход"
