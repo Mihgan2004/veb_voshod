@@ -16,7 +16,7 @@ export function MarqueeStrip() {
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#07090c] py-3 sm:py-4 border-t border-white/[0.04] border-b border-white/[0.04]"
+      className="relative w-full overflow-hidden bg-[#07090c] py-3 sm:py-4 my-10 sm:my-14 border-t border-white/[0.04] border-b border-white/[0.04]"
     >
       <div className="overflow-hidden">
         <div

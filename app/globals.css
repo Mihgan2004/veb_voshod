@@ -347,6 +347,11 @@ body {
   display: none;
 }
 
+/* Добро пожаловать — чуть пожирнее через лёгкий stroke */
+.vx-welcome-text {
+  -webkit-text-stroke: 0.4px currentColor;
+}
+
 /* Золотой градиент + свечение для прелоадера */
 .vx-logo-gold path,
 .vx-logo-gold line,

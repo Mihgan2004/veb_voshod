@@ -1,6 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { Russo_One } from "next/font/google";
+
+const russoOne = Russo_One({
+  weight: "400",
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  variable: "--font-welcome",
+});
 import Image from "next/image";
 import Link from "next/link";
 import { ASSETS } from "@/lib/assets";
@@ -205,10 +213,10 @@ export const WelcomeBlock: React.FC = () => {
         {/* 1. Верх — «Добро пожаловать» (фиксированно наверху) */}
         <div
           ref={welcomeRef}
-          className="relative z-10 flex-shrink-0 pt-[16%] sm:pt-[14%] flex justify-center items-start select-none welcome-entrance"
+          className={`relative z-10 flex-shrink-0 pt-[20%] sm:pt-[18%] flex justify-center items-start select-none welcome-entrance ${russoOne.variable}`}
           style={{ willChange: "transform, opacity" }}
         >
-          <div className="text-[26px] sm:text-[32px] md:text-[48px] font-light tracking-[0.08em] text-white/90 uppercase text-center whitespace-pre-line">
+          <div className="vx-welcome-text text-[26px] sm:text-[32px] md:text-[48px] font-semibold tracking-[0.08em] text-white/90 uppercase text-center whitespace-pre-line" style={{ fontFamily: "var(--font-welcome), sans-serif" }}>
             <WelcomeTypewriter disabled={!noScroll} />
           </div>
         </div>
