@@ -208,7 +208,7 @@ export function LookbookSlider() {
   };
 
   return (
-    <section className="vx-section-seams py-16 sm:py-20 scroll-snap-start">
+    <section className="vx-section-seams py-16 sm:py-20">
       <div className="relative z-10">
         {/* ---- Header + Arrows ---- */}
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 flex items-end justify-between opacity-0 md:opacity-100 animate-mobile-enter">
@@ -216,7 +216,7 @@ export function LookbookSlider() {
             <span className="text-[11px] font-mono uppercase tracking-[0.32em] block mb-1.5 bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
               @VOSHOD
             </span>
-            <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-silver-shimmer">
+            <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90">
               Галлерея
             </h2>
           </div>

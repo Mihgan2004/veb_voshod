@@ -65,7 +65,7 @@ function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[100vh] overflow-hidden mb-0 bg-[#0B0D10] scroll-snap-start"
+      className="relative h-[100vh] overflow-hidden mb-0 bg-[#0B0D10]"
     >
       {!videoError && (
         <video

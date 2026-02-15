@@ -11,10 +11,6 @@ html {
   overflow-x: hidden;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  scroll-padding-top: 0;
-  scroll-padding-bottom: 2rem;
-  /* Мягкий snap — останавливает «улёт» при быстрой прокрутке, proximity = только при остановке */
-  scroll-snap-type: y proximity;
 }
 
 body {
@@ -95,10 +91,6 @@ body {
     display: none;
   }
 
-  .scroll-snap-start {
-    scroll-snap-align: start;
-  }
-
   .animate-shimmer {
     animation: shimmer 1.4s ease-in-out infinite;
   }
@@ -106,55 +98,6 @@ body {
   .animate-gold-shimmer {
     animation: gold-shimmer 3.5s ease-in-out infinite;
   }
-
-  /* Серебристый премиальный ПЕРЕЛИВАЮЩИЙСЯ градиент для белых букв */
-  .text-silver-gradient {
-    background: linear-gradient(
-      165deg,
-      #ffffff 0%,
-      #f0f2f5 15%,
-      #e8eaee 35%,
-      #d8dce2 50%,
-      #e4e6ea 65%,
-      #f2f4f7 85%,
-      #ffffff 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
-
-  .text-silver-shimmer {
-    /* Fallback: видимый цвет когда gradient text не поддерживается */
-    color: #e4e6ea;
-  }
-}
-
-/* Серебристый переливающийся градиент — только при поддержке background-clip: text */
-@supports ((background-clip: text) or (-webkit-background-clip: text)) {
-  .text-silver-shimmer {
-    color: transparent;
-    background: linear-gradient(
-      110deg,
-      #ffffff 0%,
-      #e8eaef 12%,
-      #d0d4dc 25%,
-      #c8ccd4 38%,
-      #e0e4ea 50%,
-      #f0f2f7 62%,
-      #d8dce2 75%,
-      #e8ecf0 88%,
-      #ffffff 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: silver-shimmer 4s ease-in-out infinite;
-  }
-}
-
 /* ========== 1) ЕДИНЫЙ AMBIENT ФОН НА ВСЮ СТРАНИЦУ ========== */
 .vx-page-ambient {
   position: relative;
@@ -337,15 +280,6 @@ body {
     background-position: 0% 50%;
   }
   100% {
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes silver-shimmer {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
     background-position: 100% 50%;
   }
 }

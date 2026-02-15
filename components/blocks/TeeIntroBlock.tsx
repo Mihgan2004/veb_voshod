@@ -151,7 +151,7 @@ export const TeeIntroBlock: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full border-t border-white/5 tee-intro-mobile-height scroll-snap-start"
+      className="relative w-full border-t border-white/5 tee-intro-mobile-height"
       style={
         isMobile
           ? undefined
@@ -285,7 +285,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                 {/* Заголовок */}
                 <h2
-                  className="text-2xl sm:text-3xl md:text-5xl font-light tracking-wide text-silver-shimmer"
+                  className="text-2xl sm:text-3xl md:text-5xl font-light tracking-wide text-white/90"
                   style={mkStyle(e1, 32)}
                 >
                   КОНЦЕРН{' '}
@@ -298,7 +298,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                 {/* Описание */}
                 <p
-                  className="mt-4 sm:mt-5 max-w-2xl text-xs sm:text-sm md:text-base text-silver-shimmer leading-relaxed"
+                  className="mt-4 sm:mt-5 max-w-2xl text-xs sm:text-sm md:text-base text-white/90 leading-relaxed"
                   style={mkStyle(e2, 26)}
                 >
                   Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы,
