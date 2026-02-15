@@ -1,6 +1,7 @@
 import Hero from "@/components/hero/Hero";
 import { WelcomeBlock } from "@/components/blocks/WelcomeBlock";
 import { TeeIntroBlock } from "@/components/blocks/TeeIntroBlock";
+import { MarqueeStrip } from "@/components/sections/MarqueeStrip";
 import { HighlightsCollections } from "@/components/sections/HighlightsCollections";
 import { LookbookSlider } from "@/components/sections/LookbookSlider";
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
@@ -20,6 +21,7 @@ export default function HomePage() {
         <TeeIntroBlock />
       </HomeScrollProvider>
 
+      <MarqueeStrip />
       <HighlightsCollections collections={STATIC_COLLECTIONS} />
       <LookbookSlider />
 
