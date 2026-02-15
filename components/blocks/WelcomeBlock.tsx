@@ -63,36 +63,26 @@ export const WelcomeBlock: React.FC = () => {
 
   useEffect(() => {
     if (noScroll) {
-      /* Мобильная анимация: приветствие сверху, кнопка снизу, плавный переход к следующему блоку */
-      const els = [welcomeRef.current, logoRef.current, ctaRef.current];
-      const delays = [0, 220, 440];
-      /* welcome: сверху (от -50px) → top 16%; logo: fade; cta: снизу (от +32px) → вверх */
-      const fromY = [-50, 0, 32];
-      els.forEach((el, i) => {
-        if (!el) return;
-        el.style.opacity = "0";
-        el.style.transform = el === welcomeRef.current
-          ? "translateX(-50%) translateY(-50px)"
-          : i === 1
-            ? "translateY(0)"
-            : `translateY(${fromY[i]}px)`;
-      });
-      const t = setTimeout(() => {
-        els.forEach((el, i) => {
-          if (!el) return;
-          el.style.transition = "opacity 0.55s ease-out, transform 0.55s ease-out";
-          setTimeout(() => {
-            if (!el) return;
-            el.style.opacity = "1";
-            el.style.transform = el === welcomeRef.current
-              ? "translateX(-50%) translateY(0)"
-              : i === 1
-                ? "translateY(0)"
-                : "translateY(0)";
-          }, delays[i]);
-        });
-      }, 80);
-      return () => clearTimeout(t);
+      /* Мобильная анимация — через CSS (welcome-entrance, logo-entrance, cta-entrance в globals.css) */
+      if (compact) {
+        if (welcomeRef.current) {
+          welcomeRef.current.style.transform = "translateX(-50%) translateY(-50%) scale(0.78)";
+          welcomeRef.current.style.opacity = "0.35";
+          welcomeRef.current.style.transition = "";
+        }
+        if (logoRef.current) {
+          logoRef.current.style.opacity = "1";
+          logoRef.current.style.transform = "translateY(0px)";
+          logoRef.current.style.transition = "";
+        }
+        if (ctaRef.current) {
+          ctaRef.current.style.opacity = "1";
+          ctaRef.current.style.transform = "translateY(0px)";
+          ctaRef.current.style.transition = "";
+        }
+        return;
+      }
+      return;
     }
 
     if (compact) {
@@ -215,10 +205,10 @@ export const WelcomeBlock: React.FC = () => {
 
         <div
           ref={welcomeRef}
-          className="absolute left-1/2 top-[16%] -translate-x-1/2 w-full max-w-full flex justify-center items-center select-none"
+          className="absolute inset-x-0 top-[12%] flex justify-center items-center select-none px-4 welcome-entrance"
           style={{ willChange: "transform, opacity" }}
         >
-          <div className="text-[30px] sm:text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase text-center whitespace-pre-line">
+          <div className="text-[28px] sm:text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase text-center whitespace-pre-line">
             <WelcomeTypewriter disabled={!noScroll} />
           </div>
         </div>
@@ -226,7 +216,7 @@ export const WelcomeBlock: React.FC = () => {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
             ref={logoRef}
-            className="flex flex-col items-center relative"
+            className="flex flex-col items-center relative logo-entrance"
             style={{ willChange: "transform, opacity" }}
           >
             {/* Подсветка «Восход» — золотой ореол */}
@@ -250,7 +240,7 @@ export const WelcomeBlock: React.FC = () => {
 
         <div
           ref={ctaRef}
-          className="absolute inset-x-0 bottom-10 flex justify-center"
+          className="absolute inset-x-0 bottom-10 flex justify-center cta-entrance"
           style={{ willChange: "transform, opacity" }}
         >
           <Link
