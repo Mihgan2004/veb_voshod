@@ -98,6 +98,8 @@ body {
   .animate-gold-shimmer {
     animation: gold-shimmer 3.5s ease-in-out infinite;
   }
+}
+
 /* ========== 1) ЕДИНЫЙ AMBIENT ФОН НА ВСЮ СТРАНИЦУ ========== */
 .vx-page-ambient {
   position: relative;
