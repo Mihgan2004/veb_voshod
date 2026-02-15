@@ -24,11 +24,12 @@ export function useLiteMode(): boolean {
     const saveData = (navigator as { connection?: { saveData?: boolean } }).connection?.saveData;
     const isMobile = window.innerWidth <= 768;
 
-    const shouldLite =
+    const shouldLite = Boolean(
       isTelegram ||
       (isInAppWebView && isMobile) ||
       prefersReducedMotion ||
-      saveData;
+      saveData
+    );
 
     setLite(shouldLite);
 
