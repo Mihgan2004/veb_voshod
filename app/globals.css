@@ -342,6 +342,22 @@ body {
   }
 }
 
+/* Скрыть рамку на прелоадере — только буквы */
+.vx-logo-no-frame .vx-logo-frame-path {
+  display: none;
+}
+
+/* Золотой градиент + свечение для прелоадера */
+.vx-logo-gold path,
+.vx-logo-gold line,
+.vx-logo-gold polyline,
+.vx-logo-gold polygon,
+.vx-logo-gold circle,
+.vx-logo-gold rect {
+  stroke: url(#vx-gold-stroke);
+  filter: url(#vx-glow);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .vx-logo-draw path,
   .vx-logo-draw line,
@@ -353,6 +369,14 @@ body {
     stroke-dasharray: none;
     stroke-dashoffset: 0;
     fill: currentColor;
+  }
+  .vx-logo-gold path,
+  .vx-logo-gold line,
+  .vx-logo-gold polyline,
+  .vx-logo-gold polygon,
+  .vx-logo-gold circle,
+  .vx-logo-gold rect {
+    filter: none;
   }
 }
 
