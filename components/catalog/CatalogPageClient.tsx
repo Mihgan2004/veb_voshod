@@ -42,11 +42,11 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
       {/* Header */}
       <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
         <h1 className="text-[28px] sm:text-[40px] font-medium tracking-[-0.02em] text-white">
-          CATALOG
+          КАТАЛОГ
         </h1>
         <span className="h-px flex-1 bg-white/10 shrink-0" />
         <span className="text-[11px] font-mono tracking-[0.32em] uppercase text-white/45">
-          {filtered.length} ITEMS
+          {filtered.length} ШАГ
         </span>
       </div>
 

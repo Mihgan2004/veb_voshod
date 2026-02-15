@@ -7,7 +7,7 @@ export function Footer() {
       <div className="vx-footer-inner">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div className="vx-footer-meta font-mono text-white/35">
-            <p>© 2024 ВОСХОД. МОСКВА.</p>
+            <p>© 2026 ВОСХОД. СОЛНЕЧНОГОРСК.</p>
             <p className="mt-1">ВСЕ ПРАВА ЗАЩИЩЕНЫ.</p>
           </div>
           <nav className="vx-footer-links font-mono">
