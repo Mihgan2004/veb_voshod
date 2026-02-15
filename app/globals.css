@@ -11,8 +11,8 @@ html {
   overflow-x: hidden;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  /* Лёгкий snap для премиального ощущения при остановке прокрутки */
-  scroll-snap-type: y proximity;
+  /* Без жёсткого snap — плавная прокрутка между блоками без рывков */
+  /* scroll-snap-type: y proximity; */
 }
 
 body {

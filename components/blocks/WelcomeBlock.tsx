@@ -63,27 +63,32 @@ export const WelcomeBlock: React.FC = () => {
 
   useEffect(() => {
     if (noScroll) {
-      /* Мобильная анимация появления: staggered fade-in + slide-up */
+      /* Мобильная анимация: приветствие сверху, кнопка снизу, плавный переход к следующему блоку */
       const els = [welcomeRef.current, logoRef.current, ctaRef.current];
-      const delays = [0, 180, 360];
-      const fromY = [28, 20, 24];
+      const delays = [0, 220, 440];
+      /* welcome: сверху (от -40px) → центр; logo: fade; cta: снизу (от +32px) → вверх */
+      const fromY = [-40, 0, 32];
       els.forEach((el, i) => {
         if (!el) return;
         el.style.opacity = "0";
         el.style.transform = el === welcomeRef.current
-          ? "translateX(-50%) translateY(calc(-50% + 28px))"
-          : `translateY(${fromY[i]}px)`;
+          ? "translateX(-50%) translateY(calc(-50% - 40px))"
+          : i === 1
+            ? "translateY(0)"
+            : `translateY(${fromY[i]}px)`;
       });
       const t = setTimeout(() => {
         els.forEach((el, i) => {
           if (!el) return;
-          el.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+          el.style.transition = "opacity 0.55s ease-out, transform 0.55s ease-out";
           setTimeout(() => {
             if (!el) return;
             el.style.opacity = "1";
             el.style.transform = el === welcomeRef.current
               ? "translateX(-50%) translateY(-50%)"
-              : "translateY(0)";
+              : i === 1
+                ? "translateY(0)"
+                : "translateY(0)";
           }, delays[i]);
         });
       }, 80);
@@ -196,7 +201,7 @@ export const WelcomeBlock: React.FC = () => {
       }
     >
       <div
-        className="sticky top-0 h-[100svh] overflow-hidden"
+        className="sticky top-0 h-[100svh] overflow-hidden px-4 sm:px-6"
         style={isMobile ? undefined : { transform: "translateZ(0)" }}
       >
         <div className="pointer-events-none absolute inset-0">
@@ -213,7 +218,7 @@ export const WelcomeBlock: React.FC = () => {
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-full flex justify-center items-center select-none"
           style={{ willChange: "transform, opacity" }}
         >
-          <div className="text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase text-center whitespace-pre-line">
+          <div className="text-[30px] sm:text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase text-center whitespace-pre-line">
             <WelcomeTypewriter disabled={!noScroll} />
           </div>
         </div>

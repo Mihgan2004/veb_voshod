@@ -55,7 +55,8 @@ function FadeImage({
         sizes={sizes}
         priority={priority}
         loading={priority ? "eager" : "lazy"}
-        quality={70}
+        quality={75}
+        unoptimized={src.endsWith(".avif")}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
         className="object-cover"
@@ -201,7 +202,8 @@ export function LookbookSlider() {
     if (!el) return;
     const frame = el.querySelector<HTMLElement>("[data-frame]");
     if (!frame) return;
-    const step = frame.offsetWidth;
+    const gap = parseInt(getComputedStyle(el).gap || "0", 10) || 16;
+    const step = frame.offsetWidth + gap;
     el.scrollBy({ left: step * dir, behavior: "smooth" });
   };
 
@@ -228,19 +230,19 @@ export function LookbookSlider() {
         {/* ---- Photo strip (seamless / слитные фото) ---- */}
         <div
           ref={scrollRef}
-          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
+          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-4 sm:gap-5 px-4 sm:px-6 min-[1288px]:px-[calc((100vw-1240px)/2+24px)] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {LOOKBOOK_IMAGES.map((src, i) => (
             <div
               key={src}
               data-frame
-              className="shrink-0 snap-start w-[78vw] sm:w-[45vw] lg:w-[25vw]"
+              className="shrink-0 snap-start w-[78vw] min-w-[78vw] sm:w-[45vw] sm:min-w-[45vw] lg:w-[400px] lg:min-w-[400px]"
             >
               <div className="relative aspect-square overflow-hidden bg-white/[0.02]">
                 <FadeImage
                   src={src}
                   alt={`Lookbook ${i + 1}`}
-                  sizes="(max-width:640px) 78vw, (max-width:1024px) 45vw, 25vw"
+                  sizes="(max-width:640px) 78vw, (max-width:1024px) 45vw, 400px"
                   priority={i === 0}
                 />
               </div>
