@@ -66,13 +66,13 @@ export const WelcomeBlock: React.FC = () => {
       /* Мобильная анимация: приветствие сверху, кнопка снизу, плавный переход к следующему блоку */
       const els = [welcomeRef.current, logoRef.current, ctaRef.current];
       const delays = [0, 220, 440];
-      /* welcome: сверху (от -40px) → центр; logo: fade; cta: снизу (от +32px) → вверх */
-      const fromY = [-40, 0, 32];
+      /* welcome: сверху (от -50px) → top 16%; logo: fade; cta: снизу (от +32px) → вверх */
+      const fromY = [-50, 0, 32];
       els.forEach((el, i) => {
         if (!el) return;
         el.style.opacity = "0";
         el.style.transform = el === welcomeRef.current
-          ? "translateX(-50%) translateY(calc(-50% - 40px))"
+          ? "translateX(-50%) translateY(-50px)"
           : i === 1
             ? "translateY(0)"
             : `translateY(${fromY[i]}px)`;
@@ -85,7 +85,7 @@ export const WelcomeBlock: React.FC = () => {
             if (!el) return;
             el.style.opacity = "1";
             el.style.transform = el === welcomeRef.current
-              ? "translateX(-50%) translateY(-50%)"
+              ? "translateX(-50%) translateY(0)"
               : i === 1
                 ? "translateY(0)"
                 : "translateY(0)";
@@ -135,7 +135,7 @@ export const WelcomeBlock: React.FC = () => {
       const logoIn = smoothstep(0.4, 0.7, p);
       const ctaIn = smoothstep(0.78, 0.96, p);
 
-      const welcomeTop = lerp(50, 16, welcomeMove);
+      const welcomeTop = lerp(50, 16, welcomeMove); /* desktop: с 50% до 16% (сверху) */
       const welcomeScale = lerp(1, 0.78, welcomeMove);
       const welcomeOpacity = lerp(1, 0.35, welcomeMove) * welcomeIn;
 
@@ -215,7 +215,7 @@ export const WelcomeBlock: React.FC = () => {
 
         <div
           ref={welcomeRef}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-full flex justify-center items-center select-none"
+          className="absolute left-1/2 top-[16%] -translate-x-1/2 w-full max-w-full flex justify-center items-center select-none"
           style={{ willChange: "transform, opacity" }}
         >
           <div className="text-[30px] sm:text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase text-center whitespace-pre-line">
