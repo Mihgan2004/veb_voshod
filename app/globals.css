@@ -11,8 +11,10 @@ html {
   overflow-x: hidden;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  /* Без жёсткого snap — плавная прокрутка между блоками без рывков */
-  /* scroll-snap-type: y proximity; */
+  scroll-padding-top: 0;
+  scroll-padding-bottom: 2rem;
+  /* Мягкий snap — останавливает «улёт» при быстрой прокрутке, proximity = только при остановке */
+  scroll-snap-type: y proximity;
 }
 
 body {
@@ -124,6 +126,15 @@ body {
   }
 
   .text-silver-shimmer {
+    /* Fallback: видимый цвет когда gradient text не поддерживается */
+    color: #e4e6ea;
+  }
+}
+
+/* Серебристый переливающийся градиент — только при поддержке background-clip: text */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .text-silver-shimmer {
+    color: transparent;
     background: linear-gradient(
       110deg,
       #ffffff 0%,
@@ -140,7 +151,6 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: transparent;
     animation: silver-shimmer 4s ease-in-out infinite;
   }
 }

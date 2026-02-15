@@ -256,7 +256,7 @@ export const WelcomeBlock: React.FC = () => {
               sm:backdrop-blur-md
               text-[11px] md:text-xs
               uppercase tracking-[0.22em]
-              text-silver-shimmer
+              text-[#F5F5F5]
               transition-colors duration-200
               hover:border-[#C6902E]/35 hover:bg-white/7
             "
