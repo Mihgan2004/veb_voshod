@@ -122,7 +122,7 @@ export function HighlightsCollections({
       <div className="relative z-10">
         {/* ---- Header ---- */}
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 opacity-0 md:opacity-100 animate-mobile-enter">
-          <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90 text-center">
+          <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-silver-gradient text-center">
             КОЛЛЕКЦИИ
           </h2>
         </div>

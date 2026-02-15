@@ -205,10 +205,10 @@ export const WelcomeBlock: React.FC = () => {
 
         <div
           ref={welcomeRef}
-          className="absolute inset-x-0 top-[12%] flex justify-center items-center select-none px-4 welcome-entrance"
+          className="absolute inset-x-0 top-[8%] sm:top-[6%] flex justify-center items-center select-none px-4 welcome-entrance"
           style={{ willChange: "transform, opacity" }}
         >
-          <div className="text-[28px] sm:text-[34px] md:text-[56px] font-light tracking-[0.08em] text-[#F5F5F5] uppercase text-center whitespace-pre-line">
+          <div className="text-[28px] sm:text-[34px] md:text-[56px] font-light tracking-[0.08em] text-silver-gradient uppercase text-center whitespace-pre-line">
             <WelcomeTypewriter disabled={!noScroll} />
           </div>
         </div>
@@ -255,7 +255,7 @@ export const WelcomeBlock: React.FC = () => {
               sm:backdrop-blur-md
               text-[11px] md:text-xs
               uppercase tracking-[0.22em]
-              text-[#F5F5F5]
+              text-silver-gradient
               transition-colors duration-200
               hover:border-[#C6902E]/35 hover:bg-white/7
             "

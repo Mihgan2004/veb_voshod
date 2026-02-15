@@ -104,6 +104,24 @@ body {
   .animate-gold-shimmer {
     animation: gold-shimmer 3.5s ease-in-out infinite;
   }
+
+  /* Серебристый дорогой градиент для белых букв на главной */
+  .text-silver-gradient {
+    background: linear-gradient(
+      165deg,
+      #ffffff 0%,
+      #f0f2f5 15%,
+      #e8eaee 35%,
+      #d8dce2 50%,
+      #e4e6ea 65%,
+      #f2f4f7 85%,
+      #ffffff 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
 }
 
 /* ========== 1) ЕДИНЫЙ AMBIENT ФОН НА ВСЮ СТРАНИЦУ ========== */

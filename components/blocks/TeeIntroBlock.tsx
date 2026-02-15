@@ -285,7 +285,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                 {/* Заголовок */}
                 <h2
-                  className="text-2xl sm:text-3xl md:text-5xl font-light tracking-wide"
+                  className="text-2xl sm:text-3xl md:text-5xl font-light tracking-wide text-silver-gradient"
                   style={mkStyle(e1, 32)}
                 >
                   КОНЦЕРН{' '}
@@ -298,7 +298,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                 {/* Описание */}
                 <p
-                  className="mt-4 sm:mt-5 max-w-2xl text-xs sm:text-sm md:text-base text-white/55 leading-relaxed"
+                  className="mt-4 sm:mt-5 max-w-2xl text-xs sm:text-sm md:text-base text-silver-gradient leading-relaxed"
                   style={mkStyle(e2, 26)}
                 >
                   Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы,
@@ -335,7 +335,7 @@ export const TeeIntroBlock: React.FC = () => {
                 <div className="mt-6 sm:mt-8" style={mkStyle(e4, 24)}>
                   <Link
                     href="/catalog"
-                    className="inline-flex items-center justify-center h-11 sm:h-12 md:h-14 px-6 sm:px-8 md:px-10 rounded-full border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.2em] sm:tracking-[0.22em] text-[#F5F5F5] transition-all duration-300 hover:border-[#C6902E]/35 hover:bg-white/10"
+                    className="inline-flex items-center justify-center h-11 sm:h-12 md:h-14 px-6 sm:px-8 md:px-10 rounded-full border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.2em] sm:tracking-[0.22em] text-silver-gradient transition-all duration-300 hover:border-[#C6902E]/35 hover:bg-white/10"
                   >
                     СМОТРЕТЬ КАТАЛОГ →
                   </Link>
