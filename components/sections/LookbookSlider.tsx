@@ -216,7 +216,7 @@ export function LookbookSlider() {
             <span className="text-[11px] font-mono uppercase tracking-[0.32em] block mb-1.5 bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
               @VOSHOD
             </span>
-            <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-silver-gradient">
+            <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-silver-shimmer">
               Галлерея
             </h2>
           </div>

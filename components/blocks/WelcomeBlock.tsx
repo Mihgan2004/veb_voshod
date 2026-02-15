@@ -66,7 +66,7 @@ export const WelcomeBlock: React.FC = () => {
       /* Мобильная анимация — через CSS (welcome-entrance, logo-entrance, cta-entrance в globals.css) */
       if (compact) {
         if (welcomeRef.current) {
-          welcomeRef.current.style.transform = "translateX(-50%) translateY(-50%) scale(0.78)";
+          welcomeRef.current.style.transform = "scale(0.78)";
           welcomeRef.current.style.opacity = "0.35";
           welcomeRef.current.style.transition = "";
         }
@@ -87,7 +87,7 @@ export const WelcomeBlock: React.FC = () => {
 
     if (compact) {
       if (welcomeRef.current) {
-        welcomeRef.current.style.transform = "translateX(-50%) translateY(-50%) scale(0.78)";
+        welcomeRef.current.style.transform = "scale(0.78)";
         welcomeRef.current.style.opacity = "0.35";
         welcomeRef.current.style.transition = "";
       }
@@ -125,13 +125,11 @@ export const WelcomeBlock: React.FC = () => {
       const logoIn = smoothstep(0.4, 0.7, p);
       const ctaIn = smoothstep(0.78, 0.96, p);
 
-      const welcomeTop = lerp(50, 16, welcomeMove); /* desktop: с 50% до 16% (сверху) */
       const welcomeScale = lerp(1, 0.78, welcomeMove);
       const welcomeOpacity = lerp(1, 0.35, welcomeMove) * welcomeIn;
 
       welcomeRef.current!.style.transition = "";
-      welcomeRef.current!.style.top = `${welcomeTop}%`;
-      welcomeRef.current!.style.transform = `translateX(-50%) translateY(-50%) scale(${welcomeScale})`;
+      welcomeRef.current!.style.transform = `scale(${welcomeScale})`;
       welcomeRef.current!.style.opacity = String(welcomeOpacity);
 
       logoRef.current!.style.transition = "";
@@ -191,9 +189,10 @@ export const WelcomeBlock: React.FC = () => {
       }
     >
       <div
-        className="sticky top-0 h-[100svh] overflow-hidden px-4 sm:px-6"
+        className="sticky top-0 h-[100svh] overflow-hidden px-4 sm:px-6 flex flex-col"
         style={isMobile ? undefined : { transform: "translateZ(0)" }}
       >
+        {/* Фоны */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[#0B0D10]" />
           <div className="absolute inset-0 bg-[radial-gradient(1200px_520px_at_50%_0%,rgba(198,144,46,0.28),transparent_60%)]" />
@@ -203,23 +202,24 @@ export const WelcomeBlock: React.FC = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_12%,rgba(0,0,0,0.72)_88%)]" />
         </div>
 
+        {/* 1. Верх — «Добро пожаловать» (фиксированно наверху) */}
         <div
           ref={welcomeRef}
-          className="absolute inset-x-0 top-[8%] sm:top-[6%] flex justify-center items-center select-none px-4 welcome-entrance"
+          className="relative z-10 flex-shrink-0 pt-[12%] sm:pt-[10%] flex justify-center items-start select-none welcome-entrance"
           style={{ willChange: "transform, opacity" }}
         >
-          <div className="text-[28px] sm:text-[34px] md:text-[56px] font-light tracking-[0.08em] text-silver-gradient uppercase text-center whitespace-pre-line">
+          <div className="text-[26px] sm:text-[32px] md:text-[48px] font-light tracking-[0.08em] text-silver-shimmer uppercase text-center whitespace-pre-line">
             <WelcomeTypewriter disabled={!noScroll} />
           </div>
         </div>
 
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {/* 2. Середина — логотип ВОСХОД */}
+        <div className="relative z-0 flex-1 flex items-center justify-center pointer-events-none min-h-0">
           <div
             ref={logoRef}
-            className="flex flex-col items-center relative logo-entrance"
+            className="flex flex-col items-center relative logo-entrance -mt-4 sm:-mt-6"
             style={{ willChange: "transform, opacity" }}
           >
-            {/* Подсветка «Восход» — золотой ореол */}
             <div
               className="absolute -inset-12 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(198,144,46,0.25)_0%,transparent_65%)] blur-2xl pointer-events-none select-none"
               aria-hidden
@@ -230,7 +230,7 @@ export const WelcomeBlock: React.FC = () => {
               width={640}
               height={184}
               sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, 640px"
-              className="w-[260px] sm:w-[360px] md:w-[640px] select-none pointer-events-none"
+              className="w-[220px] sm:w-[320px] md:w-[560px] select-none pointer-events-none"
               draggable={false}
               style={{ backfaceVisibility: "hidden" }}
               priority
@@ -238,9 +238,10 @@ export const WelcomeBlock: React.FC = () => {
           </div>
         </div>
 
+        {/* 3. Низ — кнопка В КАТАЛОГ */}
         <div
           ref={ctaRef}
-          className="absolute inset-x-0 bottom-10 flex justify-center cta-entrance"
+          className="relative z-10 flex-shrink-0 pb-10 sm:pb-12 flex justify-center cta-entrance"
           style={{ willChange: "transform, opacity" }}
         >
           <Link
@@ -255,7 +256,7 @@ export const WelcomeBlock: React.FC = () => {
               sm:backdrop-blur-md
               text-[11px] md:text-xs
               uppercase tracking-[0.22em]
-              text-silver-gradient
+              text-silver-shimmer
               transition-colors duration-200
               hover:border-[#C6902E]/35 hover:bg-white/7
             "

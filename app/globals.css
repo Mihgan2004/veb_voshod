@@ -105,7 +105,7 @@ body {
     animation: gold-shimmer 3.5s ease-in-out infinite;
   }
 
-  /* Серебристый дорогой градиент для белых букв на главной */
+  /* Серебристый премиальный ПЕРЕЛИВАЮЩИЙСЯ градиент для белых букв */
   .text-silver-gradient {
     background: linear-gradient(
       165deg,
@@ -121,6 +121,27 @@ body {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
+  }
+
+  .text-silver-shimmer {
+    background: linear-gradient(
+      110deg,
+      #ffffff 0%,
+      #e8eaef 12%,
+      #d0d4dc 25%,
+      #c8ccd4 38%,
+      #e0e4ea 50%,
+      #f0f2f7 62%,
+      #d8dce2 75%,
+      #e8ecf0 88%,
+      #ffffff 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: silver-shimmer 4s ease-in-out infinite;
   }
 }
 
@@ -306,6 +327,15 @@ body {
     background-position: 0% 50%;
   }
   100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes silver-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
     background-position: 100% 50%;
   }
 }
