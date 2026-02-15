@@ -22,8 +22,10 @@ export default function HomePage() {
       </HomeScrollProvider>
 
       <MarqueeStrip />
-      <HighlightsCollections collections={STATIC_COLLECTIONS} />
-      <LookbookSlider />
+      <div className="vx-below-fold">
+        <HighlightsCollections collections={STATIC_COLLECTIONS} />
+        <LookbookSlider />
+      </div>
 
       <div className="h-4" />
     </div>

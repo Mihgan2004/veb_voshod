@@ -35,9 +35,8 @@ function FadeImage({
   return (
     <>
       {!loaded && (
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-white/[0.04]" />
-          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute inset-0 bg-[#0B0D10]">
+          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
         </div>
       )}
 
@@ -139,7 +138,7 @@ export function HighlightsCollections({
               prefetch={false}
               className="group shrink-0 snap-start w-[78vw] max-w-[520px] sm:w-[520px] lg:w-[560px] outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded-2xl flex flex-col"
             >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition-all duration-300 group-hover:border-white/[0.18] group-hover:bg-white/[0.03]">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-[#0B0D10] transition-all duration-300 group-hover:border-white/[0.18] group-hover:bg-white/[0.03]">
                 <FadeImage
                   src={col.coverImage || "/globe.svg"}
                   alt={col.label ?? col.tag}

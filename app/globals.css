@@ -111,7 +111,7 @@ body {
     linear-gradient(180deg, #07090c 0%, #050607 55%, #07090c 100%);
 }
 
-/* Grain */
+/* Grain — feTurbulence тяжёлый для мобилы/Telegram, отключаем в lite */
 .vx-page-ambient::before {
   content: "";
   position: absolute;
@@ -121,6 +121,30 @@ body {
   opacity: .14;
   mix-blend-mode: soft-light;
   filter: contrast(135%);
+}
+
+/* Облегчённый режим: Telegram, in-app WebView, save-data */
+[data-lite="true"] .vx-page-ambient::before,
+[data-lite="true"] .vx-page-ambient::after {
+  display: none;
+}
+[data-lite="true"] .bg-noise {
+  background-image: none !important;
+}
+[data-lite="true"] [class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Ниже сгиба — content-visibility для плавного скролла */
+.vx-below-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+
+/* Next Image: тёмный фон вместо серого placeholder */
+.vx-img-wrap {
+  background-color: #0B0D10;
 }
 
 /* Редкие "пылинки" */

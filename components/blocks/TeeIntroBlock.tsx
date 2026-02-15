@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ASSETS } from '@/lib/assets';
 import { useHomeScrollCompact } from '@/components/home/HomeScrollContext';
+import { useLiteMode } from '@/lib/useLiteMode';
 
 // ========== ПЕЧАТНАЯ МАШИНКА ==========
 const TYPEWRITER_TEXT = '// PROJECT VOSKHOD / DROP';
@@ -71,9 +72,11 @@ export const TeeIntroBlock: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [p, setP] = useState(0.15);
   const { compact, animationsDisabled, isMobile } = useHomeScrollCompact();
+  const liteMode = useLiteMode();
 
   // На мобилке — убираем scroll-through, используем статичное состояние
   const noScrollOnMobile = isMobile;
+  const noHeavyEffects = animationsDisabled || liteMode;
   const effectiveCompact = compact || noScrollOnMobile;
 
   useEffect(() => {
@@ -145,7 +148,7 @@ export const TeeIntroBlock: React.FC = () => {
     opacity: enter * fadeOut,
     transform: `translateY(${lerp(slideFrom, 0, enter)}px)`,
     /* Без transition — мгновенный отклик на скролл, без лагов */
-    ...(animationsDisabled ? {} : { willChange: 'opacity, transform' }),
+    ...(noHeavyEffects ? {} : { willChange: 'opacity, transform' }),
   });
 
   return (
@@ -204,7 +207,7 @@ export const TeeIntroBlock: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/35" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0.78)_78%)]" />
-          <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay bg-noise" />
+          {!liteMode && <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay bg-noise" />}
         </div>
 
         <div className="relative z-10 h-full min-h-[100vh] sm:min-h-0 sm:h-full max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-0">
@@ -237,8 +240,8 @@ export const TeeIntroBlock: React.FC = () => {
                   inset: '-35% -25% -20% -25%',
                   background:
                     'radial-gradient(ellipse 88% 72% at 50% 36%, rgba(11,13,16,0.97) 0%, rgba(11,13,16,0.88) 25%, rgba(11,13,16,0.55) 50%, rgba(11,13,16,0.18) 72%, transparent 92%)',
-                  filter: animationsDisabled ? 'blur(12px)' : 'blur(24px)',
-                  animation: animationsDisabled ? 'none' : 'teeGlowBreathe 7s ease-in-out infinite',
+                  filter: noHeavyEffects ? 'blur(6px)' : 'blur(24px)',
+                  animation: noHeavyEffects ? 'none' : 'teeGlowBreathe 7s ease-in-out infinite',
                 }}
                 aria-hidden
               />
@@ -250,8 +253,8 @@ export const TeeIntroBlock: React.FC = () => {
                   inset: '-15% -12% -8% -12%',
                   background:
                     'radial-gradient(ellipse 55% 40% at 52% 28%, rgba(198,144,46,0.08) 0%, rgba(198,144,46,0.03) 45%, transparent 75%)',
-                  filter: animationsDisabled ? 'blur(16px)' : 'blur(32px)',
-                  animation: animationsDisabled ? 'none' : 'teeGoldShimmer 9s ease-in-out infinite',
+                  filter: noHeavyEffects ? 'blur(6px)' : 'blur(32px)',
+                  animation: noHeavyEffects ? 'none' : 'teeGoldShimmer 9s ease-in-out infinite',
                 }}
                 aria-hidden
               />
@@ -263,8 +266,8 @@ export const TeeIntroBlock: React.FC = () => {
                   inset: '-10% -8% -5% -8%',
                   background:
                     'radial-gradient(ellipse 95% 85% at 50% 45%, transparent 30%, rgba(11,13,16,0.4) 65%, rgba(11,13,16,0.7) 90%)',
-                  filter: animationsDisabled ? 'blur(8px)' : 'blur(14px)',
-                  animation: animationsDisabled ? 'none' : 'teeVignettePulse 11s ease-in-out infinite',
+                  filter: noHeavyEffects ? 'blur(4px)' : 'blur(14px)',
+                  animation: noHeavyEffects ? 'none' : 'teeVignettePulse 11s ease-in-out infinite',
                 }}
                 aria-hidden
               />
@@ -295,7 +298,7 @@ export const TeeIntroBlock: React.FC = () => {
                 >
                   КОНЦЕРН{' '}
                   <span
-                    className="bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] bg-clip-text text-transparent animate-gold-shimmer"
+                    className={`bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-clip-text text-transparent ${noHeavyEffects ? '' : 'bg-[length:200%_100%] animate-gold-shimmer'}`}
                   >
                     ВОСХОД
                   </span>
@@ -317,7 +320,7 @@ export const TeeIntroBlock: React.FC = () => {
                 >
                   <div
                     className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md p-3 sm:p-4"
-                    style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat1 6s ease-in-out infinite' }}
+                    style={{ animation: noHeavyEffects ? 'none' : 'teeCardFloat1 6s ease-in-out infinite' }}
                   >
                     <div className="text-[10px] font-mono text-white/35">CODE</div>
                     <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">VSHD-TEE</div>
@@ -327,7 +330,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                   <div
                     className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md p-3 sm:p-4"
-                    style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat2 7s ease-in-out infinite 0.5s' }}
+                    style={{ animation: noHeavyEffects ? 'none' : 'teeCardFloat2 7s ease-in-out infinite 0.5s' }}
                   >
                     <div className="text-[10px] font-mono text-white/35">MATERIAL</div>
                     <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">GRAPHITE</div>

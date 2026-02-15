@@ -42,9 +42,8 @@ function FadeImage({
   return (
     <>
       {!loaded && (
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-white/[0.04]" />
-          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute inset-0 bg-[#0B0D10]">
+          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
         </div>
       )}
 
