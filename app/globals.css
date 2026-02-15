@@ -347,9 +347,10 @@ body {
   display: none;
 }
 
-/* Добро пожаловать — чуть пожирнее через лёгкий stroke */
+/* Добро пожаловать — контурная надпись */
 .vx-welcome-text {
-  -webkit-text-stroke: 0.4px currentColor;
+  color: transparent;
+  -webkit-text-stroke: 0.8px rgba(255, 255, 255, 0.85);
 }
 
 /* Золотой градиент + свечение для прелоадера */

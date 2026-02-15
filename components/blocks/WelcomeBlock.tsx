@@ -216,7 +216,7 @@ export const WelcomeBlock: React.FC = () => {
           className={`relative z-10 flex-shrink-0 pt-[20%] sm:pt-[18%] flex justify-center items-start select-none welcome-entrance ${russoOne.variable}`}
           style={{ willChange: "transform, opacity" }}
         >
-          <div className="vx-welcome-text text-[26px] sm:text-[32px] md:text-[48px] font-semibold tracking-[0.08em] text-white/90 uppercase text-center whitespace-pre-line" style={{ fontFamily: "var(--font-welcome), sans-serif" }}>
+          <div className="vx-welcome-text text-[22px] sm:text-[28px] md:text-[40px] font-light tracking-[0.08em] uppercase text-center whitespace-pre-line" style={{ fontFamily: "var(--font-welcome), sans-serif" }}>
             <WelcomeTypewriter disabled={!noScroll} />
           </div>
         </div>
