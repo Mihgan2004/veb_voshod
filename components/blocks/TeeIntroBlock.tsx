@@ -240,12 +240,43 @@ export const TeeIntroBlock: React.FC = () => {
 
             {/* Текстовый блок — поднят выше на мобилке (-mt-10) */}
             <div className="col-span-12 md:col-span-8 order-2 md:order-none flex flex-col justify-center items-center md:items-start -mt-10 sm:-mt-4 md:mt-0 pt-0 pb-6 sm:py-0 relative">
-              {/* Тёмный градиент за текстом: мягко затемняет футболку, плавные стопы */}
+              {/* === Мобильный градиент: многослойный, анимированный (из референса) === */}
+
+              {/* Слой 1 — основной радиальный градиент с дыханием */}
               <div
-                className="absolute inset-0 pointer-events-none"
+                className="absolute md:hidden pointer-events-none"
                 style={{
+                  inset: '-35% -25% -20% -25%',
                   background:
-                    'radial-gradient(ellipse 95% 75% at 50% 48%, rgba(7,9,12,0.85) 0%, rgba(7,9,12,0.72) 30%, rgba(7,9,12,0.45) 55%, rgba(7,9,12,0.18) 80%, transparent 100%)',
+                    'radial-gradient(ellipse 88% 72% at 50% 36%, rgba(11,13,16,0.97) 0%, rgba(11,13,16,0.88) 25%, rgba(11,13,16,0.55) 50%, rgba(11,13,16,0.18) 72%, transparent 92%)',
+                  filter: noHeavyEffects ? 'blur(12px)' : 'blur(24px)',
+                  animation: noHeavyEffects ? 'none' : 'teeGlowBreathe 7s ease-in-out infinite',
+                }}
+                aria-hidden
+              />
+
+              {/* Слой 2 — тёплое золотое свечение */}
+              <div
+                className="absolute md:hidden pointer-events-none"
+                style={{
+                  inset: '-15% -12% -8% -12%',
+                  background:
+                    'radial-gradient(ellipse 55% 40% at 52% 28%, rgba(198,144,46,0.08) 0%, rgba(198,144,46,0.03) 45%, transparent 75%)',
+                  filter: noHeavyEffects ? 'blur(16px)' : 'blur(32px)',
+                  animation: noHeavyEffects ? 'none' : 'teeGoldShimmer 9s ease-in-out infinite',
+                }}
+                aria-hidden
+              />
+
+              {/* Слой 3 — виньетка для глубины */}
+              <div
+                className="absolute md:hidden pointer-events-none"
+                style={{
+                  inset: '-10% -8% -5% -8%',
+                  background:
+                    'radial-gradient(ellipse 95% 85% at 50% 45%, transparent 30%, rgba(11,13,16,0.4) 65%, rgba(11,13,16,0.7) 90%)',
+                  filter: noHeavyEffects ? 'blur(8px)' : 'blur(14px)',
+                  animation: noHeavyEffects ? 'none' : 'teeVignettePulse 11s ease-in-out infinite',
                 }}
                 aria-hidden
               />
