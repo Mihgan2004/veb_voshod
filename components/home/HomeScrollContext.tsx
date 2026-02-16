@@ -61,19 +61,17 @@ export function HomeScrollProvider({ children }: { children: React.ReactNode }) 
       prevMobile.current = true;
     }
 
+    /* На мобилке анимации отключены всегда (без тяжёлых эффектов) */
+    if (!prevAnimDisabled.current) {
+      setAnimationsDisabled(true);
+      prevAnimDisabled.current = true;
+    }
+
     const scrollY = window.scrollY;
     const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const vh = window.innerHeight;
-
     if (scrollHeight <= 0) {
       ticking.current = false;
       return;
-    }
-
-    const animDisabled = scrollY > vh * ANIMATIONS_DISABLE_SCROLL_VH;
-    if (animDisabled !== prevAnimDisabled.current) {
-      setAnimationsDisabled(animDisabled);
-      prevAnimDisabled.current = animDisabled;
     }
 
     if (scrollY + BOTTOM_THRESHOLD >= scrollHeight) {

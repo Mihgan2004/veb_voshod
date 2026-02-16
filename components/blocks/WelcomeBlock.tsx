@@ -219,7 +219,7 @@ export const WelcomeBlock: React.FC = () => {
           style={{ willChange: "transform, opacity" }}
         >
           <div className="vx-welcome-text text-[22px] sm:text-[28px] md:text-[40px] font-light tracking-[0.08em] uppercase text-center whitespace-pre-line" style={{ fontFamily: "var(--font-welcome), sans-serif" }}>
-            <WelcomeTypewriter disabled={!noScroll} />
+            <WelcomeTypewriter disabled={noScroll} />
           </div>
         </div>
 
