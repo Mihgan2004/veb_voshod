@@ -216,16 +216,101 @@ export const TeeIntroBlock: React.FC = () => {
               className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
             >
               <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={ASSETS.tee.cutout}
-                  alt="VOSKHOD tee"
-                  className={`absolute left-1/2 -translate-x-[calc(50%+90px)] md:left-[-80vw] md:translate-x-0 top-1/2 -translate-y-1/2 w-auto max-w-none pointer-events-none select-none object-contain
+                {/* ВАЖНО: все translate/scale/height — на wrapper, чтобы маска совпала 1:1 */}
+                <div
+                  className={`
+                    relative inline-block pointer-events-none select-none
+                    left-1/2 -translate-x-[calc(50%+90px)] md:left-auto md:translate-x-0
+                    top-1/2 -translate-y-1/2
                     scale-[1.75] sm:scale-[1.5] md:scale-[1.2] origin-[50%_40%]
-                    ${TEE_INTRO.mobile.teeHeight} ${TEE_INTRO.mobile.teeMaxHeight} ${TEE_INTRO.tablet.teeHeight} ${TEE_INTRO.tablet.teeMaxHeight} ${TEE_INTRO.desktop.teeHeight} ${TEE_INTRO.desktop.teeMaxHeight}
-                    drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] md:drop-shadow-[0_50px_90px_rgba(0,0,0,0.65)]`}
-                  draggable={false}
-                />
+                    ${TEE_INTRO.mobile.teeHeight} ${TEE_INTRO.mobile.teeMaxHeight}
+                    ${TEE_INTRO.tablet.teeHeight} ${TEE_INTRO.tablet.teeMaxHeight}
+                    ${TEE_INTRO.desktop.teeHeight} ${TEE_INTRO.desktop.teeMaxHeight}
+                  `}
+                  style={{ isolation: 'isolate' }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={ASSETS.tee.cutout}
+                    alt="VOSKHOD tee"
+                    className="
+                      block h-full w-auto max-w-none object-contain
+                      drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]
+                      md:drop-shadow-[0_50px_90px_rgba(0,0,0,0.65)]
+                    "
+                    style={{
+                      filter: 'brightness(0.96) contrast(1.06) saturate(0.95)',
+                    }}
+                    draggable={false}
+                  />
+
+                  {/* ОВЕРЛЕЙ 1: затемнение/виньетка (multiply) — по контуру футболки (маска).
+                      Быстрая настройка под референс:
+                      • Сила затемнения: opacity (0.75–0.85 мягче, 0.92–0.98 жёстче).
+                      • Точка светлее/темнее: radial-gradient at 72% 18% — вправо-вверх at 78% 12%, темнее сверху at 70% 25%.
+                      • Низ: linear-gradient(to bottom ... 55% ... 100%) — 0.75→0.55 мягче, →0.85 сильнее "провал". */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(ellipse 70% 65% at 72% 18%,
+                          rgba(0,0,0,0.00) 0%,
+                          rgba(0,0,0,0.18) 40%,
+                          rgba(0,0,0,0.58) 78%,
+                          rgba(0,0,0,0.92) 110%
+                        ),
+                        linear-gradient(to bottom,
+                          rgba(0,0,0,0.00) 0%,
+                          rgba(0,0,0,0.18) 55%,
+                          rgba(0,0,0,0.75) 100%
+                        ),
+                        linear-gradient(to right,
+                          rgba(0,0,0,0.55) 0%,
+                          rgba(0,0,0,0.08) 55%,
+                          rgba(0,0,0,0.35) 100%
+                        )
+                      `,
+                      mixBlendMode: 'multiply',
+                      opacity: 0.92,
+                      filter: noHeavyEffects ? 'none' : 'blur(0.6px)',
+                      WebkitMaskImage: `url(${ASSETS.tee.cutout})`,
+                      maskImage: `url(${ASSETS.tee.cutout})`,
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskSize: '100% 100%',
+                      maskSize: '100% 100%',
+                      WebkitMaskPosition: 'center',
+                      maskPosition: 'center',
+                    }}
+                    aria-hidden
+                  />
+
+                  {/* ОВЕРЛЕЙ 2: лёгкая дымка/подсветка (screen) — «киношность». */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(ellipse 62% 48% at 70% 22%,
+                          rgba(255,255,255,0.10) 0%,
+                          rgba(255,255,255,0.04) 35%,
+                          rgba(255,255,255,0.00) 70%
+                        )
+                      `,
+                      mixBlendMode: 'screen',
+                      opacity: 0.22,
+                      filter: noHeavyEffects ? 'blur(6px)' : 'blur(12px)',
+                      WebkitMaskImage: `url(${ASSETS.tee.cutout})`,
+                      maskImage: `url(${ASSETS.tee.cutout})`,
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskSize: '100% 100%',
+                      maskSize: '100% 100%',
+                      WebkitMaskPosition: 'center',
+                      maskPosition: 'center',
+                    }}
+                    aria-hidden
+                  />
+                </div>
               </div>
             </div>
 
