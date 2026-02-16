@@ -216,12 +216,12 @@ export const TeeIntroBlock: React.FC = () => {
               className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
             >
               <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
-                {/* Тёмный градиент по футболке: плавное затемнение к краям, без резких переходов */}
+                {/* Градиент как на референсе: свет слева, тень справа — левое плечо и бок ярче, правый край мягко уходит в фон */}
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     background:
-                      'radial-gradient(ellipse 70% 60% at 50% 52%, rgba(7,9,12,0.25) 0%, rgba(7,9,12,0.5) 45%, rgba(7,9,12,0.78) 75%, rgba(7,9,12,0.92) 100%)',
+                      'linear-gradient(to right, transparent 0%, rgba(7,9,12,0.08) 25%, rgba(7,9,12,0.35) 55%, rgba(7,9,12,0.65) 80%, rgba(7,9,12,0.88) 100%)',
                   }}
                   aria-hidden
                 />

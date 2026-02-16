@@ -372,6 +372,24 @@ body {
   display: none;
 }
 
+/* Прелоадер: плавная отрисовка лого (длиннее и мягче) */
+.vx-logo-preloader-draw.vx-logo-draw path,
+.vx-logo-preloader-draw.vx-logo-draw line,
+.vx-logo-preloader-draw.vx-logo-draw polyline,
+.vx-logo-preloader-draw.vx-logo-draw polygon,
+.vx-logo-preloader-draw.vx-logo-draw circle,
+.vx-logo-preloader-draw.vx-logo-draw rect {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: vx-draw-preloader 1.8s ease-out forwards;
+}
+
+@keyframes vx-draw-preloader {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* Добро пожаловать — контурная надпись */
 .vx-welcome-text {
   color: transparent;
@@ -395,7 +413,13 @@ body {
   .vx-logo-draw polyline,
   .vx-logo-draw polygon,
   .vx-logo-draw circle,
-  .vx-logo-draw rect {
+  .vx-logo-draw rect,
+  .vx-logo-preloader-draw.vx-logo-draw path,
+  .vx-logo-preloader-draw.vx-logo-draw line,
+  .vx-logo-preloader-draw.vx-logo-draw polyline,
+  .vx-logo-preloader-draw.vx-logo-draw polygon,
+  .vx-logo-preloader-draw.vx-logo-draw circle,
+  .vx-logo-preloader-draw.vx-logo-draw rect {
     animation: none !important;
     stroke-dasharray: none;
     stroke-dashoffset: 0;

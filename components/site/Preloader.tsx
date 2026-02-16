@@ -10,22 +10,29 @@ import { useLiteMode } from "@/lib/useLiteMode";
 const MIN_DURATION_MS = 2800;
 const LITE_DURATION_MS = 800;
 const SKIP_KEY = "voshod-preloader-seen";
+const INITIAL_PATH_KEY = "voshod-initial-path";
 
+/** Прелоадер показывается только при первом заходе на главную (не при переходах между страницами). */
 export function Preloader() {
   const pathname = usePathname();
-  const isHome = pathname === "/";
   const liteMode = useLiteMode();
-  const [visible, setVisible] = useState(isHome);
+  const [visible, setVisible] = useState(false);
   const [phase, setPhase] = useState<"show" | "hide">("show");
 
   useEffect(() => {
-    if (!isHome) {
-      setVisible(false);
-      return;
+    if (typeof window === "undefined") return;
+
+    // Запоминаем первый URL в сессии (полный заход на сайт)
+    let initialPath = sessionStorage.getItem(INITIAL_PATH_KEY);
+    if (initialPath === null) {
+      sessionStorage.setItem(INITIAL_PATH_KEY, pathname);
+      initialPath = pathname;
     }
 
-    const skip = typeof window !== "undefined" && sessionStorage.getItem(SKIP_KEY);
-    if (skip) {
+    // Показываем прелоадер только если зашли сразу на главную и ещё не показывали
+    const isFirstLoadToHome = initialPath === "/" && pathname === "/";
+    const alreadySeen = sessionStorage.getItem(SKIP_KEY);
+    if (!isFirstLoadToHome || alreadySeen) {
       setVisible(false);
       return;
     }
@@ -52,7 +59,7 @@ export function Preloader() {
       window.addEventListener("load", finish);
       return () => window.removeEventListener("load", finish);
     }
-  }, [isHome, liteMode]);
+  }, [pathname, liteMode]);
 
   if (!visible) return null;
 
@@ -75,7 +82,11 @@ export function Preloader() {
             priority
           />
         ) : (
-          <LogoDraw variant="gold" hideFrame className="w-[140px] md:w-[180px]" />
+          <LogoDraw
+            variant="gold"
+            hideFrame
+            className="w-[140px] md:w-[180px] vx-logo-preloader-draw"
+          />
         )}
       </div>
     </div>
