@@ -4,14 +4,15 @@ import { useMemo, useState, useEffect, useDeferredValue } from "react";
 import type { Product, Category } from "@/lib/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
 
-const CATEGORIES: { value: Category | "all"; label: string }[] = [
-  { value: "all", label: "ALL" },
-  { value: "tee", label: "TEE" },
-  { value: "hoodie", label: "HOODIE" },
-  { value: "patch", label: "PATCH" },
-  { value: "lanyard", label: "LANYARD" },
-  { value: "accessory", label: "ACC" },
-];
+const CATEGORY_LABELS: Record<Category, string> = {
+  tee: "TEE",
+  hoodie: "HOODIE",
+  patch: "PATCH",
+  cap: "CAP",
+  lanyard: "LANYARD",
+  accessory: "ACC",
+  other: "OTHER",
+};
 
 const SEARCH_DEBOUNCE_MS = 200;
 
@@ -22,6 +23,16 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
 
   const deferredCategory = useDeferredValue(category);
   const deferredQuery = useDeferredValue(queryDebounced);
+
+  /** Категории из Directus: уникальные по товарам + ALL. Порядок: all, затем по алфавиту slug. */
+  const categories = useMemo(() => {
+    const slugs = Array.from(new Set(products.map((p) => p.category))).sort();
+    const list: { value: Category | "all"; label: string }[] = [
+      { value: "all", label: "ALL" },
+      ...slugs.map((value) => ({ value, label: CATEGORY_LABELS[value] ?? value.toUpperCase() })),
+    ];
+    return list;
+  }, [products]);
 
   useEffect(() => {
     const t = setTimeout(() => setQueryDebounced(queryInput.trim()), SEARCH_DEBOUNCE_MS);
@@ -54,7 +65,7 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
       <div className="mb-10 sm:mb-12 space-y-4">
         {/* Category pills — horizontal scroll on mobile, contain для плавности */}
         <div className="flex gap-2 sm:gap-2.5 overflow-x-auto scrollbar-none pb-0.5 [contain:paint] [-webkit-overflow-scrolling:touch]">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setCategory(cat.value)}

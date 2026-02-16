@@ -216,6 +216,15 @@ export const TeeIntroBlock: React.FC = () => {
               className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
             >
               <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
+                {/* Чёрный градиент за футболкой — мягкий переход в фон */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      'radial-gradient(ellipse 75% 65% at 50% 55%, transparent 35%, rgba(7,9,12,0.4) 60%, rgba(7,9,12,0.85) 100%)',
+                  }}
+                  aria-hidden
+                />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={ASSETS.tee.cutout}
