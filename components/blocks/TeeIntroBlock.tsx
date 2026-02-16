@@ -216,12 +216,12 @@ export const TeeIntroBlock: React.FC = () => {
               className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
             >
               <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
-                {/* Чёрный градиент за футболкой — мягкий переход в фон */}
+                {/* Тёмный градиент по футболке: плавное затемнение к краям, без резких переходов */}
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     background:
-                      'radial-gradient(ellipse 75% 65% at 50% 55%, transparent 35%, rgba(7,9,12,0.4) 60%, rgba(7,9,12,0.85) 100%)',
+                      'radial-gradient(ellipse 70% 60% at 50% 52%, rgba(7,9,12,0.25) 0%, rgba(7,9,12,0.5) 45%, rgba(7,9,12,0.78) 75%, rgba(7,9,12,0.92) 100%)',
                   }}
                   aria-hidden
                 />
@@ -240,12 +240,12 @@ export const TeeIntroBlock: React.FC = () => {
 
             {/* Текстовый блок — поднят выше на мобилке (-mt-10) */}
             <div className="col-span-12 md:col-span-8 order-2 md:order-none flex flex-col justify-center items-center md:items-start -mt-10 sm:-mt-4 md:mt-0 pt-0 pb-6 sm:py-0 relative">
-              {/* Единый градиент за текстом (на футболке): плавный переход от тёмного к прозрачному, без квадратов */}
+              {/* Тёмный градиент за текстом: мягко затемняет футболку, плавные стопы */}
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
                   background:
-                    'radial-gradient(ellipse 100% 80% at 50% 50%, rgba(11,13,16,0.92) 0%, rgba(11,13,16,0.6) 40%, rgba(11,13,16,0.2) 70%, transparent 100%)',
+                    'radial-gradient(ellipse 95% 75% at 50% 48%, rgba(7,9,12,0.85) 0%, rgba(7,9,12,0.72) 30%, rgba(7,9,12,0.45) 55%, rgba(7,9,12,0.18) 80%, transparent 100%)',
                 }}
                 aria-hidden
               />

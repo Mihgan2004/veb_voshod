@@ -1,5 +1,3 @@
-"use client";
-
 import { Russo_One } from "next/font/google";
 
 const russoOne = Russo_One({
@@ -11,16 +9,17 @@ const russoOne = Russo_One({
 
 const MARQUEE_TEXT = "ВОСХОД х ОТКРЫТИЕ";
 
+/** Бегущая строка — серверный компонент, рендерится на сервере. */
 export function MarqueeStrip() {
   const repeated = Array(12).fill(MARQUEE_TEXT).join("  •  ");
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#07090c] py-2 sm:py-2.5 mt-6 sm:mt-8 border-t border-white/[0.04] border-b border-white/[0.04]"
+      className={`relative w-full overflow-hidden bg-[#07090c] py-2 sm:py-2.5 mt-6 sm:mt-8 border-t border-white/[0.04] border-b border-white/[0.04] ${russoOne.variable}`}
     >
       <div className="overflow-hidden">
         <div
-          className={`inline-flex whitespace-nowrap text-[11px] sm:text-[13px] md:text-[14px] uppercase tracking-[0.35em] text-white/25 animate-marquee ${russoOne.variable}`}
+          className="inline-flex whitespace-nowrap text-[11px] sm:text-[13px] md:text-[14px] uppercase tracking-[0.35em] text-white/25 animate-marquee"
           style={{ fontFamily: "var(--font-marquee), sans-serif" }}
         >
           <span>{repeated}</span>

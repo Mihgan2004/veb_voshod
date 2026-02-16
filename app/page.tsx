@@ -1,24 +1,44 @@
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import Hero from "@/components/hero/Hero";
-import { WelcomeBlock } from "@/components/blocks/WelcomeBlock";
-import { TeeIntroBlock } from "@/components/blocks/TeeIntroBlock";
 import { MarqueeStrip } from "@/components/sections/MarqueeStrip";
 import { HighlightsCollections } from "@/components/sections/HighlightsCollections";
 import { LookbookSlider } from "@/components/sections/LookbookSlider";
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
 import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
 
+/* Тяжёлые блоки со скроллом/анимациями — отдельные чанки, рендер на сервере (ssr: true). */
+const WelcomeBlock = dynamic(
+  () => import("@/components/blocks/WelcomeBlock").then((m) => ({ default: m.WelcomeBlock })),
+  { ssr: true }
+);
+
+const TeeIntroBlock = dynamic(
+  () => import("@/components/blocks/TeeIntroBlock").then((m) => ({ default: m.TeeIntroBlock })),
+  { ssr: true }
+);
+
 /* ------------------------------------------------------------------ */
-/*  Home page: статичные коллекции в Highlights; /collections — Directus */
+/*  Главная: серверный рендер. Hero + Welcome + TeeIntro — клиент (скролл);
+    MarqueeStrip, ниже — сервер/клиент по месту. */
 /* ------------------------------------------------------------------ */
 export const revalidate = 60;
+
+function HomeScrollFallback() {
+  return (
+    <div className="relative w-full border-t border-white/5 min-h-[100vh] bg-[#0B0D10]" aria-hidden />
+  );
+}
 
 export default function HomePage() {
   return (
     <div className="animate-fade-in">
       <Hero />
       <HomeScrollProvider>
-        <WelcomeBlock />
-        <TeeIntroBlock />
+        <Suspense fallback={<HomeScrollFallback />}>
+          <WelcomeBlock />
+          <TeeIntroBlock />
+        </Suspense>
       </HomeScrollProvider>
 
       <MarqueeStrip />
