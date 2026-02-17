@@ -70,14 +70,17 @@ export const OrbitalDock: React.FC = () => {
 
   return (
     <>
-      {/* ---- Top bar ---- */}
+      {/* ---- Top bar (капсула): на мобилке — safe area, отступы, без переполнения) ---- */}
       <nav
-        className={`fixed top-4 sm:top-5 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-auto max-w-[min(90vw,720px)] transition-all duration-500 ease-out ${
+        className={`fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
           scrolled ? "opacity-95" : "opacity-100"
-        }`}
+        } 
+        top-[max(1rem,env(safe-area-inset-top))] sm:top-5 md:top-6
+        w-[calc(100%-2rem)] min-w-0 max-w-[min(90vw,720px)] sm:w-auto`}
       >
-        <div className="relative rounded-full">
-          <div className="relative overflow-hidden rounded-full bg-[#141821]/90 sm:bg-graphite/60 sm:backdrop-blur-md border border-white/10 px-3 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 flex items-center gap-3 sm:gap-6 md:gap-8 shadow-[0_12px_40px_rgba(0,0,0,0.4)]">
+        <div className="relative rounded-full min-w-0">
+          <div className="relative overflow-hidden rounded-full bg-[#141821]/90 sm:bg-graphite/60 sm:backdrop-blur-md border border-white/10 flex items-center justify-between sm:justify-start gap-3 sm:gap-6 md:gap-8 shadow-[0_12px_40px_rgba(0,0,0,0.4)] 
+            px-4 py-2.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 min-h-[44px] sm:min-h-0">
             {/* Logo — rendered at 20px, source should be 80px+ for retina */}
             <Link href="/" className="shrink-0 flex items-center">
               <Image
@@ -119,34 +122,34 @@ export const OrbitalDock: React.FC = () => {
               </Link>
             </div>
 
-            {/* Mobile: иконка корзины с бейджем (видна при добавлении товара) */}
-            <Link
-              href="/cart"
-              aria-label={`Корзина${cartCount > 0 ? `, товаров: ${cartCount}` : ""}`}
-              className="md:hidden relative shrink-0 w-9 h-9 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/[0.06] transition-all duration-200 z-10"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-                <path d="M3 6h18" />
-                <path d="M16 10a4 4 0 0 1-8 0" />
-              </svg>
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-gold text-graphite text-[10px] font-bold tabular-nums">
-                  {cartCount > 99 ? "99+" : cartCount}
-                </span>
-              )}
-            </Link>
-
-            {/* Burger button */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Menu"
-              className="md:hidden shrink-0 w-7 h-7 flex flex-col items-center justify-center gap-[4px] text-white/70 hover:text-white transition-colors duration-200"
-            >
-              <span className={`block w-[16px] h-[1.5px] bg-current transition-all duration-300 origin-center ${menuOpen ? "rotate-45 translate-y-[5.5px]" : ""}`} />
-              <span className={`block w-[16px] h-[1.5px] bg-current transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""}`} />
-              <span className={`block w-[16px] h-[1.5px] bg-current transition-all duration-300 origin-center ${menuOpen ? "-rotate-45 -translate-y-[5.5px]" : ""}`} />
-            </button>
+            {/* Мобилка: лого слева, иконки корзины и меню справа */}
+            <div className="flex md:hidden items-center gap-2 shrink-0">
+              <Link
+                href="/cart"
+                aria-label={`Корзина${cartCount > 0 ? `, товаров: ${cartCount}` : ""}`}
+                className="relative shrink-0 w-9 h-9 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/[0.06] transition-all duration-200 z-10"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                  <path d="M3 6h18" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                {cartCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-gold text-graphite text-[10px] font-bold tabular-nums">
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </span>
+                )}
+              </Link>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Menu"
+                className="shrink-0 w-9 h-9 flex flex-col items-center justify-center gap-[4px] text-white/70 hover:text-white hover:bg-white/[0.06] rounded-full transition-colors duration-200"
+              >
+                <span className={`block w-[16px] h-[1.5px] bg-current transition-all duration-300 origin-center ${menuOpen ? "rotate-45 translate-y-[5.5px]" : ""}`} />
+                <span className={`block w-[16px] h-[1.5px] bg-current transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""}`} />
+                <span className={`block w-[16px] h-[1.5px] bg-current transition-all duration-300 origin-center ${menuOpen ? "-rotate-45 -translate-y-[5.5px]" : ""}`} />
+              </button>
+            </div>
           </div>
 
           <div className="absolute inset-0 rounded-full border border-white/5 pointer-events-none mix-blend-overlay" />
