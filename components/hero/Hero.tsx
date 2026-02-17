@@ -96,7 +96,7 @@ function Hero() {
       <a
         href="#welcome"
         aria-label="Вниз"
-        className="absolute top-[75%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[3] flex items-center justify-center w-10 h-14 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-white/10 active:scale-95"
+        className="absolute top-[78%] md:top-[85%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[3] flex items-center justify-center w-10 h-14 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-white/10 active:scale-95"
       >
         <svg
           width="14"

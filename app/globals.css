@@ -565,9 +565,7 @@ body {
     opacity: 1 !important;
     transform: none !important;
   }
-  .animate-marquee {
-    animation: none !important;
-  }
+  /* Бегущая строка на мобилке включена — анимация .animate-marquee не отключаем */
   .animate-gold-shimmer {
     animation: none !important;
   }
