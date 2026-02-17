@@ -215,10 +215,10 @@ export const WelcomeBlock: React.FC = () => {
         {/* 1. Верх — «Добро пожаловать» (фиксированно наверху) */}
         <div
           ref={welcomeRef}
-          className={`relative z-10 flex-shrink-0 pt-[20%] sm:pt-[18%] flex justify-center items-start select-none welcome-entrance ${russoOne.variable}`}
+          className={`relative z-10 flex-shrink-0 pt-[20%] sm:pt-[18%] md:pt-[16%] lg:pt-[14%] flex justify-center items-start select-none welcome-entrance ${russoOne.variable}`}
           style={{ willChange: "transform, opacity" }}
         >
-          <div className="vx-welcome-text text-[22px] sm:text-[28px] md:text-[40px] font-light tracking-[0.08em] uppercase text-center whitespace-pre-line" style={{ fontFamily: "var(--font-welcome), sans-serif" }}>
+          <div className="vx-welcome-text text-[22px] sm:text-[28px] md:text-[36px] lg:text-[44px] xl:text-[48px] font-light tracking-[0.08em] uppercase text-center whitespace-pre-line" style={{ fontFamily: "var(--font-welcome), sans-serif" }}>
             <WelcomeTypewriter disabled={noScroll} />
           </div>
         </div>
@@ -241,8 +241,8 @@ export const WelcomeBlock: React.FC = () => {
               alt="Проект Восход"
               width={640}
               height={184}
-              sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, 640px"
-              className="w-[220px] sm:w-[320px] md:w-[560px] select-none pointer-events-none"
+              sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, (max-width: 1280px) 480px, 640px"
+              className="w-[220px] sm:w-[320px] md:w-[420px] lg:w-[520px] xl:w-[580px] select-none pointer-events-none"
               draggable={false}
               style={{ backfaceVisibility: "hidden" }}
               priority
@@ -253,20 +253,20 @@ export const WelcomeBlock: React.FC = () => {
         {/* 3. Низ — кнопка В КАТАЛОГ */}
         <div
           ref={ctaRef}
-          className="relative z-10 flex-shrink-0 pb-10 sm:pb-12 flex justify-center cta-entrance"
+          className="relative z-10 flex-shrink-0 pb-10 sm:pb-12 md:pb-14 flex justify-center cta-entrance"
           style={{ willChange: "transform, opacity" }}
         >
           <Link
             href="/catalog"
             className="
               group inline-flex items-center justify-center
-              h-12 md:h-14
-              px-8 md:px-10
+              h-12 md:h-14 lg:h-[52px]
+              px-8 md:px-10 lg:px-12
               rounded-full
               border border-white/10
               bg-[#141821]/85 sm:bg-white/5
               sm:backdrop-blur-md
-              text-[11px] md:text-xs
+              text-[11px] md:text-xs lg:text-[13px]
               uppercase tracking-[0.22em]
               text-[#F5F5F5]
               transition-colors duration-200

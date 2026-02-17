@@ -54,8 +54,8 @@ const TEE_INTRO = {
     containerMinHeight: 'sm:min-h-[55vh]',
   },
   desktop: {
-    teeHeight: 'md:h-[200vh]',
-    teeMaxHeight: 'md:max-h-none',
+    teeHeight: 'md:h-[88vh]',
+    teeMaxHeight: 'md:max-h-[820px]',
     containerMinHeight: 'md:min-h-screen',
   },
 } as const;
@@ -210,19 +210,19 @@ export const TeeIntroBlock: React.FC = () => {
           {!liteMode && <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay bg-noise" />}
         </div>
 
-        <div className="relative z-10 h-full min-h-[100vh] sm:min-h-0 sm:h-full max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-0">
-          <div className="h-full grid grid-cols-12 items-center gap-6 sm:gap-8">
+        <div className="relative z-10 h-full min-h-[100vh] sm:min-h-0 sm:h-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-10 sm:py-0">
+          <div className="h-full grid grid-cols-12 items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12">
             <div
-              className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
+              className={`col-span-12 md:col-span-5 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
             >
               <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
                 {/* ВАЖНО: все translate/scale/height — на wrapper, чтобы маска совпала 1:1 */}
                 <div
                   className={`
                     relative inline-block pointer-events-none select-none
-                    left-1/2 -translate-x-[calc(50%+90px)] md:left-auto md:translate-x-0
+                    left-1/2 -translate-x-[calc(50%+90px)] md:left-0 md:translate-x-0
                     top-1/2 -translate-y-1/2
-                    scale-[1.75] sm:scale-[1.5] md:scale-[1.2] origin-[50%_40%]
+                    scale-[1.75] sm:scale-[1.5] md:scale-[1.05] lg:scale-[1.12] origin-[50%_40%]
                     ${TEE_INTRO.mobile.teeHeight} ${TEE_INTRO.mobile.teeMaxHeight}
                     ${TEE_INTRO.tablet.teeHeight} ${TEE_INTRO.tablet.teeMaxHeight}
                     ${TEE_INTRO.desktop.teeHeight} ${TEE_INTRO.desktop.teeMaxHeight}
@@ -315,7 +315,7 @@ export const TeeIntroBlock: React.FC = () => {
             </div>
 
             {/* Текстовый блок — поднят выше на мобилке (-mt-10) */}
-            <div className="col-span-12 md:col-span-8 order-2 md:order-none flex flex-col justify-center items-center md:items-start -mt-10 sm:-mt-4 md:mt-0 pt-0 pb-6 sm:py-0 relative">
+            <div className="col-span-12 md:col-span-7 order-2 md:order-none flex flex-col justify-center items-center md:items-start -mt-10 sm:-mt-4 md:mt-0 pt-0 pb-6 sm:py-0 relative md:pl-4 lg:pl-8">
               {/* === Мобильный градиент: многослойный, анимированный (из референса) === */}
 
               {/* Слой 1 — основной радиальный градиент с дыханием */}
@@ -378,7 +378,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                 {/* Заголовок */}
                 <h2
-                  className="text-2xl sm:text-3xl md:text-5xl font-light tracking-wide text-white/90"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3rem] font-light tracking-wide text-white/90"
                   style={mkStyle(e1, 32)}
                 >
                   КОНЦЕРН{' '}
@@ -391,7 +391,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                 {/* Описание */}
                 <p
-                  className="mt-4 sm:mt-5 max-w-2xl text-xs sm:text-sm md:text-base text-white/90 leading-relaxed"
+                  className="mt-4 sm:mt-5 max-w-2xl text-xs sm:text-sm md:text-[15px] lg:text-base text-white/90 leading-relaxed"
                   style={mkStyle(e2, 26)}
                 >
                   Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы,

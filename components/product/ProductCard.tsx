@@ -38,16 +38,16 @@ function ProductCardInner({ product }: { product: Product }) {
       </div>
 
       {/* --- Инфо под фото: цвет, название, цена --- */}
-      <div className="mt-3 sm:mt-4 space-y-1">
+      <div className="mt-3 sm:mt-4 md:mt-4 space-y-1">
         {product.specs?.color && (
-          <span className="text-[10px] font-mono uppercase tracking-wider text-white/45">
+          <span className="text-[10px] md:text-[11px] font-mono uppercase tracking-wider text-white/45">
             {product.specs.color}
           </span>
         )}
-        <h3 className="text-[13px] sm:text-[14px] font-medium leading-tight tracking-[0.01em] text-white/85 group-hover:text-white transition-colors duration-300 line-clamp-1">
+        <h3 className="text-[13px] sm:text-[14px] md:text-[15px] font-medium leading-tight tracking-[0.01em] text-white/85 group-hover:text-white transition-colors duration-300 line-clamp-1">
           {product.name}
         </h3>
-        <p className="text-[13px] sm:text-[14px] font-semibold text-white tabular-nums">
+        <p className="text-[13px] sm:text-[14px] md:text-[15px] font-semibold text-white tabular-nums">
           {product.price.toLocaleString("ru-RU")} &#8381;
         </p>
       </div>

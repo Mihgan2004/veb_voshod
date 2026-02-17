@@ -72,12 +72,12 @@ export const OrbitalDock: React.FC = () => {
     <>
       {/* ---- Top bar ---- */}
       <nav
-        className={`fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out ${
+        className={`fixed top-4 sm:top-5 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-auto max-w-[min(90vw,720px)] transition-all duration-500 ease-out ${
           scrolled ? "opacity-95" : "opacity-100"
         }`}
       >
         <div className="relative rounded-full">
-          <div className="relative overflow-hidden rounded-full bg-[#141821]/90 sm:bg-graphite/60 sm:backdrop-blur-md border border-white/10 px-3 sm:px-5 py-1.5 sm:py-2 flex items-center gap-3 sm:gap-6 shadow-[0_12px_40px_rgba(0,0,0,0.4)]">
+          <div className="relative overflow-hidden rounded-full bg-[#141821]/90 sm:bg-graphite/60 sm:backdrop-blur-md border border-white/10 px-3 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 flex items-center gap-3 sm:gap-6 md:gap-8 shadow-[0_12px_40px_rgba(0,0,0,0.4)]">
             {/* Logo — rendered at 20px, source should be 80px+ for retina */}
             <Link href="/" className="shrink-0 flex items-center">
               <Image
@@ -86,13 +86,13 @@ export const OrbitalDock: React.FC = () => {
                 width={59}
                 height={32}
                 sizes="59px"
-                className="h-5 w-auto"
+                className="h-5 md:h-[22px] w-auto"
                 priority
               />
             </Link>
 
             {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-5 text-[11px] font-medium text-gray-400 z-10">
+            <div className="hidden md:flex items-center gap-6 lg:gap-8 text-[11px] md:text-[12px] font-medium text-gray-400 z-10 tracking-[0.02em]">
               <Link
                 href="/catalog"
                 className={`hover:text-white transition-colors duration-200 ${isActive("/catalog") ? "text-white" : ""}`}
@@ -108,7 +108,7 @@ export const OrbitalDock: React.FC = () => {
             </div>
 
             {/* Time + Cart (desktop) */}
-            <div className="hidden md:flex items-center gap-3 text-[11px] font-mono text-gray-400 z-10">
+            <div className="hidden md:flex items-center gap-4 text-[11px] md:text-[12px] font-mono text-gray-400 z-10 tracking-wide">
               {time ? (
                 <span className="border-r border-white/10 pr-3" suppressHydrationWarning>
                   MSC {time}

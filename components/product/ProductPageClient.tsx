@@ -141,14 +141,14 @@ export function ProductPageClient({ product }: { product: Product }) {
 
   return (
     <div className="animate-fade-in min-h-screen">
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pt-24 sm:pt-28 md:pt-32 pb-16 md:pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-start">
 
           {/* ============================================================ */}
           {/*  LEFT: Gallery + main image                                   */}
           {/* ============================================================ */}
-          <div className="lg:sticky lg:top-28 space-y-3">
-            <div className="relative bg-white/[0.02] rounded-sm border border-white/[0.06] overflow-hidden aspect-[3/4] min-h-[400px] lg:min-h-[640px]">
+          <div className="lg:sticky lg:top-32 space-y-3">
+            <div className="relative bg-white/[0.02] rounded-lg border border-white/[0.06] overflow-hidden aspect-[3/4] min-h-[400px] lg:min-h-[560px] xl:min-h-[640px]">
               <Image
                 key={selectedImageIndex}
                 src={src}

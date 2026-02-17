@@ -14,7 +14,7 @@ export function PageShell({
 }) {
   return (
     <div
-      className={`max-w-[1240px] mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-24 ${className}`}
+      className={`max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pt-24 sm:pt-28 md:pt-32 pb-24 md:pb-32 ${className}`}
     >
       {children}
     </div>

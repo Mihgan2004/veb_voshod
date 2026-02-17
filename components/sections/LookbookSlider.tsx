@@ -210,12 +210,12 @@ export function LookbookSlider() {
     <section className="vx-section-seams py-16 sm:py-20">
       <div className="relative z-10">
         {/* ---- Header + Arrows ---- */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 flex items-end justify-between opacity-0 md:opacity-100 animate-mobile-enter">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 flex items-end justify-between opacity-0 md:opacity-100 animate-mobile-enter">
           <div>
             <span className="text-[11px] font-mono uppercase tracking-[0.32em] block mb-1.5 bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
               @VOSHOD
             </span>
-            <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90">
+            <h2 className="text-[22px] sm:text-[28px] md:text-[2rem] font-semibold uppercase tracking-[0.28em] text-white/90">
               Галлерея
             </h2>
           </div>
@@ -229,7 +229,7 @@ export function LookbookSlider() {
         {/* ---- Photo strip (seamless / слитные фото) ---- */}
         <div
           ref={scrollRef}
-          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-4 sm:gap-5 px-4 sm:px-6 min-[1288px]:px-[calc((100vw-1240px)/2+24px)] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
+          className="mt-8 sm:mt-10 md:mt-12 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-4 sm:gap-5 md:gap-6 px-4 sm:px-6 lg:px-10 xl:px-12 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {LOOKBOOK_IMAGES.map((src, i) => (
             <div
@@ -250,7 +250,7 @@ export function LookbookSlider() {
         </div>
 
         {/* ---- Progress indicator ---- */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-5">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 mt-5">
           <ScrollProgress scrollRef={scrollRef} />
         </div>
       </div>

@@ -120,8 +120,8 @@ export function HighlightsCollections({
     <section className="vx-section-seams py-16 sm:py-20">
       <div className="relative z-10">
         {/* ---- Header ---- */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 opacity-0 md:opacity-100 animate-mobile-enter">
-          <h2 className="text-[22px] sm:text-[28px] font-semibold uppercase tracking-[0.28em] text-white/90 text-center">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 opacity-0 md:opacity-100 animate-mobile-enter">
+          <h2 className="text-[22px] sm:text-[28px] md:text-[2rem] font-semibold uppercase tracking-[0.28em] text-white/90 text-center">
             КОЛЛЕКЦИИ
           </h2>
         </div>
@@ -129,7 +129,7 @@ export function HighlightsCollections({
         {/* ---- Carousel ---- */}
         <div
           ref={scrollRef}
-          className="mt-8 sm:mt-10 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-5 sm:gap-6 px-4 sm:px-6 min-[1288px]:px-[calc((100vw-1240px)/2+24px)] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
+          className="mt-8 sm:mt-10 md:mt-12 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-5 sm:gap-6 md:gap-8 px-4 sm:px-6 lg:px-10 xl:px-12 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {collections.map((col) => (
             <Link
@@ -159,7 +159,7 @@ export function HighlightsCollections({
         </div>
 
         {/* ---- Progress indicator ---- */}
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 mt-5">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 mt-5">
           <ScrollProgress scrollRef={scrollRef} />
         </div>
       </div>

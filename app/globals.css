@@ -207,6 +207,12 @@ body {
   padding: 56px 0 44px;
 }
 
+@media (min-width: 768px) {
+  .vx-footer {
+    padding: 64px 0 52px;
+  }
+}
+
 .vx-footer::before {
   content: "";
   position: absolute;
@@ -221,7 +227,7 @@ body {
 }
 
 .vx-footer .vx-footer-inner {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -229,6 +235,18 @@ body {
 @media (min-width: 640px) {
   .vx-footer .vx-footer-inner {
     padding: 0 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .vx-footer .vx-footer-inner {
+    padding: 0 40px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .vx-footer .vx-footer-inner {
+    padding: 0 48px;
   }
 }
 

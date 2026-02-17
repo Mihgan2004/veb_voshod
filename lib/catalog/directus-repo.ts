@@ -54,12 +54,20 @@ function normalizeCategorySlug(v: unknown): Product["category"] {
         ? (v as any).slug
         : "";
 
-  const s = String(slug).toLowerCase();
+  const s = String(slug).toLowerCase().trim();
 
-  // под твой UI-фильтр + реальный data model
-  if (s === "tee" || s === "hoodie" || s === "patch" || s === "cap") return s as any;
-  if (s === "accessory" || s === "accessories") return "accessory" as any;
-  return "other" as any;
+  // Латинские slug из схемы Directus
+  if (s === "tee" || s === "hoodie" || s === "patch" || s === "cap" || s === "lanyard") return s as Product["category"];
+  if (s === "accessory" || s === "accessories") return "accessory";
+
+  // Кириллица: часто в Directus slug заполняют по-русски — маппим в латинский тип
+  if (s === "футболка" || s === "футболки") return "tee";
+  if (s === "худи" || s === "свитшот") return "hoodie";
+  if (s === "нашлепка" || s === "патч") return "patch";
+  if (s === "кепка" || s === "шапка") return "cap";
+  if (s === "аксессуар" || s === "аксессуары") return "accessory";
+
+  return "other";
 }
 
 export function createDirectusRepo(opts: { url: string; token?: string }): CatalogRepo {
