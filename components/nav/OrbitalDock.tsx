@@ -76,11 +76,11 @@ export const OrbitalDock: React.FC = () => {
           scrolled ? "opacity-95" : "opacity-100"
         } 
         top-[max(1rem,env(safe-area-inset-top))] sm:top-5 md:top-6
-        w-[calc(100%-2rem)] min-w-0 max-w-[min(90vw,720px)] sm:w-auto`}
+        w-max max-w-[calc(100%-2rem)] sm:max-w-[min(90vw,720px)]`}
       >
-        <div className="relative rounded-full min-w-0">
-          <div className="relative overflow-hidden rounded-full bg-[#141821]/90 sm:bg-graphite/60 sm:backdrop-blur-md border border-white/10 flex items-center justify-between sm:justify-start gap-3 sm:gap-6 md:gap-8 shadow-[0_12px_40px_rgba(0,0,0,0.4)] 
-            px-4 py-2.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 min-h-[44px] sm:min-h-0">
+        <div className="relative rounded-full">
+<div className="relative overflow-hidden rounded-full bg-[#141821]/90 sm:bg-graphite/60 sm:backdrop-blur-md border border-white/10 flex items-center gap-2 sm:gap-6 md:gap-8 shadow-[0_12px_40px_rgba(0,0,0,0.4)]
+            px-3 py-2 sm:px-5 sm:py-2 md:px-6 md:py-2.5 min-h-[40px] sm:min-h-0">
             {/* Logo — rendered at 20px, source should be 80px+ for retina */}
             <Link href="/" className="shrink-0 flex items-center">
               <Image
@@ -123,7 +123,7 @@ export const OrbitalDock: React.FC = () => {
             </div>
 
             {/* Мобилка: лого слева, иконки корзины и меню справа */}
-            <div className="flex md:hidden items-center gap-2 shrink-0">
+            <div className="flex md:hidden items-center gap-1.5 shrink-0">
               <Link
                 href="/cart"
                 aria-label={`Корзина${cartCount > 0 ? `, товаров: ${cartCount}` : ""}`}
