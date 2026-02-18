@@ -11,6 +11,7 @@ html {
   overflow-x: hidden;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  background: #0b0d10;
 }
 
 body {
@@ -414,15 +415,31 @@ body {
   -webkit-text-stroke: 0.8px rgba(255, 255, 255, 0.85);
 }
 
-/* Золотой градиент + свечение для прелоадера */
+/* Золотой градиент + свечение для прелоадера (fallback — золотой цвет до загрузки градиента) */
 .vx-logo-gold path,
 .vx-logo-gold line,
 .vx-logo-gold polyline,
 .vx-logo-gold polygon,
 .vx-logo-gold circle,
 .vx-logo-gold rect {
+  stroke: #C6902E;
   stroke: url(#vx-gold-stroke);
   filter: url(#vx-glow);
+}
+
+/* Прелоадер: плавное появление лого (без белого мигания) */
+@keyframes vx-preloader-logo-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.vx-preloader-logo {
+  opacity: 0;
+  animation: vx-preloader-logo-in 0.45s ease-out 0.15s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

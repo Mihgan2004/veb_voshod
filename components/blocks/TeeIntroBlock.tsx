@@ -353,7 +353,7 @@ export const TeeIntroBlock: React.FC = () => {
 
                 <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl" style={mkStyle(e3, 36)}>
                   <div
-                    className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md p-3 sm:p-4"
+                    className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md md:bg-transparent md:backdrop-blur-none md:border-white/5 p-3 sm:p-4"
                     style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat1 6s ease-in-out infinite' }}
                   >
                     <div className="text-[10px] font-mono text-white/35">CODE</div>
@@ -362,7 +362,7 @@ export const TeeIntroBlock: React.FC = () => {
                     <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">IN STOCK</div>
                   </div>
                   <div
-                    className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md p-3 sm:p-4"
+                    className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md md:bg-transparent md:backdrop-blur-none md:border-white/5 p-3 sm:p-4"
                     style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat2 7s ease-in-out infinite 0.5s' }}
                   >
                     <div className="text-[10px] font-mono text-white/35">MATERIAL</div>
@@ -375,7 +375,7 @@ export const TeeIntroBlock: React.FC = () => {
                 <div className="mt-6 sm:mt-8" style={mkStyle(e4, 24)}>
                   <Link
                     href="/catalog"
-                    className="inline-flex items-center justify-center h-11 sm:h-12 md:h-14 px-6 sm:px-8 md:px-10 rounded-full border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.2em] sm:tracking-[0.22em] text-[#F5F5F5] transition-all duration-300 hover:border-[#C6902E]/35 hover:bg-white/10"
+                    className="inline-flex items-center justify-center h-11 sm:h-12 md:h-14 px-6 sm:px-8 md:px-10 rounded-full border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md md:bg-transparent md:backdrop-blur-none md:border-white/5 text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.2em] sm:tracking-[0.22em] text-[#F5F5F5] transition-all duration-300 hover:border-[#C6902E]/35 hover:bg-white/10 md:hover:bg-white/5"
                   >
                     СМОТРЕТЬ КАТАЛОГ →
                   </Link>

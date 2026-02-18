@@ -12,24 +12,22 @@ const LITE_DURATION_MS = 800;
 const SKIP_KEY = "voshod-preloader-seen";
 const INITIAL_PATH_KEY = "voshod-initial-path";
 
-/** Прелоадер показывается только при первом заходе на главную (не при переходах между страницами). */
+/** Прелоадер: плавная отрисовка при первом заходе на главную; при переходах (каталог и др.) — тёмный фон без белого мигания. */
 export function Preloader() {
   const pathname = usePathname();
   const liteMode = useLiteMode();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(() => pathname === "/");
   const [phase, setPhase] = useState<"show" | "hide">("show");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Запоминаем первый URL в сессии (полный заход на сайт)
     let initialPath = sessionStorage.getItem(INITIAL_PATH_KEY);
     if (initialPath === null) {
       sessionStorage.setItem(INITIAL_PATH_KEY, pathname);
       initialPath = pathname;
     }
 
-    // Показываем прелоадер только если зашли сразу на главную и ещё не показывали
     const isFirstLoadToHome = initialPath === "/" && pathname === "/";
     const alreadySeen = sessionStorage.getItem(SKIP_KEY);
     if (!isFirstLoadToHome || alreadySeen) {
@@ -49,7 +47,7 @@ export function Preloader() {
         setTimeout(() => {
           setVisible(false);
           sessionStorage.setItem(SKIP_KEY, "1");
-        }, 450);
+        }, 500);
       }, remaining);
     };
 
@@ -65,13 +63,14 @@ export function Preloader() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] grid place-items-center bg-black transition-opacity duration-500 ease-out ${
-        phase === "hide" ? "opacity-0" : "opacity-100"
-      }`}
-      style={{ pointerEvents: visible ? "auto" : "none" }}
+      className="fixed inset-0 z-[9999] grid place-items-center bg-[#0b0d10] transition-opacity duration-500 ease-out vx-preloader-overlay"
+      style={{
+        opacity: phase === "hide" ? 0 : 1,
+        pointerEvents: visible ? "auto" : "none",
+      }}
       aria-hidden
     >
-      <div className="text-white flex items-center justify-center">
+      <div className="vx-preloader-logo flex items-center justify-center">
         {liteMode ? (
           <Image
             src={ASSETS.brand.logoDesktop}
