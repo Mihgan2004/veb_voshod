@@ -41,8 +41,11 @@ export default function HomePage() {
         </Suspense>
       </HomeScrollProvider>
 
-      <MarqueeStrip />
-      <div className="vx-below-fold">
+      {/* Бегущая строка — между TeeIntroBlock и блоком КОЛЛЕКЦИИ, без наложения */}
+      <div className="relative flex justify-center shrink-0 mt-[min(25vh,220px)] sm:mt-[min(28vh,260px)] mb-10 sm:mb-12" aria-hidden>
+        <MarqueeStrip />
+      </div>
+      <div className="vx-below-fold vx-brutal-bg">
         <HighlightsCollections collections={STATIC_COLLECTIONS} />
         <LookbookSlider />
       </div>

@@ -153,7 +153,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
       };
 
       const res = await client.request<DirectusListResponse<Row>>(
-        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images.id,sizes,inStock,code,batch,isFeatured,color,fabric,density,print,category.slug,collection.id`
+        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images,sizes,inStock,code,batch,isFeatured,color,fabric,density,print,category,category.slug,collection.id`
       );
 
       return res.data

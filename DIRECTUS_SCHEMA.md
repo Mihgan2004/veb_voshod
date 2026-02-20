@@ -135,3 +135,9 @@ DIRECTUS_ORDER_ITEMS_NAME=order_items
 ```
 
 После создания полей в Directus убедитесь, что в **Products** есть поля `description`, `color`, `fabric`, `density`, `print`, `code`, `batch` и галерея `images` (Multiple Files). Тогда карточка товара и страница товара будут показывать все данные.
+
+### Изображения и категории на главной
+
+- **Коллекции (coverImage):** поле `coverImage` в коллекции — тип **File** (M2O → directus_files). Загрузи обложку и выбери её в записи. URL будет `{DIRECTUS_URL}/assets/{id}`.
+- **Категории:** в **products** поле `category` — либо **String** (dropdown: tee, hoodie, patch, cap, accessory, other), либо **M2O → categories** с полем `slug`. Категории для фильтра в каталоге берутся из товаров.
+- **На главной** отображаются коллекции с `isFeatured: true`, отсортированные по `sort`. При ошибке Directus показываются статичные коллекции.
