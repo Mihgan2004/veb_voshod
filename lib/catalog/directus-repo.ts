@@ -20,13 +20,17 @@ function assetUrl(base: string, file: unknown): string | undefined {
   return id ? `${base}/assets/${id}` : undefined;
 }
 
-/** Массив файлов из Directus (M2M или JSON) → массив URL. */
+/** Массив файлов из Directus (M2M junction или JSON) → массив URL. */
 function assetUrls(base: string, value: unknown): string[] {
   if (!value) return [];
   const arr = Array.isArray(value) ? value : [value];
   const urls: string[] = [];
   for (const item of arr) {
-    const url = assetUrl(base, item);
+    let fileRef = item;
+    if (typeof item === "object" && item !== null && "directus_files_id" in item) {
+      fileRef = (item as { directus_files_id: unknown }).directus_files_id;
+    }
+    const url = assetUrl(base, fileRef);
     if (url) urls.push(url);
   }
   return urls;
@@ -153,7 +157,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
       };
 
       const res = await client.request<DirectusListResponse<Row>>(
-        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images,sizes,inStock,code,batch,isFeatured,color,fabric,density,print,category,category.slug,collection.id`
+        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images.directus_files_id,sizes,inStock,code,batch,isFeatured,color,fabric,density,print,category,category.slug,collection.id`
       );
 
       return res.data

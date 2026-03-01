@@ -74,15 +74,31 @@
 
 ## 4. Коллекция `orders` (заказы)
 
-| Поле     | Тип    | Описание |
-|----------|--------|----------|
-| `id`     | PK (Integer, Auto) | Идентификатор заказа |
-| `name`   | String | Имя заказчика |
-| `email`  | String | Email |
-| `phone`  | String | Телефон (опционально) |
-| `comment`| Text   | Комментарий к заказу |
-| `total`  | Decimal/Integer | Сумма заказа (руб.) |
-| `status` | String | Статус: `new`, `confirmed`, `shipped`, `cancelled` и т.д. |
+| Поле              | Тип              | Описание |
+|-------------------|------------------|----------|
+| `id`              | PK (Integer, Auto) | Идентификатор заказа |
+| `name`            | String           | Имя заказчика |
+| `email`           | String           | Email |
+| `phone`           | String           | Телефон (опционально) |
+| `comment`         | Text             | Комментарий к заказу |
+| `total`           | Decimal/Integer  | Сумма заказа (руб.), включая доставку |
+| `status`          | String           | Статус: `new`, `pending_payment`, `paid`, `payment_failed`, `confirmed`, `shipped`, `delivered`, `cancelled` |
+| `delivery_type`   | String           | Тип доставки: `pvz`, `postamat`, `courier` |
+| `delivery_address`| Text             | Полный адрес доставки или ПВЗ |
+| `cdek_pvz_code`   | String           | Код пункта выдачи СДЭК (для ПВЗ/постамат) |
+| `delivery_cost`   | Integer          | Стоимость доставки (руб.) |
+| `payment_id`      | String           | ID платежа в ЮКасса |
+| `payment_status`  | String           | Статус платежа: `pending`, `succeeded`, `canceled` |
+
+**Статусы заказа:**
+- `new` — новый заказ (для ручной обработки, без оплаты онлайн)
+- `pending_payment` — ожидает оплаты
+- `paid` — оплачен
+- `payment_failed` — ошибка оплаты
+- `confirmed` — подтверждён, готовится к отправке
+- `shipped` — отправлен
+- `delivered` — доставлен
+- `cancelled` — отменён
 
 **Переменная окружения:** `DIRECTUS_ORDERS_NAME=orders` (по умолчанию).
 
@@ -132,6 +148,18 @@ DIRECTUS_COLLECTIONS_NAME=collections
 DIRECTUS_PRODUCTS_NAME=products
 DIRECTUS_ORDERS_NAME=orders
 DIRECTUS_ORDER_ITEMS_NAME=order_items
+
+# ЮКасса (платежи)
+YOOKASSA_SHOP_ID=...          # ID магазина в ЮКасса
+YOOKASSA_SECRET_KEY=...       # Секретный ключ API
+
+# СДЭК API v2 (доставка)
+CDEK_CLIENT_ID=...            # Client ID из личного кабинета СДЭК
+CDEK_CLIENT_SECRET=...        # Client Secret
+CDEK_FROM_CITY_CODE=44        # Код города отправления (44 = Москва)
+
+# URL сайта (для return_url и webhook)
+NEXT_PUBLIC_SITE_URL=https://voshod.shop
 ```
 
 После создания полей в Directus убедитесь, что в **Products** есть поля `description`, `color`, `fabric`, `density`, `print`, `code`, `batch` и галерея `images` (Multiple Files). Тогда карточка товара и страница товара будут показывать все данные.
@@ -141,3 +169,31 @@ DIRECTUS_ORDER_ITEMS_NAME=order_items
 - **Коллекции (coverImage):** поле `coverImage` в коллекции — тип **File** (M2O → directus_files). Загрузи обложку и выбери её в записи. URL будет `{DIRECTUS_URL}/assets/{id}`.
 - **Категории:** в **products** поле `category` — либо **String** (dropdown: tee, hoodie, patch, cap, accessory, other), либо **M2O → categories** с полем `slug`. Категории для фильтра в каталоге берутся из товаров.
 - **На главной** отображаются коллекции с `isFeatured: true`, отсортированные по `sort`. При ошибке Directus показываются статичные коллекции.
+
+---
+
+## Интеграции
+
+### ЮКасса (платежи)
+
+1. Зарегистрируйтесь в [ЮКасса](https://yookassa.ru/) и создайте магазин
+2. В личном кабинете получите `shopId` и `secretKey`
+3. Настройте webhook URL: `https://voshod.shop/api/payments/webhook`
+4. Выберите события для webhook: `payment.succeeded`, `payment.canceled`
+
+### СДЭК (доставка)
+
+1. Зарегистрируйтесь в [СДЭК](https://www.cdek.ru/ru/integration/) для получения API v2
+2. В личном кабинете получите `Client ID` и `Client Secret`
+3. Определите код города отправления (по умолчанию 44 = Москва)
+
+### Webhook ЮКасса
+
+Webhook URL для настройки в личном кабинете ЮКасса:
+```
+POST https://voshod.shop/api/payments/webhook
+```
+
+ЮКасса отправляет события:
+- `payment.succeeded` — платёж успешно завершён → заказ переходит в статус `paid`
+- `payment.canceled` — платёж отменён → заказ переходит в статус `payment_failed`
