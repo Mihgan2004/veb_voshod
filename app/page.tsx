@@ -1,4 +1,4 @@
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { Suspense } from "react";
 import Hero from "@/components/hero/Hero";
 import { MarqueeStrip } from "@/components/sections/MarqueeStrip";
@@ -7,12 +7,12 @@ import { LookbookSlider } from "@/components/sections/LookbookSlider";
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
 import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
 
-const WelcomeBlock = dynamic(
+const WelcomeBlock = nextDynamic(
   () => import("@/components/blocks/WelcomeBlock").then((m) => ({ default: m.WelcomeBlock })),
   { ssr: true }
 );
 
-const TeeIntroBlock = dynamic(
+const TeeIntroBlock = nextDynamic(
   () => import("@/components/blocks/TeeIntroBlock").then((m) => ({ default: m.TeeIntroBlock })),
   { ssr: true }
 );
