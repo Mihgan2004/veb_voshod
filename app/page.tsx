@@ -37,10 +37,8 @@ export default function HomePage() {
         </Suspense>
       </HomeScrollProvider>
 
-      {/* Бегущая строка — сразу после TeeIntro, минимальные отступы */}
-      <div className="relative z-10 -mt-16 sm:-mt-20 md:-mt-24 mb-6 sm:mb-8 px-4">
-        <MarqueeStrip />
-      </div>
+      {/* Бегущая строка — отдельный блок на всю ширину */}
+      <MarqueeStrip />
 
       <div className="vx-below-fold vx-brutal-bg">
         <HighlightsCollections collections={STATIC_COLLECTIONS} />
