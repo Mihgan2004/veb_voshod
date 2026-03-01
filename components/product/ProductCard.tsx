@@ -1,15 +1,21 @@
 // components/product/ProductCard.tsx
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@/lib/types";
 
 function ProductCardInner({ product }: { product: Product }) {
+  const [imgError, setImgError] = useState(false);
+  
   const src =
     product.imagePlaceholder ||
     (product.images?.length ? product.images[0] : null) ||
     product.image ||
     "/globe.svg";
+
+  const fallbackSrc = "/globe.svg";
 
   return (
     <Link
@@ -19,15 +25,22 @@ function ProductCardInner({ product }: { product: Product }) {
     >
       {/* --- Изображение --- */}
       <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-white/[0.03] border border-white/[0.06] transition-[border-color] duration-200 sm:duration-300 group-hover:border-white/[0.14]">
-        <Image
-          src={src}
-          alt={product.name}
-          fill
-          unoptimized={false}
-          sizes="(max-width: 479px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          loading="lazy"
-          className="object-cover transition-transform duration-200 sm:duration-300 ease-out group-hover:scale-[1.02] sm:group-hover:scale-[1.03]"
-        />
+        {imgError ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/[0.02]">
+            <span className="text-[10px] font-mono text-white/30">NO IMAGE</span>
+          </div>
+        ) : (
+          <Image
+            src={src}
+            alt={product.name}
+            fill
+            unoptimized
+            sizes="(max-width: 479px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            loading="lazy"
+            onError={() => setImgError(true)}
+            className="object-cover transition-transform duration-200 sm:duration-300 ease-out group-hover:scale-[1.02] sm:group-hover:scale-[1.03]"
+          />
+        )}
 
         {/* Статус-бейдж */}
         {product.status !== "available" && (

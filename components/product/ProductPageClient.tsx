@@ -154,7 +154,7 @@ export function ProductPageClient({ product }: { product: Product }) {
                 src={src}
                 alt={product.name}
                 fill
-                unoptimized={false}
+                unoptimized
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
@@ -181,7 +181,7 @@ export function ProductPageClient({ product }: { product: Product }) {
                         src={url}
                         alt=""
                         fill
-                        unoptimized={false}
+                        unoptimized
                         sizes="64px"
                         className="object-cover"
                       />
