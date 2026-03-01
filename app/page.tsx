@@ -7,7 +7,6 @@ import { LookbookSlider } from "@/components/sections/LookbookSlider";
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
 import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
 
-/* Тяжёлые блоки со скроллом/анимациями — отдельные чанки, рендер на сервере (ssr: true). */
 const WelcomeBlock = dynamic(
   () => import("@/components/blocks/WelcomeBlock").then((m) => ({ default: m.WelcomeBlock })),
   { ssr: true }
@@ -18,11 +17,8 @@ const TeeIntroBlock = dynamic(
   { ssr: true }
 );
 
-/* ------------------------------------------------------------------ */
-/*  Главная: серверный рендер. Hero + Welcome + TeeIntro — клиент (скролл);
-    MarqueeStrip, ниже — сервер/клиент по месту. */
-/* ------------------------------------------------------------------ */
-export const revalidate = 60;
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 function HomeScrollFallback() {
   return (
@@ -41,10 +37,11 @@ export default function HomePage() {
         </Suspense>
       </HomeScrollProvider>
 
-      {/* Бегущая строка — между TeeIntroBlock и блоком КОЛЛЕКЦИИ, без наложения */}
-      <div className="relative flex justify-center shrink-0 mt-[min(25vh,220px)] sm:mt-[min(28vh,260px)] mb-10 sm:mb-12" aria-hidden>
+      {/* Бегущая строка — сразу после TeeIntro, минимальные отступы */}
+      <div className="relative z-10 -mt-16 sm:-mt-20 md:-mt-24 mb-6 sm:mb-8 px-4">
         <MarqueeStrip />
       </div>
+
       <div className="vx-below-fold vx-brutal-bg">
         <HighlightsCollections collections={STATIC_COLLECTIONS} />
         <LookbookSlider />

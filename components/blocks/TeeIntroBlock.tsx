@@ -384,7 +384,6 @@ export const TeeIntroBlock: React.FC = () => {
             </div>
           </div>
 
-          <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-16 sm:h-24 bg-gradient-to-b from-transparent to-black/30" />
         </div>
       </div>
     </section>

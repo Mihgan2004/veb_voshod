@@ -10,26 +10,31 @@ const russoOne = Russo_One({
 const MARQUEE_TEXT = "ВОСХОД х ОТКРЫТИЕ";
 
 /**
- * Бегущая строка — серверный компонент (SSR), без "use client".
- * Показывается на всех устройствах, в т.ч. мобилка.
- * На мобилке позиция чуть ниже / адаптивная — на стыке между блоками.
+ * Бегущая строка — компактная, без лишних отступов.
+ * Размещается сразу после TeeIntroBlock, между блоками.
  */
 export function MarqueeStrip() {
-  const repeated = Array(12).fill(MARQUEE_TEXT).join("  •  ");
+  const repeated = Array(16).fill(MARQUEE_TEXT).join("  •  ");
 
   return (
-    <section
-      className={`relative w-full max-w-4xl mx-auto overflow-hidden py-3 sm:py-4 border border-white/10 rounded-lg px-4 sm:px-6 ${russoOne.variable}`}
+    <div
+      className={`
+        relative w-full max-w-5xl mx-auto overflow-hidden
+        py-2.5 sm:py-3 md:py-3.5
+        border border-white/[0.08] rounded-xl
+        bg-white/[0.02]
+        ${russoOne.variable}
+      `}
     >
-      <div className="overflow-hidden flex items-center justify-center">
+      <div className="overflow-hidden">
         <div
-          className="inline-flex whitespace-nowrap text-[11px] sm:text-[12px] md:text-[13px] font-medium uppercase tracking-[0.28em] text-white/40 animate-marquee"
+          className="inline-flex whitespace-nowrap text-[10px] sm:text-[11px] md:text-[12px] font-medium uppercase tracking-[0.25em] text-white/35 animate-marquee"
           style={{ fontFamily: "var(--font-marquee), sans-serif" }}
         >
-          <span>{repeated}</span>
-          <span aria-hidden>{repeated}</span>
+          <span className="pr-4">{repeated}</span>
+          <span className="pr-4" aria-hidden>{repeated}</span>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
