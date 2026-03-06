@@ -157,7 +157,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
       };
 
       const res = await client.request<DirectusListResponse<Row>>(
-        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images.directus_files_id,sizes,inStock,code,batch,isFeatured,color,fabric,density,print,category,category.slug,collection.id`
+        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images.directus_files_id,sizes,inStock,code,batch,isFeatured,color,fabric,density,print,category,category.slug,category.name,collection.id`
       );
 
       return res.data
@@ -183,6 +183,9 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
             ? [mainImage, ...galleryUrls.filter((u) => u !== mainImage)]
             : galleryUrls;
 
+          const categoryObj = typeof r.category === "object" && r.category && "name" in r.category ? (r.category as { slug?: unknown; name?: unknown }) : null;
+          const categoryName = typeof categoryObj?.name === "string" ? categoryObj.name : undefined;
+
           return {
             id,
             slug,
@@ -190,6 +193,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
             price: Number.isFinite(priceNum) ? priceNum : 0,
             description: typeof r.description === "string" ? r.description : "",
             category: normalizeCategorySlug(r.category),
+            categoryName: categoryName || undefined,
             sizes,
             inStock,
             isFeatured,

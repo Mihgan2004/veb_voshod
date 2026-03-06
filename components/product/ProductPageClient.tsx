@@ -201,7 +201,7 @@ export function ProductPageClient({ product }: { product: Product }) {
             <div className="flex items-center gap-2 text-[11px] font-mono tracking-[0.32em] uppercase text-white/40 mb-4">
               <Link href="/catalog" className="hover:text-white/60 transition-colors duration-200">КАТАЛОГ</Link>
               <span className="text-white/20">/</span>
-              <span>{product.category.toUpperCase()}</span>
+              <span>{product.categoryName?.trim() || product.category.toUpperCase()}</span>
             </div>
 
             {/* Name */}

@@ -4,6 +4,23 @@
 
 ---
 
+## Категории (названия в каталоге)
+
+Чтобы в каталоге и на странице товара отображались **названия категорий** (а не только slug):
+
+1. В Directus создай коллекцию **`categories`** (если ещё нет):
+   - `id` (UUID, PK)
+   - `slug` (String) — например: `tee`, `hoodie`, `patch`
+   - `name` (String) — отображаемое название: «Футболки», «Худи», «Патчи»
+
+2. В коллекции **`products`** поле **`category`** должно быть типом **Relation (Many-to-One)** к коллекции `categories`.
+
+3. В запросе к API сайт уже запрашивает `category`, `category.slug`, `category.name` — названия подхватятся автоматически.
+
+Если `category` у товара не заполнен или связь не настроена, будет показываться fallback по slug (TEE, HOODIE, OTHER и т.д.).
+
+---
+
 ## Текущая схема
 
 Сейчас в коллекции `products`:
@@ -143,27 +160,10 @@ function SizeSelector({ product }: { product: Product }) {
 
 ### Уменьшение количества при заказе
 
-При создании заказа обновляй quantity в Directus:
+**Реализовано в проекте:** остатки списываются автоматически при **успешной оплате** (webhook ЮКасса `payment.succeeded`): для каждой позиции заказа находится запись в `products_sizes` по `product_id` и `size`, поле `quantity` уменьшается на купленное количество.
 
-```typescript
-// В API checkout
-async function decrementStock(productId: string, size: string, qty: number) {
-  // Найди запись в products_sizes
-  const res = await directusClient.request(
-    `/items/products_sizes?filter[product_id][_eq]=${productId}&filter[size][_eq]=${size}`
-  );
-  
-  const item = res.data[0];
-  if (!item) throw new Error("Size not found");
-  
-  const newQty = Math.max(0, item.quantity - qty);
-  
-  await directusClient.request(`/items/products_sizes/${item.id}`, {
-    method: "PATCH",
-    body: JSON.stringify({ quantity: newQty }),
-  });
-}
-```
+- Токен сервера (DIRECTUS_TOKEN) должен иметь права **Read** на `order_items` и **Read + Update** на `products_sizes`.
+- Имя коллекции остатков можно задать через `DIRECTUS_PRODUCTS_SIZES_NAME` (по умолчанию `products_sizes`).
 
 ---
 

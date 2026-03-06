@@ -8,8 +8,20 @@ import type {
   CdekOfficeType,
 } from "./types";
 
-const CDEK_API_URL = "https://api.cdek.ru/v2";
-const CDEK_AUTH_URL = "https://api.cdek.ru/v2/oauth/token";
+const CDEK_PROD_BASE = "https://api.cdek.ru/v2";
+const CDEK_TEST_BASE = "https://api.edu.cdek.ru/v2";
+
+const CDEK_TEST_CLIENT_ID = "wqGwiQx0gg8mLtiEKsUinjVSICCjtTEP";
+
+export function getCdekBaseUrl(): string {
+  const override = process.env.CDEK_API_URL;
+  if (override) return override.replace(/\/+$/, "");
+
+  const clientId = process.env.CDEK_CLIENT_ID;
+  if (clientId === CDEK_TEST_CLIENT_ID) return CDEK_TEST_BASE;
+
+  return CDEK_PROD_BASE;
+}
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
@@ -41,7 +53,9 @@ export async function getToken(): Promise<string> {
     client_secret: clientSecret,
   });
 
-  const response = await fetch(CDEK_AUTH_URL, {
+  const baseUrl = getCdekBaseUrl();
+
+  const response = await fetch(`${baseUrl}/oauth/token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -80,7 +94,9 @@ export async function calculateTariff(
     tariff_code: tariffCode,
   };
 
-  const response = await fetch(`${CDEK_API_URL}/calculator/tariff`, {
+  const baseUrl = getCdekBaseUrl();
+
+  const response = await fetch(`${baseUrl}/calculator/tariff`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -122,8 +138,10 @@ export async function getOffices(
     params.set("type", type);
   }
 
+  const baseUrl = getCdekBaseUrl();
+
   const response = await fetch(
-    `${CDEK_API_URL}/deliverypoints?${params.toString()}`,
+    `${baseUrl}/deliverypoints?${params.toString()}`,
     {
       method: "GET",
       headers: {
@@ -151,8 +169,10 @@ export async function searchCities(query: string): Promise<{ code: number; city:
     size: "10",
   });
 
+  const baseUrl = getCdekBaseUrl();
+
   const response = await fetch(
-    `${CDEK_API_URL}/location/cities?${params.toString()}`,
+    `${baseUrl}/location/cities?${params.toString()}`,
     {
       method: "GET",
       headers: {

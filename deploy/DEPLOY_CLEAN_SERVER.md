@@ -175,7 +175,8 @@ curl -s http://127.0.0.1:8055/server/health
 cd /home/ubuntu/voshod/voshod-web
 npm ci
 cp .env.example .env.local
-nano .env.local
+
+cd /home/alantrei/projects/voshod-web && node scripts/svg-to-logo.js
 ```
 
 Заполни:
@@ -310,12 +311,13 @@ cd /home/ubuntu/voshod/voshod-web
 git stash push -m "server local edits"
 
 # Подтянуть из репо
-git pull origin main
+  git pull origin main
 
 # Собрать и перезапустить
 npm install
 npm run build
 pm2 restart voshod-web
+pm2 start ecosystem.config.cjs
 
 # При необходимости вернуть свои правки поверх
 # git stash pop

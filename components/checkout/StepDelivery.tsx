@@ -104,7 +104,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             toCityCode: cityCode,
-            tariffCode: 139,
+            tariffCode: 137,
           }),
         });
 

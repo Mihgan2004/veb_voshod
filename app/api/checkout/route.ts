@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import {
   createCheckoutOrder,
   updateOrderPaymentId,
+  getProductPricesById,
   type CheckoutOrderPayload,
 } from "@/lib/orders/directus-orders";
 import { createPayment } from "@/lib/yookassa";
 import type { CartLine } from "@/lib/cart/cart-store";
 import type { CdekDeliveryType } from "@/lib/cdek/types";
+
+const MAX_PRICE_DRIFT_RUB = 1;
 
 type CheckoutRequestBody = {
   customer: {
@@ -58,15 +61,44 @@ export async function POST(req: Request) {
 
     const { customer, cart, delivery } = body;
 
-    const subtotal = cart.reduce(
+    // --- Server-side price verification ---
+    // Never trust client-sent prices — fetch the real ones from Directus
+    const productIds = cart.map((item) => item.product.id);
+    const realPrices = await getProductPricesById(productIds);
+
+    const verifiedCart: CartLine[] = cart.map((item) => {
+      const serverPrice = realPrices.get(String(item.product.id));
+      if (serverPrice !== undefined) {
+        const drift = Math.abs(serverPrice - item.product.price);
+        if (drift > MAX_PRICE_DRIFT_RUB) {
+          console.warn(
+            `[checkout] Price mismatch for product ${item.product.id}: client=${item.product.price}, server=${serverPrice}`
+          );
+        }
+        return {
+          ...item,
+          product: { ...item.product, price: serverPrice },
+        };
+      }
+      return item;
+    });
+
+    const subtotal = verifiedCart.reduce(
       (sum, item) => sum + item.product.price * item.qty,
       0
     );
     const total = subtotal + delivery.cost;
 
+    if (total <= 0) {
+      return NextResponse.json(
+        { error: "INVALID_TOTAL", message: "Order total must be positive" },
+        { status: 400 }
+      );
+    }
+
     const orderPayload: CheckoutOrderPayload = {
       customer,
-      cart,
+      cart: verifiedCart,
       delivery: {
         type: delivery.type,
         address: delivery.address,
@@ -81,7 +113,7 @@ export async function POST(req: Request) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     const returnUrl = `${siteUrl}/checkout/success?orderId=${orderId}`;
 
-    const itemsDescription = cart
+    const itemsDescription = verifiedCart
       .map((item) => `${item.product.name} (${item.size}) x${item.qty}`)
       .join(", ");
     const description = `Заказ №${orderId}: ${itemsDescription}`.slice(0, 128);

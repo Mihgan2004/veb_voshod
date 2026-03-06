@@ -33,6 +33,8 @@ export type Product = {
   price: number;
 
   category: Category;
+  /** Название категории из Directus (для отображения). Если нет — используется slug. */
+  categoryName?: string;
 
   inStock: boolean;
   isFeatured: boolean;

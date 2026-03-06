@@ -241,8 +241,8 @@ export function CdekMapWidget({
           },
         ],
         tariffs: {
-          office: [136, 137],
-          door: [],
+          office: [136],
+          door: [137],
         },
         onReady: () => {
           console.log("[CdekWidget] Widget ready");

@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { verifyWebhookIp, type YooWebhookEvent } from "@/lib/yookassa";
+import {
+  verifyWebhookIp,
+  getPayment,
+  isPaymentSucceeded,
+  isPaymentCanceled,
+  type YooWebhookEvent,
+} from "@/lib/yookassa";
 import {
   getOrderByPaymentId,
   updateOrderStatus,
+  decrementStockForOrder,
 } from "@/lib/orders/directus-orders";
 
 function getClientIp(headersList: Headers): string {
@@ -28,7 +35,7 @@ export async function POST(req: Request) {
     const isValidIp = verifyWebhookIp(clientIp);
 
     if (!isValidIp && process.env.NODE_ENV === "production") {
-      console.warn(`[webhook] Invalid IP address: ${clientIp}`);
+      console.warn(`[webhook] Rejected — invalid IP: ${clientIp}`);
       return NextResponse.json(
         { error: "FORBIDDEN", message: "Invalid source IP" },
         { status: 403 }
@@ -44,10 +51,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const { event, object: payment } = body;
-    const paymentId = payment.id;
+    const { event, object: webhookPayment } = body;
+    const paymentId = webhookPayment.id;
 
-    console.log(`[webhook] Received event: ${event}, paymentId: ${paymentId}`);
+    console.log(`[webhook] Received ${event}, paymentId: ${paymentId}`);
 
     const order = await getOrderByPaymentId(paymentId);
 
@@ -56,23 +63,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, message: "Order not found" });
     }
 
-    switch (event) {
-      case "payment.succeeded":
-        await updateOrderStatus(order.id, "paid", "succeeded");
-        console.log(`[webhook] Order ${order.id} marked as paid`);
-        break;
+    // Second-layer verification: fetch the real payment status from YooKassa API
+    // to protect against forged webhook payloads (per official docs recommendation)
+    const realPayment = await getPayment(paymentId);
 
-      case "payment.canceled":
-        await updateOrderStatus(order.id, "payment_failed", "canceled");
-        console.log(`[webhook] Order ${order.id} marked as payment_failed`);
-        break;
+    if (realPayment.status !== webhookPayment.status) {
+      console.warn(
+        `[webhook] Status mismatch: webhook=${webhookPayment.status}, API=${realPayment.status}. Using API status.`
+      );
+    }
 
-      case "payment.waiting_for_capture":
-        console.log(`[webhook] Payment ${paymentId} waiting for capture`);
-        break;
-
-      default:
-        console.log(`[webhook] Unhandled event: ${event}`);
+    if (isPaymentSucceeded(realPayment)) {
+      await updateOrderStatus(order.id, "paid", "succeeded");
+      await decrementStockForOrder(order.id);
+      console.log(`[webhook] Order ${order.id} → paid, stock decremented`);
+    } else if (isPaymentCanceled(realPayment)) {
+      await updateOrderStatus(order.id, "payment_failed", "canceled");
+      console.log(`[webhook] Order ${order.id} → payment_failed`);
+    } else if (realPayment.status === "waiting_for_capture") {
+      console.log(`[webhook] Payment ${paymentId} waiting_for_capture (auto-capture is on, will resolve shortly)`);
+    } else if (realPayment.status === "pending") {
+      console.log(`[webhook] Payment ${paymentId} still pending`);
     }
 
     return NextResponse.json({ ok: true });

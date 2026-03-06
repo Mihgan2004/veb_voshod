@@ -24,12 +24,19 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
   const deferredCategory = useDeferredValue(category);
   const deferredQuery = useDeferredValue(queryDebounced);
 
-  /** Категории из Directus: уникальные по товарам + ALL. Порядок: all, затем по алфавиту slug. */
+  /** Категории из Directus: уникальные по товарам + ALL. Название — из categoryName или fallback по slug. */
   const categories = useMemo(() => {
     const slugs = Array.from(new Set(products.map((p) => p.category))).sort();
     const list: { value: Category | "all"; label: string }[] = [
-      { value: "all", label: "ALL" },
-      ...slugs.map((value) => ({ value, label: CATEGORY_LABELS[value] ?? value.toUpperCase() })),
+      { value: "all", label: "ВСЕ" },
+      ...slugs.map((value) => {
+        const firstWithCategory = products.find((p) => p.category === value);
+        const label =
+          firstWithCategory?.categoryName?.trim() ||
+          CATEGORY_LABELS[value] ||
+          value.toUpperCase();
+        return { value, label };
+      }),
     ];
     return list;
   }, [products]);

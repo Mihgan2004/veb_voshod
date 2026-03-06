@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     const { toCityCode, tariffCode, packages } = body;
 
     const fromCityCode = getFromCityCode();
-    const tariff = tariffCode ?? CDEK_TARIFF_CODES.PVZ_TO_PVZ;
+    const tariff = tariffCode ?? CDEK_TARIFF_CODES.WAREHOUSE_TO_OFFICE;
     const pkgs = packages ?? [getDefaultPackage()];
 
     const result = await calculateTariff(fromCityCode, toCityCode, pkgs, tariff);

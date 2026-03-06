@@ -106,9 +106,12 @@ export type CdekTokenResponse = {
 };
 
 export const CDEK_TARIFF_CODES = {
-  PVZ_TO_PVZ: 136,
-  PVZ_TO_POSTAMAT: 137,
-  PVZ_TO_DOOR: 139,
+  /** 136: Посылка склад-склад (до ПВЗ / постамата) */
+  WAREHOUSE_TO_OFFICE: 136,
+  /** 137: Посылка склад-дверь (курьер) */
+  WAREHOUSE_TO_DOOR: 137,
+  /** 139: Посылка дверь-дверь */
+  DOOR_TO_DOOR: 139,
 } as const;
 
 export type CdekTariffCode = (typeof CDEK_TARIFF_CODES)[keyof typeof CDEK_TARIFF_CODES];

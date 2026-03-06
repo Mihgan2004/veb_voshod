@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { getToken } from "@/lib/cdek";
-
-const CDEK_API_URL = "https://api.cdek.ru/v2";
+import { getToken, getCdekBaseUrl } from "@/lib/cdek";
 
 export async function POST(req: Request) {
   try {
@@ -9,20 +7,21 @@ export async function POST(req: Request) {
     const { action, params } = body;
 
     const token = await getToken();
+    const baseUrl = getCdekBaseUrl();
 
     let response: Response;
     let result: unknown;
 
     switch (action) {
-      case "offices":
+      case "offices": {
         const officeParams = new URLSearchParams();
         if (params.city_code) officeParams.set("city_code", params.city_code);
         if (params.type) officeParams.set("type", params.type);
         if (params.postal_code) officeParams.set("postal_code", params.postal_code);
         if (params.country_code) officeParams.set("country_codes", params.country_code);
-        
+
         response = await fetch(
-          `${CDEK_API_URL}/deliverypoints?${officeParams.toString()}`,
+          `${baseUrl}/deliverypoints?${officeParams.toString()}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             cache: "no-store",
@@ -30,9 +29,10 @@ export async function POST(req: Request) {
         );
         result = await response.json();
         break;
+      }
 
       case "calculate":
-        response = await fetch(`${CDEK_API_URL}/calculator/tarifflist`, {
+        response = await fetch(`${baseUrl}/calculator/tarifflist`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -44,14 +44,14 @@ export async function POST(req: Request) {
         result = await response.json();
         break;
 
-      case "cities":
+      case "cities": {
         const cityParams = new URLSearchParams();
         if (params.city) cityParams.set("city", params.city);
         if (params.country_codes) cityParams.set("country_codes", params.country_codes);
         if (params.size) cityParams.set("size", params.size);
-        
+
         response = await fetch(
-          `${CDEK_API_URL}/location/cities?${cityParams.toString()}`,
+          `${baseUrl}/location/cities?${cityParams.toString()}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             cache: "no-store",
@@ -59,14 +59,15 @@ export async function POST(req: Request) {
         );
         result = await response.json();
         break;
+      }
 
-      case "regions":
+      case "regions": {
         const regionParams = new URLSearchParams();
         if (params.country_codes) regionParams.set("country_codes", params.country_codes);
         if (params.size) regionParams.set("size", params.size);
-        
+
         response = await fetch(
-          `${CDEK_API_URL}/location/regions?${regionParams.toString()}`,
+          `${baseUrl}/location/regions?${regionParams.toString()}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             cache: "no-store",
@@ -74,6 +75,7 @@ export async function POST(req: Request) {
         );
         result = await response.json();
         break;
+      }
 
       default:
         return NextResponse.json(

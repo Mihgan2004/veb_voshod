@@ -352,3 +352,140 @@ export async function getOrderByPaymentId(
   return null;
 }
 
+/**
+ * Получить статус заказа и payment_status по orderId (для success page).
+ */
+export async function getOrderStatus(
+  orderId: string | number
+): Promise<{ status: OrderStatus; payment_status: PaymentStatus | null } | null> {
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_TOKEN;
+
+  if (!url || !token) return null;
+
+  const client = createDirectusClient({ url, token });
+  const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
+
+  type Row = { id: string | number; status: string; payment_status?: string };
+  type Res = { data: Row };
+
+  try {
+    const res = await client.request<Res>(
+      `/items/${ordersCollection}/${encodeURIComponent(String(orderId))}?fields=id,status,payment_status`
+    );
+    return {
+      status: (res.data.status || "new") as OrderStatus,
+      payment_status: (res.data.payment_status as PaymentStatus) || null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+type OrderItemRow = { product: string | number | null; size: string; qty: number };
+
+/**
+ * Получить позиции заказа (product id, size, qty) для списания остатков.
+ */
+export async function getOrderItems(
+  orderId: string | number
+): Promise<OrderItemRow[]> {
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_TOKEN;
+
+  if (!url || !token) return [];
+
+  const client = createDirectusClient({ url, token });
+  const orderItemsCollection = process.env.DIRECTUS_ORDER_ITEMS_NAME ?? "order_items";
+
+  type Res = { data: OrderItemRow[] };
+  const res = await client.request<Res>(
+    `/items/${orderItemsCollection}?filter[order][_eq]=${encodeURIComponent(String(orderId))}&fields=product,size,qty`
+  );
+  return res.data ?? [];
+}
+
+/**
+ * Получить реальные цены товаров из Directus по списку ID.
+ * Возвращает Map<productId, price>.
+ */
+export async function getProductPricesById(
+  productIds: (string | number)[]
+): Promise<Map<string, number>> {
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_TOKEN;
+  const prices = new Map<string, number>();
+
+  if (!url || !token || productIds.length === 0) return prices;
+
+  const client = createDirectusClient({ url, token });
+  const productsCollection = process.env.DIRECTUS_PRODUCTS_NAME ?? "products";
+
+  const uniqueIds = [...new Set(productIds.map(String))];
+  const idsFilter = uniqueIds.join(",");
+
+  type PriceRow = { id: string | number; price: number };
+  type PriceRes = { data: PriceRow[] };
+
+  const res = await client.request<PriceRes>(
+    `/items/${productsCollection}?filter[id][_in]=${encodeURIComponent(idsFilter)}&fields=id,price&limit=${uniqueIds.length}`
+  );
+
+  for (const row of res.data ?? []) {
+    prices.set(String(row.id), Number(row.price) || 0);
+  }
+
+  return prices;
+}
+
+const PRODUCTS_SIZES = process.env.DIRECTUS_PRODUCTS_SIZES_NAME ?? "products_sizes";
+
+/**
+ * Списывает остатки в products_sizes по позициям заказа.
+ * Вызывать после успешной оплаты (например в webhook payment.succeeded).
+ */
+export async function decrementStockForOrder(
+  orderId: string | number
+): Promise<void> {
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_TOKEN;
+
+  if (!url || !token) {
+    console.warn("[orders] DIRECTUS_URL or DIRECTUS_TOKEN not set, skip stock decrement");
+    return;
+  }
+
+  const client = createDirectusClient({ url, token });
+  const items = await getOrderItems(orderId);
+
+  for (const row of items) {
+    const productId = row.product;
+    const size = row.size?.trim();
+    const qty = Math.max(0, Number(row.qty) || 0);
+    if (productId == null || !size || qty === 0) continue;
+
+    try {
+      type StockRow = { id: string | number; quantity: number };
+      type StockRes = { data: StockRow[] };
+      const listRes = await client.request<StockRes>(
+        `/items/${PRODUCTS_SIZES}?filter[product_id][_eq]=${encodeURIComponent(String(productId))}&filter[size][_eq]=${encodeURIComponent(size)}&fields=id,quantity&limit=1`
+      );
+      const stockRow = listRes.data?.[0];
+      if (!stockRow) {
+        console.warn(`[orders] No products_sizes row for product ${productId} size ${size}, skip decrement`);
+        continue;
+      }
+      const newQty = Math.max(0, Number(stockRow.quantity) - qty);
+      await client.request(`/items/${PRODUCTS_SIZES}/${stockRow.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ quantity: newQty }),
+      });
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[orders] Stock decremented: product ${productId} size ${size} by ${qty}, new quantity ${newQty}`);
+      }
+    } catch (e) {
+      console.error(`[orders] Failed to decrement stock for product ${productId} size ${size}:`, e);
+    }
+  }
+}
+
