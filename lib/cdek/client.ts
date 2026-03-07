@@ -166,6 +166,8 @@ export type CdekCityResult = {
   city: string;
   region: string;
   country_code: string;
+  latitude: number;
+  longitude: number;
 };
 
 export async function searchCities(query: string): Promise<CdekCityResult[]> {

@@ -21,6 +21,8 @@ export async function GET(req: Request) {
         code: c.code,
         name: c.city,
         region: c.region || "",
+        latitude: c.latitude,
+        longitude: c.longitude,
       })),
     });
   } catch (e) {

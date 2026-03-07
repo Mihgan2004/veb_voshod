@@ -1,28 +1,13 @@
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
-import dynamic from "next/dynamic";
 import {
   useCheckout,
   type CdekPointData,
   type CourierAddressData,
 } from "@/lib/checkout/checkout-store";
 import type { CdekDeliveryType } from "@/lib/cdek/types";
-
-const CdekMapWidget = dynamic(
-  () => import("./CdekMapWidget").then((mod) => mod.CdekMapWidget),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="min-h-[500px] rounded-xl border border-white/[0.08] bg-white/[0.02] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-[13px] text-white/40">Загрузка виджета СДЭК...</p>
-        </div>
-      </div>
-    ),
-  }
-);
+import { PvzSelector } from "./PvzSelector";
 
 const inputBase =
   "w-full rounded-xl border bg-white/[0.03] px-4 py-3 text-[14px] text-white placeholder:text-white/35 outline-none transition-colors focus:border-white/25 focus:ring-1 focus:ring-white/10";
@@ -35,7 +20,11 @@ type DeliveryTab = {
 
 const deliveryTabs: DeliveryTab[] = [
   { id: "pvz", label: "ПВЗ", description: "Пункт выдачи заказов СДЭК" },
-  { id: "postamat", label: "Постамат", description: "Автоматическая выдача 24/7" },
+  {
+    id: "postamat",
+    label: "Постамат",
+    description: "Автоматическая выдача 24/7",
+  },
   { id: "courier", label: "Курьер", description: "Доставка до двери" },
 ];
 
@@ -64,21 +53,32 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
     Array<{ code: number; name: string; region?: string }>
   >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [widgetError, setWidgetError] = useState<string | null>(null);
+  const [selectedCourierCity, setSelectedCourierCity] = useState<{
+    code: number;
+    name: string;
+  } | null>(
+    courierAddress?.cityCode
+      ? { code: courierAddress.cityCode, name: courierAddress.city }
+      : null
+  );
+  const [courierError, setCourierError] = useState<string | null>(null);
+
+  // --- PVZ / Postamat handlers ---
 
   const handlePointSelect = useCallback(
     (point: CdekPointData, tariff: { cost: number; days: string }) => {
       setCdekPoint(point);
       setDeliveryCost(Math.ceil(tariff.cost));
-      setDeliveryDays(`${tariff.days} дн.`);
+      setDeliveryDays(`${tariff.days}`);
     },
     [setCdekPoint, setDeliveryCost, setDeliveryDays]
   );
 
   const handleTabChange = (type: CdekDeliveryType) => {
     setDeliveryType(type);
-    setWidgetError(null);
   };
+
+  // --- Courier handlers ---
 
   const handleCourierAddressChange = (
     field: keyof CourierAddressData,
@@ -97,6 +97,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
   const calculateCourierCost = useCallback(
     async (cityCode: number) => {
       setIsLoading(true);
+      setCourierError(null);
 
       try {
         const res = await fetch("/api/cdek/calculate", {
@@ -117,11 +118,13 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
           console.error("[delivery] Calculation failed:", data);
           setDeliveryCost(0);
           setDeliveryDays("");
+          setCourierError("Не удалось рассчитать стоимость доставки");
         }
       } catch (e) {
         console.error("[delivery] Calculation error:", e);
         setDeliveryCost(0);
         setDeliveryDays("");
+        setCourierError("Ошибка расчёта стоимости доставки");
       } finally {
         setIsLoading(false);
       }
@@ -136,7 +139,9 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
     }
 
     try {
-      const res = await fetch(`/api/cdek/cities?q=${encodeURIComponent(query)}`);
+      const res = await fetch(
+        `/api/cdek/cities?q=${encodeURIComponent(query)}`
+      );
       const data = await res.json();
 
       if (data.ok && data.cities) {
@@ -149,8 +154,10 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
   }, []);
 
   useEffect(() => {
+    if (deliveryType !== "courier") return;
+
     const timeout = setTimeout(() => {
-      if (cityInput.length >= 2) {
+      if (cityInput.length >= 2 && !selectedCourierCity) {
         searchCities(cityInput);
       } else {
         setCitySuggestions([]);
@@ -158,12 +165,17 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [cityInput, searchCities]);
+  }, [cityInput, searchCities, deliveryType, selectedCourierCity]);
 
-  const selectCity = (city: { code: number; name: string; region?: string }) => {
+  const selectCourierCity = (city: {
+    code: number;
+    name: string;
+    region?: string;
+  }) => {
     setCityInput(city.name);
     setCitySuggestions([]);
     setShowSuggestions(false);
+    setSelectedCourierCity({ code: city.code, name: city.name });
     const current = courierAddress || {
       city: "",
       cityCode: 0,
@@ -179,8 +191,25 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
     calculateCourierCost(city.code);
   };
 
+  const handleCityInputChange = (value: string) => {
+    setCityInput(value);
+    if (selectedCourierCity) {
+      setSelectedCourierCity(null);
+      setDeliveryCost(0);
+      setDeliveryDays("");
+      setCourierError(null);
+      const current = courierAddress || {
+        city: "",
+        cityCode: 0,
+        street: "",
+        house: "",
+        flat: "",
+      };
+      setCourierAddress({ ...current, city: value, cityCode: 0 });
+    }
+  };
+
   const canProceed = isDeliveryValid();
-  const showYandexKeyWarning = !process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY;
 
   return (
     <div className="space-y-6">
@@ -190,6 +219,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
         </p>
       </div>
 
+      {/* Tabs */}
       <div className="flex rounded-xl bg-white/[0.02] border border-white/[0.06] p-1">
         {deliveryTabs.map((tab) => (
           <button
@@ -211,71 +241,25 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
         {deliveryTabs.find((t) => t.id === deliveryType)?.description}
       </p>
 
-      {showYandexKeyWarning && (deliveryType === "pvz" || deliveryType === "postamat") && (
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[13px] text-amber-300">
-          <strong>Внимание:</strong> Для работы карты СДЭК необходимо добавить ключ Яндекс.Карт
-          в переменную окружения <code className="bg-white/10 px-1 rounded">NEXT_PUBLIC_YANDEX_MAPS_API_KEY</code>
-        </div>
-      )}
-
+      {/* PVZ / Postamat */}
       {(deliveryType === "pvz" || deliveryType === "postamat") && (
-        <div className="space-y-4">
-          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-            <p className="text-[12px] text-white/60 mb-3">
-              Введите город в поле поиска виджета, затем выберите удобный пункт выдачи на карте или из списка.
-            </p>
-            <ul className="text-[11px] text-white/40 space-y-1">
-              <li>• Начните вводить название города</li>
-              <li>• Выберите город из подсказок</li>
-              <li>• Кликните на ПВЗ на карте или в списке</li>
-              <li>• Нажмите кнопку «Выбрать»</li>
-            </ul>
-          </div>
-
-          {widgetError ? (
-            <div className="rounded-xl border border-crimson/30 bg-crimson/10 px-4 py-3 text-[13px] text-crimson">
-              {widgetError}
-            </div>
-          ) : (
-            <CdekMapWidget
-              filterType={deliveryType === "pvz" ? "PVZ" : "POSTAMAT"}
-              onSelect={handlePointSelect}
-            />
-          )}
-
-          {cdekPoint && (
-            <div className="rounded-xl border border-gold/30 bg-gold/5 p-4">
-              <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-gold mb-2">
-                Выбранный пункт
-              </p>
-              <p className="text-[14px] text-white font-medium">{cdekPoint.name}</p>
-              <p className="text-[13px] text-white/60 mt-1">
-                {cdekPoint.city}, {cdekPoint.address}
-              </p>
-              <p className="text-[12px] text-white/40 mt-1">{cdekPoint.workTime}</p>
-              {deliveryCost > 0 && (
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gold/20">
-                  <span className="text-[12px] text-white/50">
-                    Доставка: {deliveryDays}
-                  </span>
-                  <span className="text-[16px] font-semibold text-gold">
-                    {deliveryCost.toLocaleString("ru-RU")} ₽
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        <PvzSelector
+          filterType={deliveryType === "pvz" ? "PVZ" : "POSTAMAT"}
+          onSelect={handlePointSelect}
+        />
       )}
 
+      {/* Courier */}
       {deliveryType === "courier" && (
         <div className="space-y-4">
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
             <p className="text-[12px] text-white/60">
-              Введите адрес для курьерской доставки. Курьер доставит заказ до двери.
+              Введите адрес для курьерской доставки. Курьер доставит заказ до
+              двери.
             </p>
           </div>
 
+          {/* City search */}
           <div className="relative">
             <label
               htmlFor="courier-city"
@@ -287,13 +271,24 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
               id="courier-city"
               type="text"
               value={cityInput}
-              onChange={(e) => setCityInput(e.target.value)}
-              onFocus={() => citySuggestions.length > 0 && setShowSuggestions(true)}
+              onChange={(e) => handleCityInputChange(e.target.value)}
+              onFocus={() =>
+                citySuggestions.length > 0 && setShowSuggestions(true)
+              }
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               placeholder="Начните вводить название города"
-              className={`${inputBase} border-white/10`}
+              className={`${inputBase} ${
+                selectedCourierCity
+                  ? "border-gold/30"
+                  : "border-white/10"
+              }`}
               autoComplete="off"
             />
+            {!selectedCourierCity && cityInput.length >= 2 && (
+              <p className="text-[11px] text-amber-400/70 mt-1">
+                Выберите город из списка подсказок
+              </p>
+            )}
             {showSuggestions && citySuggestions.length > 0 && (
               <div className="absolute z-50 w-full mt-1 rounded-xl border border-white/[0.08] bg-[#11151b] shadow-2xl max-h-52 overflow-y-auto">
                 {citySuggestions.map((city) => (
@@ -301,12 +296,16 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
                     key={city.code}
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => selectCity(city)}
+                    onClick={() => selectCourierCity(city)}
                     className="w-full text-left px-4 py-3 hover:bg-white/[0.05] transition-colors border-b border-white/[0.04] last:border-b-0"
                   >
-                    <span className="block text-[14px] text-white/90">{city.name}</span>
+                    <span className="block text-[14px] text-white/90">
+                      {city.name}
+                    </span>
                     {city.region && (
-                      <span className="block text-[11px] text-white/40 mt-0.5">{city.region}</span>
+                      <span className="block text-[11px] text-white/40 mt-0.5">
+                        {city.region}
+                      </span>
                     )}
                   </button>
                 ))}
@@ -314,6 +313,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
             )}
           </div>
 
+          {/* Street */}
           <div>
             <label
               htmlFor="courier-street"
@@ -325,12 +325,15 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
               id="courier-street"
               type="text"
               value={courierAddress?.street || ""}
-              onChange={(e) => handleCourierAddressChange("street", e.target.value)}
+              onChange={(e) =>
+                handleCourierAddressChange("street", e.target.value)
+              }
               placeholder="Название улицы"
               className={`${inputBase} border-white/10`}
             />
           </div>
 
+          {/* House + Flat */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
@@ -343,7 +346,9 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
                 id="courier-house"
                 type="text"
                 value={courierAddress?.house || ""}
-                onChange={(e) => handleCourierAddressChange("house", e.target.value)}
+                onChange={(e) =>
+                  handleCourierAddressChange("house", e.target.value)
+                }
                 placeholder="№ дома"
                 className={`${inputBase} border-white/10`}
               />
@@ -359,24 +364,48 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
                 id="courier-flat"
                 type="text"
                 value={courierAddress?.flat || ""}
-                onChange={(e) => handleCourierAddressChange("flat", e.target.value)}
+                onChange={(e) =>
+                  handleCourierAddressChange("flat", e.target.value)
+                }
                 placeholder="№ кв."
                 className={`${inputBase} border-white/10`}
               />
             </div>
           </div>
 
+          {/* Courier error */}
+          {courierError && (
+            <div className="rounded-xl border border-crimson/30 bg-crimson/10 px-4 py-3 text-[13px] text-crimson">
+              {courierError}
+            </div>
+          )}
+
+          {/* Courier cost */}
           {deliveryCost > 0 && (
             <div className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
               <div>
-                <p className="text-[12px] text-white/50">Стоимость доставки</p>
-                <p className="text-[13px] text-white/40 mt-0.5">{deliveryDays}</p>
+                <p className="text-[12px] text-white/50">
+                  Стоимость доставки
+                </p>
+                <p className="text-[13px] text-white/40 mt-0.5">
+                  {deliveryDays}
+                </p>
               </div>
               <p className="text-[18px] font-semibold text-white tabular-nums">
                 {deliveryCost.toLocaleString("ru-RU")} ₽
               </p>
             </div>
           )}
+
+          {/* Hint: why button is disabled */}
+          {deliveryType === "courier" &&
+            !canProceed &&
+            selectedCourierCity &&
+            deliveryCost > 0 && (
+              <p className="text-[11px] text-white/30">
+                Заполните все обязательные поля для продолжения
+              </p>
+            )}
         </div>
       )}
 
@@ -387,6 +416,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
         </div>
       )}
 
+      {/* Navigation */}
       <div className="flex gap-3">
         <button
           type="button"
