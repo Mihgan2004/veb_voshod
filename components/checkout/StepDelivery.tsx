@@ -478,7 +478,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
         <button
           type="button"
           onClick={onBack}
-          className="flex-1 h-12 rounded-xl border border-gold/25 bg-transparent font-mono text-[12px] uppercase tracking-[0.2em] text-gold/70 hover:border-gold/40 hover:text-gold/90 hover:bg-gold/[0.06] transition-all"
+          className="flex-1 vx-back-btn"
         >
           Назад
         </button>

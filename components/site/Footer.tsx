@@ -16,7 +16,7 @@ export function Footer() {
           </div>
 
           {/* Legal links — золотой градиент */}
-          <nav className="flex flex-wrap items-center justify-start md:justify-end gap-x-5 sm:gap-x-8 md:gap-x-10 gap-y-3 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.1em] sm:tracking-[0.16em] w-full min-w-0">
+          <nav className="flex flex-wrap items-center justify-start md:justify-end gap-x-5 sm:gap-x-8 md:gap-x-10 gap-y-3 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.14em] sm:tracking-[0.2em] w-full min-w-0">
             <Link href="/legal/offer" className={GOLD_GRADIENT}>
               Оферта
             </Link>
