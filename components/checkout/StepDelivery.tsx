@@ -33,7 +33,7 @@ type ProviderTab = {
 
 const providerTabs: ProviderTab[] = [
   { id: "cdek", label: "СДЭК", logo: "/logo/cdek-1.svg" },
-  { id: "yandex", label: "Яндекс", logo: "/logo/Логотип_Яндекс_Доставка.svg.png" },
+  { id: "yandex", label: "Яндекс", logo: "/logo/ZIF.png" },
   { id: "ozon", label: "Озон", logo: "/logo/Ozon_idTmLIuY6b_0.png" },
 ];
 
@@ -238,7 +238,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
         </p>
       </div>
 
-      {/* Provider tabs — logos крупно на всю плашку */}
+      {/* Provider tabs — logos крупно на всю плашку, СДЭК чуть больше */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {providerTabs.map((tab) => (
           <button
@@ -254,11 +254,11 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
             <Image
               src={tab.logo}
               alt={tab.label}
-              width={120}
-              height={44}
-              className={`max-w-[90%] max-h-10 sm:max-h-12 w-auto h-auto object-contain transition-opacity ${
-                deliveryProvider === tab.id ? "opacity-100" : "opacity-45"
-              }`}
+              width={tab.id === "cdek" ? 140 : 120}
+              height={tab.id === "cdek" ? 52 : 44}
+              className={`max-w-[95%] w-auto h-auto object-contain transition-opacity ${
+                tab.id === "cdek" ? "max-h-12 sm:max-h-14" : "max-h-10 sm:max-h-12"
+              } ${deliveryProvider === tab.id ? "opacity-100" : "opacity-45"}`}
               unoptimized
             />
             {deliveryProvider === tab.id && (
