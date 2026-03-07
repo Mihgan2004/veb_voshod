@@ -124,9 +124,10 @@ export function DeliveryMap({
         return;
       }
 
-      if (!mounted || !containerRef.current || !window.ymaps) return;
+      const ymaps = window.ymaps;
+      if (!mounted || !containerRef.current || !ymaps) return;
 
-      mapRef.current = new window.ymaps.Map(containerRef.current, {
+      mapRef.current = new ymaps.Map(containerRef.current, {
         center: center || [55.76, 37.64],
         zoom: 11,
         controls: ["zoomControl"],
@@ -156,19 +157,20 @@ export function DeliveryMap({
   }, [center, updateCenter]);
 
   useEffect(() => {
-    if (!mapRef.current || !window.ymaps) return;
+    const ymaps = window.ymaps;
+    if (!mapRef.current || !ymaps) return;
 
     const map = mapRef.current;
     map.geoObjects.removeAll();
 
     if (offices.length === 0) return;
 
-    const collection = new window.ymaps.GeoObjectCollection();
+    const collection = new ymaps.GeoObjectCollection();
 
     offices.forEach((office) => {
       const isSelected = office.code === selectedCode;
 
-      const placemark = new window.ymaps.Placemark(
+      const placemark = new ymaps.Placemark(
         [office.lat, office.lng],
         {
           balloonContentHeader: office.name,
