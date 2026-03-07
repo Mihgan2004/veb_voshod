@@ -70,6 +70,10 @@ body {
     animation: stamp 1.2s ease-out forwards;
   }
 
+  .animate-cart-pulse {
+    animation: cartPulse 0.6s ease-out 3;
+  }
+
   .bg-noise {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
     background-repeat: repeat;
@@ -259,18 +263,6 @@ body {
   }
 }
 
-.vx-footer::before {
-  content: "";
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  top: 0;
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent, rgba(198,144,46,.12), rgba(255,255,255,.08), rgba(198,144,46,.12), transparent);
-  pointer-events: none;
-}
-
 .vx-footer .vx-footer-inner {
   max-width: 1280px;
   margin: 0 auto;
@@ -362,19 +354,6 @@ body {
   background: rgba(198,144,46,.25);
 }
 
-/* Footer divider line */
-.vx-footer-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
-  margin: 24px 0;
-}
-
-@media (min-width: 768px) {
-  .vx-footer-divider {
-    margin: 32px 0;
-  }
-}
-
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -438,6 +417,15 @@ body {
   100% {
     opacity: 1;
     transform: scale(1) rotate(-12deg);
+  }
+}
+
+@keyframes cartPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
   }
 }
 
@@ -832,7 +820,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #0B0D10;
+  color: rgba(255,255,255,0.88);
   transition: all 0.25s ease;
   box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset;
 }

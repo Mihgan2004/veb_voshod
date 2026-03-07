@@ -1,15 +1,12 @@
 import React from "react";
 import Link from "next/link";
 
-const GOLD_GRADIENT =
-  "bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent";
+const GOLD_GRADIENT = "bg-gradient-to-r from-amber-800/90 via-amber-600/70 to-amber-800/90 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent";
 
 export function Footer() {
   return (
     <footer className="vx-footer">
       <div className="vx-footer-inner">
-        <div className="vx-footer-divider" />
-
         {/* Main row */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 md:gap-12">
           {/* Copyright */}

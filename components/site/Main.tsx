@@ -5,12 +5,14 @@ import { OrbitalDock } from "@/components/nav/OrbitalDock";
 import { RouteScrollTop } from "@/components/site/RouteScrollTop";
 import { Footer } from "@/components/site/Footer";
 import { LiteModeInit } from "@/components/site/LiteModeInit";
+import { StampOverlay } from "@/components/ui/StampOverlay";
 
 export default function Main({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen vx-page-ambient font-sans text-gray-200 selection:bg-gold selection:text-black">
       <LiteModeInit />
       <Preloader />
+      <StampOverlay />
       <div className="relative z-10">
         <RouteScrollTop />
         <OrbitalDock />

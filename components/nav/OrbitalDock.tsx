@@ -16,6 +16,7 @@ const NAV_LINKS = [
 export const OrbitalDock: React.FC = () => {
   const pathname = usePathname();
   const cartCount = useCart((s) => s.cart.reduce((sum, i) => sum + i.qty, 0));
+  const stampVisible = useCart((s) => s.stampVisible);
 
   const [time, setTime] = useState("");
   const [scrolled, setScrolled] = useState(false);
@@ -119,7 +120,10 @@ export const OrbitalDock: React.FC = () => {
                   MSC {time}
                 </span>
               ) : null}
-              <Link href="/cart" className="hover:text-white/70 transition-colors duration-200 flex items-center gap-1.5">
+              <Link
+                href="/cart"
+                className={`hover:text-white/70 transition-colors duration-200 flex items-center gap-1.5 ${stampVisible ? "animate-cart-pulse" : ""}`}
+              >
                 <span className="text-white/40">CART</span>
                 <span className="text-white/60 tabular-nums">[{cartCount}]</span>
               </Link>
@@ -130,7 +134,7 @@ export const OrbitalDock: React.FC = () => {
               <Link
                 href="/cart"
                 aria-label={`Корзина${cartCount > 0 ? `, товаров: ${cartCount}` : ""}`}
-                className="relative shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-white/55 hover:text-white/80 transition-all duration-200 z-10"
+                className={`relative shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-white/55 hover:text-white/80 transition-all duration-200 z-10 ${stampVisible ? "animate-cart-pulse" : ""}`}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
