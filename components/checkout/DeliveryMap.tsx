@@ -101,6 +101,7 @@ export function DeliveryMap({
   const mapRef = useRef<YMap | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   const apiKey = process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY;
 
@@ -134,6 +135,7 @@ export function DeliveryMap({
       });
 
       setLoading(false);
+      setMapReady(true);
     })();
 
     return () => {
@@ -142,6 +144,7 @@ export function DeliveryMap({
         mapRef.current.destroy();
         mapRef.current = null;
       }
+      setMapReady(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey]);
@@ -158,7 +161,7 @@ export function DeliveryMap({
 
   useEffect(() => {
     const ymaps = window.ymaps;
-    if (!mapRef.current || !ymaps) return;
+    if (!mapReady || !mapRef.current || !ymaps) return;
 
     const map = mapRef.current;
     map.geoObjects.removeAll();
@@ -195,7 +198,7 @@ export function DeliveryMap({
     if (bounds) {
       map.setBounds(bounds, { checkZoomRange: true, zoomMargin: 50 });
     }
-  }, [offices, selectedCode, onOfficeClick]);
+  }, [offices, selectedCode, onOfficeClick, mapReady]);
 
   if (!apiKey) return null;
 

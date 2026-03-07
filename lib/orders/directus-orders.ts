@@ -357,7 +357,7 @@ export async function getOrderByPaymentId(
  */
 export async function getOrderStatus(
   orderId: string | number
-): Promise<{ status: OrderStatus; payment_status: PaymentStatus | null } | null> {
+): Promise<{ status: OrderStatus; payment_status: PaymentStatus | null; payment_id?: string } | null> {
   const url = process.env.DIRECTUS_URL;
   const token = process.env.DIRECTUS_TOKEN;
 
@@ -366,16 +366,17 @@ export async function getOrderStatus(
   const client = createDirectusClient({ url, token });
   const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
 
-  type Row = { id: string | number; status: string; payment_status?: string };
+  type Row = { id: string | number; status: string; payment_status?: string; payment_id?: string };
   type Res = { data: Row };
 
   try {
     const res = await client.request<Res>(
-      `/items/${ordersCollection}/${encodeURIComponent(String(orderId))}?fields=id,status,payment_status`
+      `/items/${ordersCollection}/${encodeURIComponent(String(orderId))}?fields=id,status,payment_status,payment_id`
     );
     return {
       status: (res.data.status || "new") as OrderStatus,
       payment_status: (res.data.payment_status as PaymentStatus) || null,
+      payment_id: res.data.payment_id || undefined,
     };
   } catch {
     return null;
