@@ -1,15 +1,13 @@
 import React from "react";
 import Link from "next/link";
 
-const GOLD_GRADIENT = "bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent";
-
 export function Footer() {
   return (
     <footer className="vx-footer">
       <div className="vx-footer-inner">
-        {/* Brand signature */}
-        <div className="vx-footer-brand font-mono">
-          ПРОЕКТ ВОСХОД — ТАКТИЧЕСКИЙ МЕРЧ
+        {/* Brand signature — золотой градиент */}
+        <div className="vx-footer-brand vx-footer-brand-gradient font-mono">
+          ПРОЕКТ ВОСХОД — ПРОЕКТ ПРО ЛЮДЕЙ
         </div>
 
         <div className="vx-footer-divider" />
@@ -22,17 +20,15 @@ export function Footer() {
             <p className="mt-1">ВСЕ ПРАВА ЗАЩИЩЕНЫ.</p>
           </div>
 
-          {/* Legal links — gold gradient, wrap on mobile, не вылезают за границы */}
-          <nav className="flex flex-wrap items-center justify-start md:justify-end gap-x-3 sm:gap-x-6 md:gap-x-8 gap-y-2 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.1em] sm:tracking-[0.18em] w-full min-w-0">
-            <Link href="/legal/offer" className={GOLD_GRADIENT}>
+          {/* Legal links — без градиента, нейтральный цвет, свободнее */}
+          <nav className="flex flex-wrap items-center justify-start md:justify-end gap-x-5 sm:gap-x-8 md:gap-x-10 gap-y-3 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.1em] sm:tracking-[0.16em] w-full min-w-0">
+            <Link href="/legal/offer" className="text-white/45 hover:text-white/65 transition-colors">
               Оферта
             </Link>
-            <span className="text-white/10 select-none hidden sm:inline" aria-hidden>·</span>
-            <Link href="/legal/shipping" className={GOLD_GRADIENT}>
+            <Link href="/legal/shipping" className="text-white/45 hover:text-white/65 transition-colors">
               Доставка
             </Link>
-            <span className="text-white/10 select-none hidden sm:inline" aria-hidden>·</span>
-            <Link href="/legal/policy" className={GOLD_GRADIENT}>
+            <Link href="/legal/policy" className="text-white/45 hover:text-white/65 transition-colors">
               Конфиденциальность
             </Link>
           </nav>

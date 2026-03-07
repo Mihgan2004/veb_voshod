@@ -299,8 +299,25 @@ body {
   font-size: 10px;
   letter-spacing: .32em;
   text-transform: uppercase;
-  color: rgba(255,255,255,.2);
   line-height: 1.8;
+}
+
+.vx-footer .vx-footer-brand:not(.vx-footer-brand-gradient) {
+  color: rgba(255,255,255,.2);
+}
+
+.vx-footer .vx-footer-brand.vx-footer-brand-gradient {
+  color: transparent;
+  background: linear-gradient(90deg, #b8860b, #d4a853, #b8860b);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: vx-footer-gold-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes vx-footer-gold-shimmer {
+  0%, 100% { background-position: 100% 50%; }
+  50% { background-position: 0% 50%; }
 }
 
 .vx-footer .vx-footer-meta {
@@ -799,16 +816,17 @@ body {
   opacity: 1;
 }
 
-/* ========== 6b) GOLD PRIMARY BUTTON — muted gold fill ========== */
+/* ========== 6b) GOLD PRIMARY BUTTON — цвет лого, приглушённый ========== */
 .vx-gold-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 48px;
   padding: 0 24px;
+  white-space: nowrap;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(180deg, #B8902F 0%, #9E7A28 100%);
+  background: linear-gradient(180deg, #9E7B2A 0%, #8A6A24 100%);
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
   font-size: 12px;
   font-weight: 600;
@@ -816,11 +834,11 @@ body {
   text-transform: uppercase;
   color: #0B0D10;
   transition: all 0.25s ease;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset;
 }
 
 .vx-gold-btn:hover:not(:disabled) {
-  background: linear-gradient(180deg, #C69835 0%, #A8822C 100%);
+  background: linear-gradient(180deg, #A88430 0%, #927328 100%);
 }
 
 .vx-gold-btn:active:not(:disabled) {

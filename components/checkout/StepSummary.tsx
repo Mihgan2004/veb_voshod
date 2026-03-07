@@ -279,7 +279,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
           disabled={submitting || !agreedToTerms}
           className="flex-1 vx-gold-btn"
         >
-          {submitting ? "Переход к оплате..." : `Оплатить ${total.toLocaleString("ru-RU")} ₽`}
+          {submitting ? "Переход к оплате..." : `Оплатить ${total.toLocaleString("ru-RU")}\u00A0₽`}
         </button>
       </div>
 
