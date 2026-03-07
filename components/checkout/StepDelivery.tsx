@@ -61,7 +61,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
 
   const [cityInput, setCityInput] = useState(courierAddress?.city || "");
   const [citySuggestions, setCitySuggestions] = useState<
-    Array<{ code: number; name: string }>
+    Array<{ code: number; name: string; region?: string }>
   >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [widgetError, setWidgetError] = useState<string | null>(null);
@@ -160,11 +160,22 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
     return () => clearTimeout(timeout);
   }, [cityInput, searchCities]);
 
-  const selectCity = (city: { code: number; name: string }) => {
+  const selectCity = (city: { code: number; name: string; region?: string }) => {
     setCityInput(city.name);
-    handleCourierAddressChange("city", city.name);
-    handleCourierAddressChange("cityCode", city.code);
+    setCitySuggestions([]);
     setShowSuggestions(false);
+    const current = courierAddress || {
+      city: "",
+      cityCode: 0,
+      street: "",
+      house: "",
+      flat: "",
+    };
+    setCourierAddress({
+      ...current,
+      city: city.name,
+      cityCode: city.code,
+    });
     calculateCourierCost(city.code);
   };
 
@@ -284,15 +295,19 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
               autoComplete="off"
             />
             {showSuggestions && citySuggestions.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 rounded-xl border border-white/[0.08] bg-graphite-light shadow-lg max-h-48 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-1 rounded-xl border border-white/[0.08] bg-[#11151b] shadow-2xl max-h-52 overflow-y-auto">
                 {citySuggestions.map((city) => (
                   <button
                     key={city.code}
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => selectCity(city)}
-                    className="w-full text-left px-4 py-2.5 text-[14px] text-white/80 hover:bg-white/[0.05] transition-colors"
+                    className="w-full text-left px-4 py-3 hover:bg-white/[0.05] transition-colors border-b border-white/[0.04] last:border-b-0"
                   >
-                    {city.name}
+                    <span className="block text-[14px] text-white/90">{city.name}</span>
+                    {city.region && (
+                      <span className="block text-[11px] text-white/40 mt-0.5">{city.region}</span>
+                    )}
                   </button>
                 ))}
               </div>

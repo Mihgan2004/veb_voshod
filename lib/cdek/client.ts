@@ -161,11 +161,19 @@ export async function getOffices(
   return (await response.json()) as CdekOffice[];
 }
 
-export async function searchCities(query: string): Promise<{ code: number; city: string }[]> {
+export type CdekCityResult = {
+  code: number;
+  city: string;
+  region: string;
+  country_code: string;
+};
+
+export async function searchCities(query: string): Promise<CdekCityResult[]> {
   const token = await getToken();
 
   const params = new URLSearchParams({
     city: query,
+    country_codes: "RU",
     size: "10",
   });
 
@@ -189,8 +197,14 @@ export async function searchCities(query: string): Promise<{ code: number; city:
     );
   }
 
-  const data = (await response.json()) as Array<{ code: number; city: string }>;
-  return data;
+  const data = (await response.json()) as CdekCityResult[];
+
+  const seen = new Set<number>();
+  return data.filter((c) => {
+    if (seen.has(c.code)) return false;
+    seen.add(c.code);
+    return true;
+  });
 }
 
 export function getFromCityCode(): number {

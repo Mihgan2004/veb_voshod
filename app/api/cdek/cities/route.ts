@@ -20,6 +20,7 @@ export async function GET(req: Request) {
       cities: cities.map((c) => ({
         code: c.code,
         name: c.city,
+        region: c.region || "",
       })),
     });
   } catch (e) {

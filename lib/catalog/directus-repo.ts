@@ -17,7 +17,11 @@ function toId(v: unknown): string | undefined {
 
 function assetUrl(base: string, file: unknown): string | undefined {
   const id = toId(file);
-  return id ? `${base}/assets/${id}` : undefined;
+  if (!id) return undefined;
+  const token = process.env.DIRECTUS_TOKEN;
+  return token
+    ? `${base}/assets/${id}?access_token=${token}`
+    : `${base}/assets/${id}`;
 }
 
 /** Массив файлов из Directus (M2M junction или JSON) → массив URL. */
