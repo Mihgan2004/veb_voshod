@@ -144,25 +144,9 @@ export function WelcomeBlockDesktop() {
         >
           <Link
             href="/catalog"
-            className="
-              group inline-flex items-center justify-center
-              h-12 md:h-14
-              px-8 md:px-10
-              rounded-full
-              border border-white/10
-              bg-[#141821]/85 sm:bg-white/5
-              sm:backdrop-blur-md
-              text-[11px] md:text-xs
-              uppercase tracking-[0.22em]
-              text-[#F5F5F5]
-              transition-all duration-300
-              hover:border-[#C6902E]/35 hover:bg-white/7
-            "
+            className="vx-cta-btn"
           >
-            <span className="relative">
-              В КАТАЛОГ
-              <span className="absolute -bottom-2 left-0 h-px w-full bg-[#C6902E]/0 group-hover:bg-[#C6902E]/40 transition-all duration-300" />
-            </span>
+            В КАТАЛОГ
           </Link>
         </div>
       </div>

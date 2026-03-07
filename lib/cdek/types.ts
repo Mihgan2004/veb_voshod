@@ -1,5 +1,7 @@
 export type CdekDeliveryType = "pvz" | "postamat" | "courier";
 
+export type DeliveryProvider = "cdek" | "yandex" | "ozon";
+
 export type CdekOfficeType = "PVZ" | "POSTAMAT";
 
 export type CdekOffice = {

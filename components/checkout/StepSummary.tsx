@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useCheckout } from "@/lib/checkout/checkout-store";
 import { useCart, type CartLine } from "@/lib/cart/cart-store";
 
@@ -15,13 +16,24 @@ const deliveryTypeLabels = {
   courier: "Курьерская доставка",
 };
 
+const providerLabels = {
+  cdek: "СДЭК",
+  yandex: "Яндекс Доставка",
+  ozon: "Озон Доставка",
+};
+
+const GOLD_GRADIENT = "bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent";
+
 export function StepSummary({ onBack }: StepSummaryProps) {
   const contacts = useCheckout((s) => s.contacts);
+  const deliveryProvider = useCheckout((s) => s.deliveryProvider);
   const deliveryType = useCheckout((s) => s.deliveryType);
   const deliveryCost = useCheckout((s) => s.deliveryCost);
   const deliveryDays = useCheckout((s) => s.deliveryDays);
   const getDeliveryAddress = useCheckout((s) => s.getDeliveryAddress);
   const cdekPoint = useCheckout((s) => s.cdekPoint);
+  const agreedToTerms = useCheckout((s) => s.agreedToTerms);
+  const setAgreedToTerms = useCheckout((s) => s.setAgreedToTerms);
 
   const cart = useCart((s) => s.cart);
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.qty, 0);
@@ -30,8 +42,15 @@ export function StepSummary({ onBack }: StepSummaryProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const deliveryLabel = deliveryProvider === "cdek"
+    ? deliveryTypeLabels[deliveryType]
+    : providerLabels[deliveryProvider];
+
+  const showCostRow = deliveryProvider === "cdek" && deliveryCost > 0;
+  const costPending = deliveryProvider === "yandex" || deliveryProvider === "ozon";
+
   async function handlePayment() {
-    if (submitting) return;
+    if (submitting || !agreedToTerms) return;
 
     setSubmitting(true);
     setError(null);
@@ -47,6 +66,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
         cart,
         delivery: {
           type: deliveryType,
+          provider: deliveryProvider,
           address: getDeliveryAddress(),
           cdekPvzCode: cdekPoint?.code,
           cost: deliveryCost,
@@ -108,20 +128,26 @@ export function StepSummary({ onBack }: StepSummaryProps) {
           Доставка
         </p>
         <div className="space-y-1">
-          <p className="text-[14px] text-white">
-            {deliveryTypeLabels[deliveryType]}
-          </p>
+          <p className="text-[14px] text-white">{deliveryLabel}</p>
           <p className="text-[13px] text-white/60">{getDeliveryAddress()}</p>
           {cdekPoint && (
             <p className="text-[12px] text-white/40">{cdekPoint.workTime}</p>
           )}
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/[0.06]">
-            <span className="text-[13px] text-white/50">
-              Срок: {deliveryDays}
-            </span>
-            <span className="text-[14px] font-medium text-white">
-              {deliveryCost.toLocaleString("ru-RU")} ₽
-            </span>
+            {showCostRow ? (
+              <>
+                <span className="text-[13px] text-white/50">
+                  Срок: {deliveryDays}
+                </span>
+                <span className="text-[14px] font-medium text-white">
+                  {deliveryCost.toLocaleString("ru-RU")} ₽
+                </span>
+              </>
+            ) : costPending ? (
+              <span className="text-[13px] text-white/50">
+                Стоимость уточняется менеджером
+              </span>
+            ) : null}
           </div>
         </div>
       </div>
@@ -173,12 +199,20 @@ export function StepSummary({ onBack }: StepSummaryProps) {
             {subtotal.toLocaleString("ru-RU")} ₽
           </span>
         </div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[13px] text-white/50">Доставка</span>
-          <span className="text-[14px] text-white tabular-nums">
-            {deliveryCost.toLocaleString("ru-RU")} ₽
-          </span>
-        </div>
+        {showCostRow && (
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[13px] text-white/50">Доставка</span>
+            <span className="text-[14px] text-white tabular-nums">
+              {deliveryCost.toLocaleString("ru-RU")} ₽
+            </span>
+          </div>
+        )}
+        {costPending && (
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[13px] text-white/50">Доставка</span>
+            <span className="text-[13px] text-white/40">уточняется</span>
+          </div>
+        )}
         <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
           <span className="text-[14px] font-medium text-white">Итого</span>
           <span className="text-[20px] font-semibold text-white tabular-nums">
@@ -193,20 +227,61 @@ export function StepSummary({ onBack }: StepSummaryProps) {
         </div>
       )}
 
+      {/* Agreement checkbox */}
+      <label className="flex items-start gap-3 cursor-pointer group">
+        <div className="relative mt-0.5 shrink-0">
+          <input
+            type="checkbox"
+            checked={agreedToTerms}
+            onChange={(e) => setAgreedToTerms(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-5 h-5 rounded border border-white/20 bg-white/[0.03] transition-all peer-checked:border-gold/50 peer-checked:bg-gold/10 peer-focus-visible:ring-1 peer-focus-visible:ring-gold/30 group-hover:border-white/30" />
+          <svg
+            className="absolute inset-0 w-5 h-5 text-gold opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none p-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={3}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <span className="text-[13px] text-white/60 leading-relaxed">
+          Нажимая на кнопку вы соглашаетесь с{" "}
+          <Link href="/legal/policy" className={`${GOLD_GRADIENT} hover:underline`}>
+            Политикой конфиденциальности
+          </Link>
+          , а также с{" "}
+          <Link href="/legal/offer" className={`${GOLD_GRADIENT} hover:underline`}>
+            Условиями продажи
+          </Link>
+          {" "}и{" "}
+          <Link href="/legal/shipping" className={`${GOLD_GRADIENT} hover:underline`}>
+            Условиями доставки
+          </Link>
+        </span>
+      </label>
+
+      {/* Action buttons */}
       <div className="flex gap-3">
         <button
           type="button"
           onClick={onBack}
           disabled={submitting}
-          className="flex-1 h-12 rounded-xl border border-white/10 bg-white/[0.02] font-mono text-[12px] uppercase tracking-[0.2em] text-white/60 hover:bg-white/[0.05] hover:text-white/80 transition-all disabled:opacity-50"
+          className="flex-1 h-12 rounded-xl border border-gold/20 bg-transparent font-mono text-[12px] uppercase tracking-[0.2em] text-gold/60 hover:border-gold/35 hover:text-gold/80 hover:bg-gold/[0.04] transition-all disabled:opacity-50"
         >
           Назад
         </button>
         <button
           type="button"
           onClick={handlePayment}
-          disabled={submitting}
-          className="flex-1 h-12 rounded-xl bg-gold text-graphite font-mono text-[12px] uppercase tracking-[0.2em] hover:bg-gold/90 active:scale-[0.99] transition-all disabled:opacity-70"
+          disabled={submitting || !agreedToTerms}
+          className={`flex-1 h-12 rounded-xl font-mono text-[12px] uppercase tracking-[0.2em] font-semibold transition-all ${
+            agreedToTerms && !submitting
+              ? "bg-gold text-graphite hover:bg-gold/90 active:scale-[0.99]"
+              : "border border-white/[0.08] bg-white/[0.03] text-white/25 cursor-not-allowed"
+          }`}
         >
           {submitting ? "Переход к оплате..." : `Оплатить ${total.toLocaleString("ru-RU")} ₽`}
         </button>

@@ -316,20 +316,20 @@ export const TeeIntroBlock: React.FC = () => {
               />
 
               <div className="relative z-10">
-                <div className="text-[10px] sm:text-xs font-mono tracking-widest text-white/40 mb-2 sm:mb-3" style={mkStyle(e0, 20)}>
+                <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.2em] text-white/30 mb-3 sm:mb-4" style={mkStyle(e0, 20)}>
                   {isMobile ? (
                     <TypewriterLine disabled={false} />
                   ) : (
                     <>
                       {'// PROJECT VOSKHOD / DROP'}
                       {!animationsDisabled && (
-                        <span className="inline-block w-[6px] h-[1.1em] bg-white/40 ml-1 align-middle" style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }} />
+                        <span className="inline-block w-[5px] h-[1em] bg-white/30 ml-1 align-middle" style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }} />
                       )}
                     </>
                   )}
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl md:text-5xl font-light tracking-wide" style={mkStyle(e1, 32)}>
+                <h2 className="text-[22px] sm:text-[28px] md:text-[44px] font-light tracking-[0.06em] leading-[1.1]" style={mkStyle(e1, 32)}>
                   {isMobile ? 'ПРОЕКТ' : 'КОНЦЕРН'}{' '}
                   <span
                     className={
@@ -343,7 +343,7 @@ export const TeeIntroBlock: React.FC = () => {
                 </h2>
 
                 <p
-                  className={`mt-4 sm:mt-5 max-w-2xl text-xs sm:text-sm md:text-base leading-relaxed ${isMobile ? 'text-white/90' : 'text-white/55'}`}
+                  className={`mt-4 sm:mt-5 max-w-xl text-[13px] sm:text-sm md:text-[15px] leading-[1.7] ${isMobile ? 'text-white/80' : 'text-white/48'}`}
                   style={mkStyle(e2, 26)}
                 >
                   {isMobile
@@ -351,31 +351,31 @@ export const TeeIntroBlock: React.FC = () => {
                     : 'Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы, "бетон/графит" и контроль качества: паспорт, партия, проверка.'}
                 </p>
 
-                <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl" style={mkStyle(e3, 36)}>
+                <div className="mt-5 sm:mt-7 grid grid-cols-2 gap-2.5 sm:gap-3 max-w-xl" style={mkStyle(e3, 36)}>
                   <div
-                    className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md md:bg-transparent md:backdrop-blur-none md:border-white/5 p-3 sm:p-4"
+                    className="vx-spec-card"
                     style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat1 6s ease-in-out infinite' }}
                   >
-                    <div className="text-[10px] font-mono text-white/35">CODE</div>
-                    <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">VSHD-TEE</div>
-                    <div className="mt-2 sm:mt-3 text-[10px] font-mono text-white/35">STATUS</div>
-                    <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">IN STOCK</div>
+                    <div className="vx-spec-card-label">CODE</div>
+                    <div className="vx-spec-card-value">VSHD-TEE</div>
+                    <div className="vx-spec-card-label mt-2.5 sm:mt-3">STATUS</div>
+                    <div className="vx-spec-card-value">IN STOCK</div>
                   </div>
                   <div
-                    className="rounded-xl border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md md:bg-transparent md:backdrop-blur-none md:border-white/5 p-3 sm:p-4"
+                    className="vx-spec-card"
                     style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat2 7s ease-in-out infinite 0.5s' }}
                   >
-                    <div className="text-[10px] font-mono text-white/35">MATERIAL</div>
-                    <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">GRAPHITE</div>
-                    <div className="mt-2 sm:mt-3 text-[10px] font-mono text-white/35">TAG</div>
-                    <div className="mt-0.5 sm:mt-1 text-xs font-mono text-white/65">LIMITED DROP</div>
+                    <div className="vx-spec-card-label">MATERIAL</div>
+                    <div className="vx-spec-card-value">GRAPHITE</div>
+                    <div className="vx-spec-card-label mt-2.5 sm:mt-3">TAG</div>
+                    <div className="vx-spec-card-value">LIMITED DROP</div>
                   </div>
                 </div>
 
-                <div className="mt-6 sm:mt-8" style={mkStyle(e4, 24)}>
+                <div className="mt-5 sm:mt-7" style={mkStyle(e4, 24)}>
                   <Link
                     href="/catalog"
-                    className="inline-flex items-center justify-center h-11 sm:h-12 md:h-14 px-6 sm:px-8 md:px-10 rounded-full border border-white/10 bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md md:bg-transparent md:backdrop-blur-none md:border-white/5 text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.2em] sm:tracking-[0.22em] text-[#F5F5F5] transition-all duration-300 hover:border-[#C6902E]/35 hover:bg-white/10 md:hover:bg-white/5"
+                    className="vx-cta-btn"
                   >
                     СМОТРЕТЬ КАТАЛОГ →
                   </Link>

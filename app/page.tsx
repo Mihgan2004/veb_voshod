@@ -37,15 +37,12 @@ export default function HomePage() {
         </Suspense>
       </HomeScrollProvider>
 
-      {/* Бегущая строка — отдельный блок на всю ширину */}
       <MarqueeStrip />
 
       <div className="vx-below-fold vx-brutal-bg">
         <HighlightsCollections collections={STATIC_COLLECTIONS} />
         <LookbookSlider />
       </div>
-
-      <div className="h-4" />
     </div>
   );
 }

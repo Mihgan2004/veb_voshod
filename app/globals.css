@@ -168,13 +168,18 @@ body {
   display: none;
 }
 
-/* Первая секция — меньше отступ сверху, бегущая строка вплотную к заголовку */
+/* Первая секция внутри brutal-bg — достаточный отступ от marquee */
 .vx-brutal-bg > section:first-child {
-  padding-top: 2rem;
+  padding-top: 3rem;
 }
 @media (min-width: 640px) {
   .vx-brutal-bg > section:first-child {
-    padding-top: 2.5rem;
+    padding-top: 4rem;
+  }
+}
+@media (min-width: 768px) {
+  .vx-brutal-bg > section:first-child {
+    padding-top: 5rem;
   }
 }
 
@@ -244,32 +249,32 @@ body {
 /* ========== 3) ФУТЕР ========== */
 .vx-footer {
   position: relative;
-  padding: 56px 0 44px;
+  padding: 48px 0 40px;
+  background: #060709;
 }
 
 @media (min-width: 768px) {
   .vx-footer {
-    padding: 64px 0 52px;
+    padding: 64px 0 48px;
   }
 }
 
 .vx-footer::before {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 8%;
+  right: 8%;
   top: 0;
   height: 1px;
   background: linear-gradient(90deg,
-    transparent, rgba(255,255,255,.10), transparent);
-  opacity: .35;
+    transparent, rgba(198,144,46,.12), rgba(255,255,255,.08), rgba(198,144,46,.12), transparent);
   pointer-events: none;
 }
 
 .vx-footer .vx-footer-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 20px;
 }
 
 @media (min-width: 640px) {
@@ -290,32 +295,67 @@ body {
   }
 }
 
-.vx-footer .vx-footer-meta {
-  opacity: .75;
-  letter-spacing: .18em;
+.vx-footer .vx-footer-brand {
+  font-size: 10px;
+  letter-spacing: .32em;
   text-transform: uppercase;
-  font-size: 11px;
-  line-height: 1.6;
+  color: rgba(255,255,255,.2);
+  line-height: 1.8;
+}
+
+.vx-footer .vx-footer-meta {
+  color: rgba(255,255,255,.32);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: 10px;
+  line-height: 1.7;
 }
 
 .vx-footer .vx-footer-links {
   display: flex;
-  gap: 22px;
+  gap: 24px;
   flex-wrap: wrap;
-  margin-top: 18px;
-  letter-spacing: .20em;
+  letter-spacing: .16em;
   text-transform: uppercase;
-  font-size: 11px;
-  opacity: .78;
+  font-size: 10px;
 }
 
 .vx-footer .vx-footer-links a {
-  opacity: .85;
-  transition: opacity .2s ease;
+  color: rgba(255,255,255,.38);
+  transition: color .25s ease;
+  position: relative;
 }
 
 .vx-footer .vx-footer-links a:hover {
-  opacity: 1;
+  color: rgba(198,144,46,.7);
+}
+
+.vx-footer .vx-footer-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: rgba(198,144,46,.0);
+  transition: background .25s ease;
+}
+
+.vx-footer .vx-footer-links a:hover::after {
+  background: rgba(198,144,46,.25);
+}
+
+/* Footer divider line */
+.vx-footer-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+  margin: 24px 0;
+}
+
+@media (min-width: 768px) {
+  .vx-footer-divider {
+    margin: 32px 0;
+  }
 }
 
 @keyframes shimmer {
@@ -638,4 +678,156 @@ body {
     animation-duration: 0.01ms !important;
     animation-delay: 0s !important;
   }
+}
+
+/* ========== 4) SECTION RHYTHM — вертикальный ритм для всех блоков ========== */
+.vx-section-pad {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+@media (min-width: 640px) {
+  .vx-section-pad {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .vx-section-pad {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
+/* ========== 5) SPEC CARD — dossier-style карточки характеристик ========== */
+.vx-spec-card {
+  position: relative;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: linear-gradient(165deg, rgba(20,24,33,0.9) 0%, rgba(14,17,22,0.95) 100%);
+  padding: 12px 14px;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .vx-spec-card {
+    padding: 16px 18px;
+  }
+}
+
+.vx-spec-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(198,144,46,0.12), transparent);
+}
+
+.vx-spec-card-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(198,144,46,0.45);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  line-height: 1;
+}
+
+.vx-spec-card-value {
+  margin-top: 4px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.72);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  line-height: 1.3;
+}
+
+/* ========== 6) CTA BUTTON — premium tactical style ========== */
+.vx-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 28px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(20,24,33,0.85) 0%, rgba(14,17,22,0.92) 100%);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245,245,245,0.9);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .vx-cta-btn {
+    height: 48px;
+    padding: 0 32px;
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 768px) {
+  .vx-cta-btn {
+    height: 52px;
+    padding: 0 40px;
+    font-size: 12px;
+  }
+}
+
+.vx-cta-btn:hover {
+  border-color: rgba(198,144,46,0.3);
+  background: linear-gradient(180deg, rgba(26,31,42,0.9) 0%, rgba(18,22,28,0.95) 100%);
+  color: #fff;
+}
+
+.vx-cta-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%, rgba(198,144,46,0.06) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.vx-cta-btn:hover::after {
+  opacity: 1;
+}
+
+/* ========== 7) SECTION HEADING — единый стиль заголовков секций ========== */
+.vx-section-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.88);
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .vx-section-title {
+    font-size: 26px;
+    letter-spacing: 0.24em;
+  }
+}
+
+@media (min-width: 768px) {
+  .vx-section-title {
+    font-size: 30px;
+    letter-spacing: 0.26em;
+  }
+}
+
+/* ========== 8) TAG LABEL — meta label style ========== */
+.vx-tag {
+  font-size: 10px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  line-height: 1;
 }

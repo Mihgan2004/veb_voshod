@@ -57,11 +57,11 @@ export function WelcomeBlockMobile() {
           style={{ willChange: "transform, opacity" }}
         >
           <div
-          className="vx-welcome-text text-[22px] sm:text-[28px] font-light tracking-[0.08em] uppercase text-center whitespace-pre-line"
+          className="vx-welcome-text text-[20px] sm:text-[26px] font-light tracking-[0.1em] uppercase text-center whitespace-pre-line leading-[1.3]"
           style={{
             fontFamily: "var(--font-welcome), sans-serif",
             color: "transparent",
-            WebkitTextStroke: "1.5px #F5F5F5",
+            WebkitTextStroke: "1.2px rgba(245,245,245,0.85)",
           }}
         >
           <WelcomeTypewriter disabled={true} />
@@ -101,21 +101,9 @@ export function WelcomeBlockMobile() {
         >
           <Link
             href="/catalog"
-            className="
-              group inline-flex items-center justify-center
-              h-12 px-8 rounded-full
-              border border-white/10
-              bg-[#141821]/85 sm:bg-white/5 sm:backdrop-blur-md
-              text-[11px] sm:text-xs uppercase tracking-[0.22em]
-              text-[#F5F5F5]
-              transition-colors duration-200
-              hover:border-[#C6902E]/35 hover:bg-white/7
-            "
+            className="vx-cta-btn"
           >
-            <span className="relative">
-              В КАТАЛОГ
-              <span className="absolute -bottom-2 left-0 h-px w-full bg-[#C6902E]/0 group-hover:bg-[#C6902E]/40 transition-colors duration-200" />
-            </span>
+            В КАТАЛОГ
           </Link>
         </div>
       </div>

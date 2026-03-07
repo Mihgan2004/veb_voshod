@@ -5,10 +5,6 @@ import Image from "next/image";
 import { useRef, useState, useCallback, useEffect } from "react";
 import type { Collection } from "@/lib/catalog";
 
-/* ================================================================== */
-/*  Fade-in image with skeleton shimmer                                */
-/* ================================================================== */
-
 function FadeImage({
   src,
   alt,
@@ -24,10 +20,10 @@ function FadeImage({
   if (error) {
     return (
       <div
-        className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[0.06] to-white/[0.02]"
+        className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[0.04] to-white/[0.01]"
         aria-hidden
       >
-        <span className="text-[10px] font-mono text-white/25 uppercase">VOSHOD</span>
+        <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest">VOSHOD</span>
       </div>
     );
   }
@@ -36,7 +32,7 @@ function FadeImage({
     <>
       {!loaded && (
         <div className="absolute inset-0 bg-[#0B0D10]">
-          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
         </div>
       )}
 
@@ -47,15 +43,11 @@ function FadeImage({
         sizes={sizes}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
-        className="object-cover"
+        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
       />
     </>
   );
 }
-
-/* ================================================================== */
-/*  Scroll progress indicator                                          */
-/* ================================================================== */
 
 function ScrollProgress({
   scrollRef,
@@ -96,18 +88,14 @@ function ScrollProgress({
   }, [sync, throttledSync, scrollRef]);
 
   return (
-    <div className="h-[2px] bg-white/10 rounded-full overflow-hidden">
+    <div className="h-px bg-white/[0.06] overflow-hidden">
       <div
-        className="h-full bg-white/35 rounded-full transition-[margin] duration-150 ease-out"
+        className="h-full bg-white/25 transition-[margin] duration-150 ease-out"
         style={{ width: `${thumb.w}%`, marginLeft: `${thumb.x}%` }}
       />
     </div>
   );
 }
-
-/* ================================================================== */
-/*  HIGHLIGHTS / COLLECTIONS                                           */
-/* ================================================================== */
 
 export function HighlightsCollections({
   collections,
@@ -117,49 +105,56 @@ export function HighlightsCollections({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="vx-section-seams py-16 sm:py-20">
+    <section className="vx-section-seams vx-section-pad">
       <div className="relative z-10">
-        {/* ---- Header ---- */}
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 opacity-0 md:opacity-100 animate-mobile-enter">
-          <h2 className="text-[22px] sm:text-[28px] md:text-[2rem] font-semibold uppercase tracking-[0.28em] text-white/90 text-center">
-            КОЛЛЕКЦИИ
-          </h2>
+        {/* Header */}
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-6 lg:px-10 xl:px-12 opacity-0 md:opacity-100 animate-mobile-enter">
+          <div className="flex flex-col items-center gap-2">
+            <span className="vx-tag text-white/20 mb-1">ARCHIVE</span>
+            <h2 className="vx-section-title text-center">
+              КОЛЛЕКЦИИ
+            </h2>
+          </div>
         </div>
 
-        {/* ---- Carousel ---- */}
+        {/* Carousel */}
         <div
           ref={scrollRef}
-          className="mt-8 sm:mt-10 md:mt-12 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-5 sm:gap-6 md:gap-8 px-4 sm:px-6 lg:px-10 xl:px-12 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
+          className="mt-10 sm:mt-12 md:mt-14 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-4 sm:gap-5 md:gap-6 px-5 sm:px-6 lg:px-10 xl:px-12 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {collections.map((col) => (
             <Link
               key={col.id}
               href={`/collections/${col.slug}`}
               prefetch={false}
-              className="group shrink-0 snap-start w-[78vw] max-w-[520px] sm:w-[520px] lg:w-[560px] outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded-2xl flex flex-col"
+              className="group shrink-0 snap-start w-[78vw] max-w-[480px] sm:w-[480px] lg:w-[520px] outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded-xl flex flex-col"
             >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-[#0B0D10] transition-all duration-300 group-hover:border-white/[0.18] group-hover:bg-white/[0.03]">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/[0.06] bg-[#0B0D10] transition-all duration-400 group-hover:border-white/[0.12]">
                 <FadeImage
                   src={col.coverImage || "/globe.svg"}
                   alt={col.label ?? col.tag}
-                  sizes="(max-width:640px) 78vw, (max-width:1024px) 520px, 560px"
+                  sizes="(max-width:640px) 78vw, (max-width:1024px) 480px, 520px"
                 />
+                {/* Gradient overlay for text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" aria-hidden />
                 {col.id === "col-1" && (
-                  <div className="absolute inset-0 bg-black/35 pointer-events-none rounded-2xl" aria-hidden />
+                  <div className="absolute inset-0 bg-black/30 pointer-events-none rounded-xl" aria-hidden />
                 )}
+                {/* Label inside card */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.28em] text-white/60 block">
+                    {col.label ?? col.tag}
+                  </span>
+                </div>
               </div>
-              <span className="mt-3 text-[11px] font-mono uppercase tracking-[0.32em] text-white/50 text-center block">
-                {col.label ?? col.tag}
-              </span>
             </Link>
           ))}
 
-          {/* trailing spacer */}
           <div className="shrink-0 w-px" aria-hidden />
         </div>
 
-        {/* ---- Progress indicator ---- */}
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 mt-5">
+        {/* Progress indicator */}
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-6 lg:px-10 xl:px-12 mt-6">
           <ScrollProgress scrollRef={scrollRef} />
         </div>
       </div>

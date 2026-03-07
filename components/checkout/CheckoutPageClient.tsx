@@ -28,6 +28,10 @@ export function CheckoutPageClient() {
     }
   }, [cart.length, router]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
+
   if (cart.length === 0) {
     return (
       <div className="animate-fade-in min-h-screen flex items-center justify-center">

@@ -4,15 +4,7 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { ASSETS } from "@/lib/assets";
 
-/* ================================================================== */
-/*  Lookbook images — source of truth in lib/assets.ts                 */
-/* ================================================================== */
-
 const LOOKBOOK_IMAGES: readonly string[] = ASSETS.lookbook;
-
-/* ================================================================== */
-/*  Fade-in image: next/image + lazy, чтобы не грузить все 9 сразу     */
-/* ================================================================== */
 
 function FadeImage({
   src,
@@ -31,10 +23,10 @@ function FadeImage({
   if (error) {
     return (
       <div
-        className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[0.06] to-white/[0.02]"
+        className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[0.04] to-white/[0.01]"
         aria-hidden
       >
-        <span className="text-[10px] font-mono text-white/25 uppercase">VOSHOD</span>
+        <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest">VOSHOD</span>
       </div>
     );
   }
@@ -43,7 +35,7 @@ function FadeImage({
     <>
       {!loaded && (
         <div className="absolute inset-0 bg-[#0B0D10]">
-          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+          <div className="absolute inset-0 -translate-x-full motion-safe:animate-shimmer bg-gradient-to-r from-transparent via-white/[0.03] to-transparent" />
         </div>
       )}
 
@@ -63,10 +55,6 @@ function FadeImage({
     </>
   );
 }
-
-/* ================================================================== */
-/*  Scroll progress indicator                                          */
-/* ================================================================== */
 
 function ScrollProgress({
   scrollRef,
@@ -107,18 +95,14 @@ function ScrollProgress({
   }, [sync, throttledSync, scrollRef]);
 
   return (
-    <div className="h-[2px] bg-white/10 rounded-full overflow-hidden">
+    <div className="h-px bg-white/[0.06] overflow-hidden">
       <div
-        className="h-full bg-white/35 rounded-full transition-[margin] duration-150 ease-out"
+        className="h-full bg-white/25 transition-[margin] duration-150 ease-out"
         style={{ width: `${thumb.w}%`, marginLeft: `${thumb.x}%` }}
       />
     </div>
   );
 }
-
-/* ================================================================== */
-/*  Chevron arrow button                                               */
-/* ================================================================== */
 
 function ArrowButton({
   direction,
@@ -134,11 +118,11 @@ function ArrowButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === "left" ? "Previous" : "Next"}
-      className="w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center border border-white/10 bg-white/[0.02] rounded-xl text-white/70 transition-all duration-200 hover:border-white/[0.18] hover:bg-white/[0.03] disabled:opacity-20 disabled:pointer-events-none"
+      className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border border-white/[0.06] bg-transparent rounded-lg text-white/45 transition-all duration-250 hover:border-white/[0.12] hover:text-white/70 hover:bg-white/[0.03] disabled:opacity-15 disabled:pointer-events-none"
     >
       <svg
-        width="16"
-        height="16"
+        width="14"
+        height="14"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -156,16 +140,11 @@ function ArrowButton({
   );
 }
 
-/* ================================================================== */
-/*  LOOKBOOK SLIDER                                                    */
-/* ================================================================== */
-
 export function LookbookSlider() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
 
-  /* ---- Sync arrow states (throttled for mobile) ---- */
   const syncArrows = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -195,7 +174,6 @@ export function LookbookSlider() {
     };
   }, [syncArrows, throttledSyncArrows]);
 
-  /* ---- Scroll by one frame ---- */
   const scroll = (dir: 1 | -1) => {
     const el = scrollRef.current;
     if (!el) return;
@@ -207,41 +185,41 @@ export function LookbookSlider() {
   };
 
   return (
-    <section className="vx-section-seams py-16 sm:py-20">
+    <section className="vx-section-seams vx-section-pad">
       <div className="relative z-10">
-        {/* ---- Header + Arrows ---- */}
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 flex items-end justify-between opacity-0 md:opacity-100 animate-mobile-enter">
+        {/* Header + Arrows */}
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-6 lg:px-10 xl:px-12 flex items-end justify-between opacity-0 md:opacity-100 animate-mobile-enter">
           <div>
-            <span className="text-[11px] font-mono uppercase tracking-[0.32em] block mb-1.5 bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
+            <span className="vx-tag bg-gradient-to-r from-amber-700/70 via-yellow-500/70 to-amber-700/70 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent block mb-2.5">
               @VOSHOD
             </span>
-            <h2 className="text-[22px] sm:text-[28px] md:text-[2rem] font-semibold uppercase tracking-[0.28em] text-white/90">
+            <h2 className="vx-section-title">
               Галлерея
             </h2>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <ArrowButton direction="left" disabled={!canLeft} onClick={() => scroll(-1)} />
             <ArrowButton direction="right" disabled={!canRight} onClick={() => scroll(1)} />
           </div>
         </div>
 
-        {/* ---- Photo strip (seamless / слитные фото) ---- */}
+        {/* Photo strip */}
         <div
           ref={scrollRef}
-          className="mt-8 sm:mt-10 md:mt-12 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-4 sm:gap-5 md:gap-6 px-4 sm:px-6 lg:px-10 xl:px-12 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
+          className="mt-10 sm:mt-12 md:mt-14 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-3 sm:gap-4 md:gap-5 px-5 sm:px-6 lg:px-10 xl:px-12 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {LOOKBOOK_IMAGES.map((src, i) => (
             <div
               key={src}
               data-frame
-              className="shrink-0 snap-start w-[78vw] min-w-[78vw] sm:w-[45vw] sm:min-w-[45vw] lg:w-[400px] lg:min-w-[400px]"
+              className="shrink-0 snap-start w-[75vw] min-w-[75vw] sm:w-[42vw] sm:min-w-[42vw] lg:w-[380px] lg:min-w-[380px]"
             >
-              <div className="relative aspect-square overflow-hidden bg-white/[0.02]">
+              <div className="relative aspect-square overflow-hidden rounded-sm border border-white/[0.04] bg-[#0a0c0f]">
                 <FadeImage
                   src={src}
                   alt={`Lookbook ${i + 1}`}
-                  sizes="(max-width:640px) 78vw, (max-width:1024px) 45vw, 400px"
+                  sizes="(max-width:640px) 75vw, (max-width:1024px) 42vw, 380px"
                   priority={i === 0}
                 />
               </div>
@@ -249,8 +227,8 @@ export function LookbookSlider() {
           ))}
         </div>
 
-        {/* ---- Progress indicator ---- */}
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 mt-5">
+        {/* Progress indicator */}
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-6 lg:px-10 xl:px-12 mt-6">
           <ScrollProgress scrollRef={scrollRef} />
         </div>
       </div>

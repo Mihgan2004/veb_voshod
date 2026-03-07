@@ -192,6 +192,8 @@ export function PvzSelector({ filterType, onSelect }: PvzSelectorProps) {
     }
   };
 
+  const selectedSummaryRef = useRef<HTMLDivElement>(null);
+
   const handleOfficeClick = useCallback(
     (code: string) => {
       const office = offices.find((o) => o.code === code);
@@ -213,6 +215,10 @@ export function PvzSelector({ filterType, onSelect }: PvzSelectorProps) {
         cost: deliveryCost,
         days: deliveryDays,
       });
+
+      setTimeout(() => {
+        selectedSummaryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
     },
     [offices, deliveryCost, deliveryDays, onSelect]
   );
@@ -427,7 +433,7 @@ export function PvzSelector({ filterType, onSelect }: PvzSelectorProps) {
 
       {/* Selected point summary */}
       {selectedOffice && deliveryCost > 0 && (
-        <div className="rounded-xl border border-gold/30 bg-gold/5 p-4">
+        <div ref={selectedSummaryRef} className="rounded-xl border border-gold/30 bg-gold/5 p-4">
           <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-gold mb-2">
             Выбранный пункт
           </p>
