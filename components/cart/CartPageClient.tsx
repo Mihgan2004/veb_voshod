@@ -98,7 +98,7 @@ export function CartPageClient() {
                           Размер {item.size} × {item.qty}
                         </p>
                       </div>
-                      <p className="text-[14px] font-semibold text-white tabular-nums shrink-0">
+                      <p className="text-[14px] font-semibold text-white vx-price shrink-0">
                         {(item.product.price * item.qty).toLocaleString("ru-RU")} ₽
                       </p>
                     </div>
@@ -121,7 +121,7 @@ export function CartPageClient() {
                 <p className="text-[11px] font-mono tracking-[0.28em] uppercase text-white/45">
                   Итого
                 </p>
-                <p className="mt-2 text-[24px] font-semibold text-white tabular-nums">
+                <p className="mt-2 text-[24px] font-semibold text-white vx-price">
                   {total.toLocaleString("ru-RU")} ₽
                 </p>
               </div>
@@ -187,7 +187,7 @@ export function CartPageClient() {
               <button
                 type="button"
                 onClick={handleCheckout}
-                className="w-full h-12 rounded-xl bg-gold text-graphite font-mono text-[12px] uppercase tracking-[0.2em] hover:bg-gold/90 active:scale-[0.99] transition-all"
+                className="w-full vx-gold-btn"
               >
                 Перейти к оформлению
               </button>

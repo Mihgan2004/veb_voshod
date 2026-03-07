@@ -56,8 +56,8 @@ function ProductCardInner({ product }: { product: Product }) {
         <h3 className="text-[13px] sm:text-[14px] font-medium leading-tight tracking-[0.01em] text-white/80 group-hover:text-white/95 transition-colors duration-300 line-clamp-1">
           {product.name}
         </h3>
-        <p className="text-[13px] sm:text-[14px] font-semibold text-white/90 tabular-nums">
-          {product.price.toLocaleString("ru-RU")} &#8381;
+        <p className="text-[13px] sm:text-[14px] font-semibold text-white/90 vx-price">
+          {product.price.toLocaleString("ru-RU")} ₽
         </p>
       </div>
     </Link>

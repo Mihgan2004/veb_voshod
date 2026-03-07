@@ -799,6 +799,47 @@ body {
   opacity: 1;
 }
 
+/* ========== 6b) GOLD PRIMARY BUTTON — muted gold fill ========== */
+.vx-gold-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(180deg, #B8902F 0%, #9E7A28 100%);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #0B0D10;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset;
+}
+
+.vx-gold-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #C69835 0%, #A8822C 100%);
+}
+
+.vx-gold-btn:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.vx-gold-btn:disabled {
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: not-allowed;
+}
+
+/* ========== 6c) PRICE TYPOGRAPHY — proportional numbers ========== */
+.vx-price {
+  font-variant-numeric: proportional-nums;
+  letter-spacing: 0;
+}
+
 /* ========== 7) SECTION HEADING — единый стиль заголовков секций ========== */
 .vx-section-title {
   font-size: 20px;

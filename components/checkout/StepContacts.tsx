@@ -128,11 +128,8 @@ export function StepContacts({ onNext }: StepContactsProps) {
 
       <button
         type="submit"
-        className={`w-full h-12 rounded-xl font-mono text-[12px] uppercase tracking-[0.2em] font-semibold transition-all ${
-          isContactsValid()
-            ? "bg-gold text-graphite hover:bg-gold/90 active:scale-[0.99]"
-            : "border border-white/[0.08] bg-white/[0.03] text-white/25 cursor-not-allowed"
-        }`}
+        disabled={!isContactsValid()}
+        className="w-full vx-gold-btn"
       >
         Продолжить
       </button>

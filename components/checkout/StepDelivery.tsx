@@ -29,14 +29,12 @@ type ProviderTab = {
   id: DeliveryProvider;
   label: string;
   logo: string;
-  logoW: number;
-  logoH: number;
 };
 
 const providerTabs: ProviderTab[] = [
-  { id: "cdek", label: "СДЭК", logo: "/logo/cdek-1.svg", logoW: 64, logoH: 24 },
-  { id: "yandex", label: "Яндекс", logo: "/logo/Логотип_Яндекс_Доставка.svg.png", logoW: 80, logoH: 24 },
-  { id: "ozon", label: "Озон", logo: "/logo/Ozon_idTmLIuY6b_0.png", logoW: 60, logoH: 24 },
+  { id: "cdek", label: "СДЭК", logo: "/logo/cdek-1.svg" },
+  { id: "yandex", label: "Яндекс", logo: "/logo/Логотип_Яндекс_Доставка.svg.png" },
+  { id: "ozon", label: "Озон", logo: "/logo/Ozon_idTmLIuY6b_0.png" },
 ];
 
 type StepDeliveryProps = {
@@ -240,31 +238,29 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
         </p>
       </div>
 
-      {/* Provider tabs */}
+      {/* Provider tabs — logos крупно на всю плашку */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {providerTabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setDeliveryProvider(tab.id)}
-            className={`relative flex flex-col items-center justify-center gap-2 py-3.5 sm:py-4 px-2 rounded-xl border transition-all duration-200 ${
+            className={`relative flex items-center justify-center min-h-[64px] sm:min-h-[76px] py-4 sm:py-5 px-2 rounded-xl border transition-all duration-200 ${
               deliveryProvider === tab.id
-                ? "border-gold/40 bg-gold/[0.06]"
+                ? "border-gold/40 bg-gold/[0.08]"
                 : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]"
             }`}
           >
-            <div className="relative h-6 flex items-center justify-center">
-              <Image
-                src={tab.logo}
-                alt={tab.label}
-                width={tab.logoW}
-                height={tab.logoH}
-                className={`h-5 sm:h-6 w-auto object-contain transition-opacity ${
-                  deliveryProvider === tab.id ? "opacity-100" : "opacity-50"
-                }`}
-                unoptimized
-              />
-            </div>
+            <Image
+              src={tab.logo}
+              alt={tab.label}
+              width={120}
+              height={44}
+              className={`max-w-[90%] max-h-10 sm:max-h-12 w-auto h-auto object-contain transition-opacity ${
+                deliveryProvider === tab.id ? "opacity-100" : "opacity-45"
+              }`}
+              unoptimized
+            />
             {deliveryProvider === tab.id && (
               <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-gold" />
             )}
@@ -413,7 +409,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
                     <p className="text-[12px] text-white/50">Стоимость доставки</p>
                     <p className="text-[13px] text-white/40 mt-0.5">{deliveryDays}</p>
                   </div>
-                  <p className="text-[18px] font-semibold text-white tabular-nums">
+                  <p className="text-[18px] font-semibold text-white vx-price">
                     {deliveryCost.toLocaleString("ru-RU")} ₽
                   </p>
                 </div>
@@ -482,7 +478,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
         <button
           type="button"
           onClick={onBack}
-          className="flex-1 h-12 rounded-xl border border-gold/20 bg-transparent font-mono text-[12px] uppercase tracking-[0.2em] text-gold/60 hover:border-gold/35 hover:text-gold/80 hover:bg-gold/[0.04] transition-all"
+          className="flex-1 h-12 rounded-xl border border-gold/25 bg-transparent font-mono text-[12px] uppercase tracking-[0.2em] text-gold/70 hover:border-gold/40 hover:text-gold/90 hover:bg-gold/[0.06] transition-all"
         >
           Назад
         </button>
@@ -490,11 +486,7 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
           type="button"
           onClick={onNext}
           disabled={!canProceed}
-          className={`flex-1 h-12 rounded-xl font-mono text-[12px] uppercase tracking-[0.2em] font-semibold transition-all ${
-            canProceed
-              ? "bg-gold text-graphite hover:bg-gold/90 active:scale-[0.99]"
-              : "border border-white/[0.08] bg-white/[0.03] text-white/25 cursor-not-allowed"
-          }`}
+          className="flex-1 vx-gold-btn"
         >
           Продолжить
         </button>

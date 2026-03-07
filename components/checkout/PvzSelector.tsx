@@ -315,7 +315,7 @@ export function PvzSelector({ filterType, onSelect }: PvzSelectorProps) {
             </p>
             <p className="text-[12px] text-white/35 mt-0.5">{deliveryDays}</p>
           </div>
-          <p className="text-[16px] font-semibold text-gold tabular-nums">
+          <p className="text-[16px] font-semibold text-gold vx-price">
             {deliveryCost.toLocaleString("ru-RU")} ₽
           </p>
         </div>
@@ -450,7 +450,7 @@ export function PvzSelector({ filterType, onSelect }: PvzSelectorProps) {
             <span className="text-[12px] text-white/50">
               Доставка: {deliveryDays}
             </span>
-            <span className="text-[16px] font-semibold text-gold">
+            <span className="text-[16px] font-semibold text-gold vx-price">
               {deliveryCost.toLocaleString("ru-RU")} ₽
             </span>
           </div>

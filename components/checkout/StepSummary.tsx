@@ -139,9 +139,9 @@ export function StepSummary({ onBack }: StepSummaryProps) {
                 <span className="text-[13px] text-white/50">
                   Срок: {deliveryDays}
                 </span>
-                <span className="text-[14px] font-medium text-white">
-                  {deliveryCost.toLocaleString("ru-RU")} ₽
-                </span>
+            <span className="text-[14px] font-medium text-white vx-price">
+              {deliveryCost.toLocaleString("ru-RU")} ₽
+            </span>
               </>
             ) : costPending ? (
               <span className="text-[13px] text-white/50">
@@ -183,7 +183,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
                     {item.size} × {item.qty}
                   </p>
                 </div>
-                <p className="text-[14px] font-medium text-white tabular-nums">
+                <p className="text-[14px] font-medium text-white vx-price">
                   {(item.product.price * item.qty).toLocaleString("ru-RU")} ₽
                 </p>
               </div>
@@ -195,14 +195,14 @@ export function StepSummary({ onBack }: StepSummaryProps) {
       <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[13px] text-white/50">Товары</span>
-          <span className="text-[14px] text-white tabular-nums">
+          <span className="text-[14px] text-white vx-price">
             {subtotal.toLocaleString("ru-RU")} ₽
           </span>
         </div>
         {showCostRow && (
           <div className="flex items-center justify-between mb-3">
             <span className="text-[13px] text-white/50">Доставка</span>
-            <span className="text-[14px] text-white tabular-nums">
+            <span className="text-[14px] text-white vx-price">
               {deliveryCost.toLocaleString("ru-RU")} ₽
             </span>
           </div>
@@ -215,7 +215,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
         )}
         <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
           <span className="text-[14px] font-medium text-white">Итого</span>
-          <span className="text-[20px] font-semibold text-white tabular-nums">
+          <span className="text-[20px] font-semibold text-white vx-price">
             {total.toLocaleString("ru-RU")} ₽
           </span>
         </div>
@@ -269,7 +269,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
           type="button"
           onClick={onBack}
           disabled={submitting}
-          className="flex-1 h-12 rounded-xl border border-gold/20 bg-transparent font-mono text-[12px] uppercase tracking-[0.2em] text-gold/60 hover:border-gold/35 hover:text-gold/80 hover:bg-gold/[0.04] transition-all disabled:opacity-50"
+          className="flex-1 h-12 rounded-xl border border-gold/25 bg-transparent font-mono text-[12px] uppercase tracking-[0.2em] text-gold/70 hover:border-gold/40 hover:text-gold/90 hover:bg-gold/[0.06] transition-all disabled:opacity-50"
         >
           Назад
         </button>
@@ -277,11 +277,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
           type="button"
           onClick={handlePayment}
           disabled={submitting || !agreedToTerms}
-          className={`flex-1 h-12 rounded-xl font-mono text-[12px] uppercase tracking-[0.2em] font-semibold transition-all ${
-            agreedToTerms && !submitting
-              ? "bg-gold text-graphite hover:bg-gold/90 active:scale-[0.99]"
-              : "border border-white/[0.08] bg-white/[0.03] text-white/25 cursor-not-allowed"
-          }`}
+          className="flex-1 vx-gold-btn"
         >
           {submitting ? "Переход к оплате..." : `Оплатить ${total.toLocaleString("ru-RU")} ₽`}
         </button>

@@ -22,16 +22,16 @@ export function Footer() {
             <p className="mt-1">ВСЕ ПРАВА ЗАЩИЩЕНЫ.</p>
           </div>
 
-          {/* Legal links — gold gradient */}
-          <nav className="flex items-center gap-6 sm:gap-8 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.18em]">
+          {/* Legal links — gold gradient, wrap on mobile, не вылезают за границы */}
+          <nav className="flex flex-wrap items-center justify-start md:justify-end gap-x-3 sm:gap-x-6 md:gap-x-8 gap-y-2 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.1em] sm:tracking-[0.18em] w-full min-w-0">
             <Link href="/legal/offer" className={GOLD_GRADIENT}>
               Оферта
             </Link>
-            <span className="text-white/10 select-none" aria-hidden>·</span>
+            <span className="text-white/10 select-none hidden sm:inline" aria-hidden>·</span>
             <Link href="/legal/shipping" className={GOLD_GRADIENT}>
               Доставка
             </Link>
-            <span className="text-white/10 select-none" aria-hidden>·</span>
+            <span className="text-white/10 select-none hidden sm:inline" aria-hidden>·</span>
             <Link href="/legal/policy" className={GOLD_GRADIENT}>
               Конфиденциальность
             </Link>

@@ -118,7 +118,7 @@ export function CheckoutPageClient() {
                         {item.size} × {item.qty}
                       </p>
                     </div>
-                    <p className="text-[12px] font-medium text-white tabular-nums">
+                    <p className="text-[12px] font-medium text-white vx-price">
                       {(item.product.price * item.qty).toLocaleString("ru-RU")} ₽
                     </p>
                   </div>
@@ -131,14 +131,14 @@ export function CheckoutPageClient() {
             <div className="space-y-2">
               <div className="flex justify-between text-[13px]">
                 <span className="text-white/50">Товары</span>
-                <span className="text-white tabular-nums">
+                <span className="text-white vx-price">
                   {subtotal.toLocaleString("ru-RU")} ₽
                 </span>
               </div>
               {deliveryCost > 0 && (
                 <div className="flex justify-between text-[13px]">
                   <span className="text-white/50">Доставка</span>
-                  <span className="text-white tabular-nums">
+                  <span className="text-white vx-price">
                     {deliveryCost.toLocaleString("ru-RU")} ₽
                   </span>
                 </div>
@@ -149,7 +149,7 @@ export function CheckoutPageClient() {
 
             <div className="flex justify-between items-center">
               <span className="text-[14px] font-medium text-white">Итого</span>
-              <span className="text-[22px] font-semibold text-white tabular-nums">
+              <span className="text-[22px] font-semibold text-white vx-price">
                 {total.toLocaleString("ru-RU")} ₽
               </span>
             </div>

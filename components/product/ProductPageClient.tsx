@@ -78,7 +78,7 @@ function QuantitySelector({
           <path d="M5 12h14" strokeLinecap="round" />
         </svg>
       </button>
-      <span className="w-10 text-center text-[14px] font-medium text-white tabular-nums">
+      <span className="w-10 text-center text-[14px] font-medium text-white vx-price">
         {value}
       </span>
       <button
@@ -211,7 +211,7 @@ export function ProductPageClient({ product }: { product: Product }) {
 
             {/* Price + status + артикул */}
             <div className="mt-4 flex flex-wrap items-baseline gap-4">
-              <span className="text-[22px] sm:text-[26px] font-bold text-white tabular-nums">
+              <span className="text-[22px] sm:text-[26px] font-bold text-white vx-price">
                 {product.price.toLocaleString("ru-RU")}&nbsp;₽
               </span>
               <span className={`text-[11px] font-mono uppercase tracking-[0.2em] ${
