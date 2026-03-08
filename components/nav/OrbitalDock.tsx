@@ -72,17 +72,17 @@ export const OrbitalDock: React.FC = () => {
       <nav
         className={`fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out
         top-[max(0.75rem,env(safe-area-inset-top))] sm:top-4 md:top-5
-        w-max max-w-[calc(100%-1.5rem)] sm:max-w-[min(88vw,680px)]`}
+        w-max max-w-[calc(100%-1.5rem)] sm:max-w-[min(88vw,680px)] lg:max-w-[min(90vw,760px)]`}
       >
         <div className="relative rounded-full">
           <div className={`relative overflow-hidden rounded-full
-            flex items-center gap-1.5 sm:gap-5 md:gap-7
-            px-2.5 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2
+            flex items-center gap-1.5 sm:gap-5 md:gap-7 lg:gap-8
+            px-2.5 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2 lg:px-6 lg:py-2.5
             min-h-[38px] sm:min-h-0
             border transition-all duration-500
             ${scrolled
-              ? "bg-[#0c0e13]/92 backdrop-blur-xl border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
-              : "bg-[#0c0e13]/75 backdrop-blur-md border-white/[0.04] shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+              ? "bg-[#0c0e13]/92 backdrop-blur-xl border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.5)] lg:border-white/[0.08] lg:shadow-[0_12px_40px_rgba(0,0,0,0.55)]"
+              : "bg-[#0c0e13]/75 backdrop-blur-md border-white/[0.04] shadow-[0_4px_20px_rgba(0,0,0,0.3)] lg:bg-[#0c0e13]/80 lg:backdrop-blur-xl lg:border-white/[0.06] lg:shadow-[0_8px_28px_rgba(0,0,0,0.4)]"
             }`}
           >
             <Link href="/" className="shrink-0 flex items-center pl-0.5">
@@ -92,13 +92,13 @@ export const OrbitalDock: React.FC = () => {
                 width={59}
                 height={32}
                 sizes="59px"
-                className="h-[18px] md:h-5 w-auto opacity-90 hover:opacity-100 transition-opacity duration-200"
+                className="h-[18px] md:h-5 lg:h-6 w-auto opacity-90 hover:opacity-100 transition-opacity duration-200"
                 priority
               />
             </Link>
 
             {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-5 lg:gap-7 text-[11px] font-medium text-white/40 z-10 tracking-[0.14em]">
+            <div className="hidden md:flex items-center gap-5 lg:gap-8 text-[11px] lg:text-[12px] font-medium text-white/40 lg:text-white/45 z-10 tracking-[0.14em] lg:tracking-[0.16em]">
               <Link
                 href="/catalog"
                 className={`transition-colors duration-200 hover:text-white/80 ${isActive("/catalog") ? "text-white/90" : ""}`}
@@ -114,7 +114,7 @@ export const OrbitalDock: React.FC = () => {
             </div>
 
             {/* Time + Cart (desktop) */}
-            <div className="hidden md:flex items-center gap-3 text-[10px] font-mono text-white/35 z-10 tracking-wider">
+            <div className="hidden md:flex items-center gap-3 lg:gap-4 text-[10px] lg:text-[11px] font-mono text-white/35 lg:text-white/40 z-10 tracking-wider">
               {time ? (
                 <span className="border-r border-white/[0.06] pr-3 tabular-nums" suppressHydrationWarning>
                   MSC {time}

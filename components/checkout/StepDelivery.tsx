@@ -256,10 +256,11 @@ export function StepDelivery({ onNext, onBack }: StepDeliveryProps) {
               alt={tab.label}
               width={tab.id === "cdek" ? 140 : 120}
               height={tab.id === "cdek" ? 52 : 44}
+              sizes="(max-width:640px) 95px, 120px"
+              loading="lazy"
               className={`max-w-[95%] w-auto h-auto object-contain transition-opacity ${
                 tab.id === "cdek" ? "max-h-12 sm:max-h-14" : "max-h-10 sm:max-h-12"
               } ${deliveryProvider === tab.id ? "opacity-100" : "opacity-45"}`}
-              unoptimized
             />
             {deliveryProvider === tab.id && (
               <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-gold" />

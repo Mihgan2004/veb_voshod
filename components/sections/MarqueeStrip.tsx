@@ -16,15 +16,15 @@ export function MarqueeStrip() {
     <section
       className={`
         relative w-full overflow-hidden
-        py-2.5 sm:py-3
-        border-y border-white/[0.04]
+        py-2.5 sm:py-3 lg:py-3.5
+        border-y border-white/[0.04] lg:border-white/[0.05]
         bg-[#07090c]
         ${russoOne.variable}
       `}
     >
       <div className="overflow-hidden">
         <div
-          className="inline-flex whitespace-nowrap text-[8px] sm:text-[9px] md:text-[10px] font-medium uppercase tracking-[0.35em] text-white/18 animate-marquee"
+          className="inline-flex whitespace-nowrap text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-medium uppercase tracking-[0.35em] lg:tracking-[0.38em] text-white/18 lg:text-white/22 animate-marquee"
           style={{ fontFamily: "var(--font-marquee), sans-serif" }}
         >
           <span className="pr-6">{repeated}</span>

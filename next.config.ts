@@ -7,6 +7,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 const nextConfig: NextConfig = {
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "picsum.photos" },
@@ -22,6 +23,26 @@ const nextConfig: NextConfig = {
     // unoptimized: true,
   },
   compress: true,
+  async headers() {
+    const staticAssetPaths = [
+      "/logo/:path*",
+      "/brand/:path*",
+      "/header/:path*",
+      "/assets/:path*",
+      "/lookbook/:path*",
+      "/video/:path*",
+      "/_next/static/:path*",
+    ];
+    return staticAssetPaths.map((source) => ({
+      source,
+      headers: [
+        {
+          key: "Cache-Control",
+          value: "public, max-age=31536000, immutable",
+        },
+      ],
+    }));
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);

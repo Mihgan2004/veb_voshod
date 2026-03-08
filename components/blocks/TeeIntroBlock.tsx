@@ -68,15 +68,25 @@ const smoothstep = (e0: number, e1: number, x: number) => {
 };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+const DESKTOP_BREAKPOINT = 1024;
+
 export const TeeIntroBlock: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [p, setP] = useState(0.15);
+  const [isDesktop, setIsDesktop] = useState(false);
   const { compact, animationsDisabled, isMobile } = useHomeScrollCompact();
   const liteMode = useLiteMode();
 
   const noScrollOnMobile = isMobile;
   const noHeavyEffects = animationsDisabled || liteMode;
   const effectiveCompact = compact || noScrollOnMobile;
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= DESKTOP_BREAKPOINT);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   // Скролл-логика как в референсе (getBoundingClientRect, без кэша)
   useEffect(() => {
@@ -141,7 +151,7 @@ export const TeeIntroBlock: React.FC = () => {
       style={
         isMobile
           ? undefined
-          : { height: effectiveCompact ? '100vh' : '220vh' }
+          : { height: effectiveCompact ? '100vh' : (isDesktop ? '180vh' : '220vh') }
       }
     >
       <style>{`
@@ -193,8 +203,8 @@ export const TeeIntroBlock: React.FC = () => {
           {!liteMode && <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay bg-noise" />}
         </div>
 
-        <div className="relative z-10 h-full min-h-[100vh] sm:min-h-0 sm:h-full max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-0">
-          <div className="h-full grid grid-cols-12 md:grid-cols-12 items-center gap-6 sm:gap-8">
+        <div className="relative z-10 h-full min-h-[100vh] sm:min-h-0 sm:h-full max-w-7xl lg:max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-10 sm:py-0">
+          <div className="h-full grid grid-cols-12 md:grid-cols-12 lg:grid-cols-12 items-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
             {/* Колонка с футболкой: мобилка — с оверлеями как раньше; десктоп — простая картинка из референса */}
             <div
               className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
@@ -216,6 +226,8 @@ export const TeeIntroBlock: React.FC = () => {
                     <img
                       src={ASSETS.tee.cutout}
                       alt="VOSKHOD tee"
+                      width={512}
+                      height={768}
                       className="block h-full w-auto max-w-none object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
                       style={{ filter: 'brightness(0.96) contrast(1.06) saturate(0.95)' }}
                       draggable={false}
@@ -265,6 +277,8 @@ export const TeeIntroBlock: React.FC = () => {
                   <img
                     src={ASSETS.tee.cutout}
                     alt="VOSKHOD tee"
+                    width={512}
+                    height={768}
                     className={`absolute left-1/2 -translate-x-[calc(50%+90px)] md:left-[-80vw] md:translate-x-0 top-1/2 -translate-y-1/2 w-auto max-w-none pointer-events-none select-none object-contain
                       scale-[1.75] sm:scale-[1.5] md:scale-[1.2] origin-[50%_40%]
                       ${TEE_INTRO.mobile.teeHeight} ${TEE_INTRO.mobile.teeMaxHeight} ${TEE_INTRO.tablet.teeHeight} ${TEE_INTRO.tablet.teeMaxHeight} ${TEE_INTRO.desktop.teeHeight} ${TEE_INTRO.desktop.teeMaxHeight}
@@ -310,13 +324,13 @@ export const TeeIntroBlock: React.FC = () => {
               />
 
               <div
-                className="absolute inset-y-0 left-0 w-56 hidden md:block pointer-events-none"
-                style={{ background: 'linear-gradient(to right, rgba(11,13,16,0.9) 0%, rgba(11,13,16,0.25) 65%, transparent 100%)' }}
+                className="absolute inset-y-0 left-0 w-56 lg:w-72 hidden md:block pointer-events-none"
+                style={{ background: 'linear-gradient(to right, rgba(11,13,16,0.92) 0%, rgba(11,13,16,0.3) 60%, transparent 100%)' }}
                 aria-hidden
               />
 
               <div className="relative z-10">
-                <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.2em] text-white/30 mb-3 sm:mb-4" style={mkStyle(e0, 20)}>
+                <div className="text-[10px] sm:text-[11px] lg:text-[11px] font-mono tracking-[0.2em] lg:tracking-[0.24em] text-white/30 lg:text-white/35 mb-3 sm:mb-4 lg:mb-4" style={mkStyle(e0, 20)}>
                   {isMobile ? (
                     <TypewriterLine disabled={false} />
                   ) : (
@@ -329,7 +343,7 @@ export const TeeIntroBlock: React.FC = () => {
                   )}
                 </div>
 
-                <h2 className="text-[22px] sm:text-[28px] md:text-[44px] font-light tracking-[0.06em] leading-[1.1]" style={mkStyle(e1, 32)}>
+                <h2 className="text-[22px] sm:text-[28px] md:text-[44px] lg:text-[40px] xl:text-[48px] font-light tracking-[0.06em] lg:tracking-[0.07em] leading-[1.1]" style={mkStyle(e1, 32)}>
                   {isMobile ? 'ПРОЕКТ' : 'КОНЦЕРН'}{' '}
                   <span
                     className={
@@ -343,7 +357,7 @@ export const TeeIntroBlock: React.FC = () => {
                 </h2>
 
                 <p
-                  className={`mt-4 sm:mt-5 max-w-xl text-[13px] sm:text-sm md:text-[15px] leading-[1.7] ${isMobile ? 'text-white/80' : 'text-white/48'}`}
+                  className={`mt-4 sm:mt-5 lg:mt-6 max-w-xl lg:max-w-2xl text-[13px] sm:text-sm md:text-[15px] lg:text-[15px] leading-[1.7] lg:leading-[1.75] ${isMobile ? 'text-white/80' : 'text-white/48 lg:text-white/55'}`}
                   style={mkStyle(e2, 26)}
                 >
                   {isMobile
@@ -351,7 +365,7 @@ export const TeeIntroBlock: React.FC = () => {
                     : 'Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы, "бетон/графит" и контроль качества: паспорт, партия, проверка.'}
                 </p>
 
-                <div className="mt-5 sm:mt-7 grid grid-cols-2 gap-2.5 sm:gap-3 max-w-xl" style={mkStyle(e3, 36)}>
+                <div className="mt-5 sm:mt-7 lg:mt-8 grid grid-cols-2 gap-2.5 sm:gap-3 lg:gap-4 max-w-xl lg:max-w-2xl" style={mkStyle(e3, 36)}>
                   <div
                     className="vx-spec-card"
                     style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat1 6s ease-in-out infinite' }}
@@ -372,10 +386,10 @@ export const TeeIntroBlock: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-5 sm:mt-7" style={mkStyle(e4, 24)}>
+                <div className="mt-5 sm:mt-7 lg:mt-8" style={mkStyle(e4, 24)}>
                   <Link
                     href="/catalog"
-                    className="vx-cta-btn"
+                    className="vx-cta-btn lg:!h-12 lg:!px-10 lg:!text-xs lg:!tracking-[0.24em] lg:border-white/[0.1] lg:hover:border-gold/25"
                   >
                     СМОТРЕТЬ КАТАЛОГ →
                   </Link>

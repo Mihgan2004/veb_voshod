@@ -14,11 +14,21 @@ const smoothstep = (e0: number, e1: number, x: number) => {
 };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+const DESKTOP_BREAKPOINT = 1024;
+
 export function WelcomeBlockDesktop() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [p, setP] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
   const { compact, animationsDisabled } = useHomeScrollCompact();
   const liteMode = useLiteMode();
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= DESKTOP_BREAKPOINT);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     if (compact) {
@@ -54,11 +64,11 @@ export function WelcomeBlockDesktop() {
     };
   }, [compact]);
 
-  // ФАЗЫ (настройки десктопа из референса)
-  const welcomeIn = smoothstep(0.05, 0.18, p);     // появление
-  const welcomeMove = smoothstep(0.18, 0.46, p);   // уход вверх + уменьшение
-  const logoIn = smoothstep(0.40, 0.70, p);        // лого в центре
-  const ctaIn = smoothstep(0.78, 0.96, p);         // кнопка в самом конце
+  // Desktop: уплотнённые фазы (220vh вместо 300vh)
+  const welcomeIn = smoothstep(0.05, 0.18, p);
+  const welcomeMove = smoothstep(isDesktop ? 0.18 : 0.18, isDesktop ? 0.38 : 0.46, p);
+  const logoIn = smoothstep(isDesktop ? 0.32 : 0.40, isDesktop ? 0.58 : 0.70, p);
+  const ctaIn = smoothstep(isDesktop ? 0.64 : 0.78, isDesktop ? 0.88 : 0.96, p);
 
   // WELCOME: центр -> вверх
   const welcomeTop = lerp(50, 16, welcomeMove);     // 50% -> 16% экрана
@@ -77,7 +87,7 @@ export function WelcomeBlockDesktop() {
       id="welcome"
       ref={sectionRef as React.RefObject<HTMLElement>}
       className="relative w-full bg-[#0B0D10] welcome-mobile-height"
-      style={compact ? { height: "100vh" } : { height: "300vh" }}
+      style={compact ? { height: "100vh" } : { height: isDesktop ? "220vh" : "300vh" }}
     >
       <div className="sticky top-0 h-[100vh] overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
@@ -99,7 +109,7 @@ export function WelcomeBlockDesktop() {
           }}
         >
           <div
-            className="text-[34px] md:text-[56px] font-light tracking-[0.08em] uppercase"
+            className="text-[34px] md:text-[56px] lg:text-[52px] font-light tracking-[0.08em] lg:tracking-[0.1em] uppercase"
             style={{
               color: "transparent",
               WebkitTextStroke: "2px #F5F5F5",
@@ -126,7 +136,7 @@ export function WelcomeBlockDesktop() {
               width={640}
               height={184}
               sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, 640px"
-              className="w-[260px] sm:w-[360px] md:w-[640px] select-none pointer-events-none"
+              className="w-[260px] sm:w-[360px] md:w-[640px] lg:w-[540px] select-none pointer-events-none"
               draggable={false}
               style={{ backfaceVisibility: "hidden" }}
               priority
@@ -135,7 +145,7 @@ export function WelcomeBlockDesktop() {
         </div>
 
         <div
-          className="absolute inset-x-0 bottom-10 flex justify-center"
+          className="absolute inset-x-0 bottom-10 lg:bottom-12 flex justify-center"
           style={{
             opacity: ctaOpacity,
             transform: `translateY(${ctaY}px)`,
@@ -144,7 +154,7 @@ export function WelcomeBlockDesktop() {
         >
           <Link
             href="/catalog"
-            className="vx-cta-btn"
+            className="vx-cta-btn lg:!h-12 lg:!px-8 lg:!text-xs lg:!tracking-[0.22em] lg:border-white/[0.1] lg:hover:border-gold/25"
           >
             В КАТАЛОГ
           </Link>
