@@ -291,42 +291,37 @@ export const TeeIntroBlock: React.FC = () => {
 
             {/* Текстовый блок */}
             <div className="col-span-12 md:col-span-8 order-2 md:order-none flex flex-col justify-center items-center md:items-start -mt-20 sm:-mt-8 md:mt-0 pt-0 pb-6 sm:py-0 relative">
-              {/* Мобильные градиенты */}
-              {/* Perf: liteMode skips animated blur gradients — major GPU cost on mobile */}
-              {!liteMode && (
-                <>
-                  <div
-                    className="absolute md:hidden pointer-events-none"
-                    style={{
-                      inset: '-35% -25% -20% -25%',
-                      background: 'radial-gradient(ellipse 88% 72% at 50% 36%, rgba(11,13,16,0.97) 0%, rgba(11,13,16,0.88) 25%, rgba(11,13,16,0.55) 50%, rgba(11,13,16,0.18) 72%, transparent 92%)',
-                      filter: noHeavyEffects ? 'blur(6px)' : 'blur(16px)',
-                      animation: noHeavyEffects ? 'none' : 'teeGlowBreathe 7s ease-in-out infinite',
-                    }}
-                    aria-hidden
-                  />
-                  <div
-                    className="absolute md:hidden pointer-events-none"
-                    style={{
-                      inset: '-15% -12% -8% -12%',
-                      background: 'radial-gradient(ellipse 55% 40% at 52% 28%, rgba(198,144,46,0.08) 0%, rgba(198,144,46,0.03) 45%, transparent 75%)',
-                      filter: noHeavyEffects ? 'blur(8px)' : 'blur(20px)',
-                      animation: noHeavyEffects ? 'none' : 'teeGoldShimmer 9s ease-in-out infinite',
-                    }}
-                    aria-hidden
-                  />
-                  <div
-                    className="absolute md:hidden pointer-events-none"
-                    style={{
-                      inset: '-10% -8% -5% -8%',
-                      background: 'radial-gradient(ellipse 95% 85% at 50% 45%, transparent 30%, rgba(11,13,16,0.4) 65%, rgba(11,13,16,0.7) 90%)',
-                      filter: noHeavyEffects ? 'blur(4px)' : 'blur(10px)',
-                      animation: noHeavyEffects ? 'none' : 'teeVignettePulse 11s ease-in-out infinite',
-                    }}
-                    aria-hidden
-                  />
-                </>
-              )}
+              {/* Мобильные градиенты (затемнение футболки) */}
+              <div
+                className="absolute md:hidden pointer-events-none"
+                style={{
+                  inset: '-35% -25% -20% -25%',
+                  background: 'radial-gradient(ellipse 88% 72% at 50% 36%, rgba(11,13,16,0.97) 0%, rgba(11,13,16,0.88) 25%, rgba(11,13,16,0.55) 50%, rgba(11,13,16,0.18) 72%, transparent 92%)',
+                  filter: noHeavyEffects ? 'blur(12px)' : 'blur(24px)',
+                  animation: noHeavyEffects ? 'none' : 'teeGlowBreathe 7s ease-in-out infinite',
+                }}
+                aria-hidden
+              />
+              <div
+                className="absolute md:hidden pointer-events-none"
+                style={{
+                  inset: '-15% -12% -8% -12%',
+                  background: 'radial-gradient(ellipse 55% 40% at 52% 28%, rgba(198,144,46,0.08) 0%, rgba(198,144,46,0.03) 45%, transparent 75%)',
+                  filter: noHeavyEffects ? 'blur(16px)' : 'blur(32px)',
+                  animation: noHeavyEffects ? 'none' : 'teeGoldShimmer 9s ease-in-out infinite',
+                }}
+                aria-hidden
+              />
+              <div
+                className="absolute md:hidden pointer-events-none"
+                style={{
+                  inset: '-10% -8% -5% -8%',
+                  background: 'radial-gradient(ellipse 95% 85% at 50% 45%, transparent 30%, rgba(11,13,16,0.4) 65%, rgba(11,13,16,0.7) 90%)',
+                  filter: noHeavyEffects ? 'blur(8px)' : 'blur(14px)',
+                  animation: noHeavyEffects ? 'none' : 'teeVignettePulse 11s ease-in-out infinite',
+                }}
+                aria-hidden
+              />
 
               <div
                 className="absolute inset-y-0 left-0 w-56 lg:w-72 hidden md:block pointer-events-none"
