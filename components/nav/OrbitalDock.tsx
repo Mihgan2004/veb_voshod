@@ -81,8 +81,8 @@ export const OrbitalDock: React.FC = () => {
             min-h-[38px] sm:min-h-0
             border transition-all duration-500
             ${scrolled
-              ? "bg-[#0c0e13]/92 backdrop-blur-xl border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.5)] lg:border-white/[0.08] lg:shadow-[0_12px_40px_rgba(0,0,0,0.55)]"
-              : "bg-[#0c0e13]/75 backdrop-blur-md border-white/[0.04] shadow-[0_4px_20px_rgba(0,0,0,0.3)] lg:bg-[#0c0e13]/80 lg:backdrop-blur-xl lg:border-white/[0.06] lg:shadow-[0_8px_28px_rgba(0,0,0,0.4)]"
+              ? "bg-[#0c0e13]/96 border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.5)] lg:border-white/[0.08] lg:shadow-[0_12px_40px_rgba(0,0,0,0.55)]"
+              : "bg-[#0c0e13]/85 border-white/[0.04] shadow-[0_4px_20px_rgba(0,0,0,0.3)] lg:bg-[#0c0e13]/88 lg:backdrop-blur-md lg:border-white/[0.06] lg:shadow-[0_8px_28px_rgba(0,0,0,0.4)]"
             }`}
           >
             <Link href="/" className="shrink-0 flex items-center pl-0.5">

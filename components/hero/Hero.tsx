@@ -68,19 +68,31 @@ function Hero() {
       className="relative h-[100vh] overflow-hidden mb-0 bg-[#0B0D10] min-h-[100dvh]"
     >
       {!videoError && (
-        <video
-          ref={videoRef}
-          loop
-          muted
-          playsInline
-          preload="none"
-          poster={ASSETS.brand.logoDesktop}
-          disablePictureInPicture
-          disableRemotePlayback
-          className="absolute inset-0 w-full h-full object-cover z-0"
-          onError={() => setVideoError(true)}
-          style={isMobile ? undefined : { filter: "contrast(1.05) saturate(0.85) brightness(0.65)" }}
-        />
+        <>
+          <video
+            ref={videoRef}
+            loop
+            muted
+            playsInline
+            preload="none"
+            poster={ASSETS.brand.logoDesktop}
+            disablePictureInPicture
+            disableRemotePlayback
+            className="absolute inset-0 w-full h-full object-cover z-0"
+            onError={() => setVideoError(true)}
+          />
+          {/* Perf: overlay replaces runtime filter (contrast/saturate/brightness) — avoids GPU cost on each video frame, reduces black-frame stutter */}
+          {!isMobile && (
+            <div
+              className="absolute inset-0 z-[0.5] pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.22) 50%, rgba(0,0,0,0.32) 100%)",
+              }}
+              aria-hidden
+            />
+          )}
+        </>
       )}
 
       {videoError && (
@@ -89,7 +101,7 @@ function Hero() {
         </div>
       )}
 
-      <div className="absolute inset-0 z-[1] bg-black/40 lg:bg-black/50" />
+      <div className="absolute inset-0 z-[1] bg-black/40 lg:bg-black/50" role="presentation" />
       <div className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.5)_85%)]" />
       {/* Desktop: cinematic vignette + warm gold falloff */}
       <div className="absolute inset-0 z-[2] hidden lg:block pointer-events-none bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,transparent_0%,rgba(0,0,0,0.4)_70%,rgba(0,0,0,0.6)_100%)]" aria-hidden />

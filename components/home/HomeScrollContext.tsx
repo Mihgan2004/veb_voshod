@@ -36,6 +36,7 @@ export function HomeScrollProvider({ children }: { children: React.ReactNode }) 
   const lastUpdate = useRef(0);
   const prevAnimDisabled = useRef(false);
   const prevMobile = useRef(false);
+  const prevCompact = useRef(false);
 
   const update = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -79,7 +80,10 @@ export function HomeScrollProvider({ children }: { children: React.ReactNode }) 
     }
 
     if (hasReachedBottom.current && scrollY < lastScrollY.current && scrollY < scrollHeight * 0.5) {
-      setCompact(true);
+      if (!prevCompact.current) {
+        prevCompact.current = true;
+        setCompact(true);
+      }
     }
 
     lastScrollY.current = scrollY;
@@ -88,8 +92,8 @@ export function HomeScrollProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   useEffect(() => {
-    // Throttle: 150ms — меньше обновлений = плавнее скролл, меньше дёрганий
-    const throttleMs = 150;
+    // Perf: 250ms throttle — fewer setState/RAF cycles during scroll, reduces main-thread spikes
+    const throttleMs = 250;
     const onScroll = () => {
       if (ticking.current) return;
       ticking.current = true;
