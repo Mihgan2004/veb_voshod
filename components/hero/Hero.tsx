@@ -83,7 +83,7 @@ function Hero() {
             onError={() => setVideoError(true)}
             onCanPlay={() => setPosterVisible(false)}
           />
-          {/* Mobile-only: constrained logo until video loads — prevents stretched/oversized placeholder */}
+          {/* Mobile-only: constrained logo until video loads — same image, reduced scale for better fit */}
           {posterVisible && (
             <div
               className="absolute inset-0 z-[0.25] flex items-center justify-center sm:hidden pointer-events-none"
@@ -94,7 +94,7 @@ function Hero() {
                 alt=""
                 width={320}
                 height={120}
-                className="w-[min(220px,72vw)] h-auto object-contain"
+                className="w-[min(140px,38vw)] h-auto object-contain"
                 priority
               />
             </div>
