@@ -1,21 +1,18 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ASSETS } from "@/lib/assets";
 
 function Hero() {
   const [videoError, setVideoError] = useState(false);
   const [loadVideo, setLoadVideo] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [posterVisible, setPosterVisible] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   /* ---- Determine which video source to use based on viewport ---- */
   const [videoSrc, setVideoSrc] = useState<string>("");
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 640);
-  }, []);
 
   useEffect(() => {
     // Respect prefers-reduced-motion
@@ -26,12 +23,17 @@ function Hero() {
     const conn = (navigator as unknown as { connection?: { saveData?: boolean } }).connection;
     if (conn?.saveData) return;
 
-    // Pick mobile vs desktop source
-    const src =
-      window.innerWidth < 640
-        ? ASSETS.video.heroMobile540
-        : ASSETS.video.heroDesktop720;
+    const isMobileViewport = window.innerWidth < 640;
+    const src = isMobileViewport
+      ? ASSETS.video.heroMobile540
+      : ASSETS.video.heroDesktop720;
     setVideoSrc(src);
+
+    if (videoRef.current) {
+      videoRef.current.poster = isMobileViewport
+        ? ASSETS.brand.logoMobile
+        : ASSETS.brand.logoDesktop;
+    }
 
     // IntersectionObserver: load video only when hero is near viewport
     const el = sectionRef.current;
@@ -54,7 +56,6 @@ function Hero() {
   useEffect(() => {
     if (!loadVideo || !videoRef.current || !videoSrc) return;
     const video = videoRef.current;
-    // Dynamically set src to avoid downloading before ready
     video.src = videoSrc;
     video.load();
     video.play().catch(() => {
@@ -80,18 +81,33 @@ function Hero() {
             disableRemotePlayback
             className="absolute inset-0 w-full h-full object-cover z-0"
             onError={() => setVideoError(true)}
+            onCanPlay={() => setPosterVisible(false)}
           />
-          {/* Perf: overlay replaces runtime filter (contrast/saturate/brightness) — avoids GPU cost on each video frame, reduces black-frame stutter */}
-          {!isMobile && (
+          {/* Mobile-only: constrained logo until video loads — prevents stretched/oversized placeholder */}
+          {posterVisible && (
             <div
-              className="absolute inset-0 z-[0.5] pointer-events-none"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.22) 50%, rgba(0,0,0,0.32) 100%)",
-              }}
+              className="absolute inset-0 z-[0.25] flex items-center justify-center sm:hidden pointer-events-none"
               aria-hidden
-            />
+            >
+              <Image
+                src={ASSETS.brand.logoMobile}
+                alt=""
+                width={320}
+                height={120}
+                className="w-[min(220px,72vw)] h-auto object-contain"
+                priority
+              />
+            </div>
           )}
+          {/* Perf: overlay replaces runtime filter — hidden on mobile via CSS, shown from sm+ (same as former isMobile logic) */}
+          <div
+            className="absolute inset-0 z-[0.5] pointer-events-none hidden sm:block"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.22) 50%, rgba(0,0,0,0.32) 100%)",
+            }}
+            aria-hidden
+          />
         </>
       )}
 

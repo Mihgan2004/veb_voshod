@@ -67,7 +67,12 @@ export default function OfferPage() {
             <h2 className="text-[16px] font-semibold text-white/80 mb-3">6. Контакты</h2>
             <p>
               По всем вопросам, связанным с исполнением настоящей оферты, Покупатель может обратиться
-              по электронной почте, указанной на сайте.
+              по электронной почте tratonis2004@mail.ru, телефону 8 920 576-04-39 или через{" "}
+              <a href="https://t.me/moderatorBOCXOD" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-gold underline underline-offset-2 transition-colors">Telegram</a>.
+              Полные контактные данные и реквизиты указаны на странице{" "}
+              <Link href="/legal/contacts" className="text-white/80 hover:text-gold underline underline-offset-2 transition-colors">
+                Контакты и реквизиты
+              </Link>.
             </p>
           </section>
 

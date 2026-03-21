@@ -39,24 +39,35 @@ export function Preloader() {
     const start = Date.now();
     const duration = liteMode ? LITE_DURATION_MS : MIN_DURATION_MS;
 
+    let t1: ReturnType<typeof setTimeout> | null = null;
+    let t2: ReturnType<typeof setTimeout> | null = null;
+
     const finish = () => {
       const elapsed = Date.now() - start;
       const remaining = Math.max(0, duration - elapsed);
-      setTimeout(() => {
+      t1 = setTimeout(() => {
         setPhase("hide");
-        setTimeout(() => {
+        t2 = setTimeout(() => {
           setVisible(false);
           sessionStorage.setItem(SKIP_KEY, "1");
         }, 500);
       }, remaining);
     };
 
+    const cleanup = () => {
+      if (t1 != null) clearTimeout(t1);
+      if (t2 != null) clearTimeout(t2);
+    };
+
     if (document.readyState === "complete") {
       finish();
     } else {
       window.addEventListener("load", finish);
-      return () => window.removeEventListener("load", finish);
     }
+    return () => {
+      window.removeEventListener("load", finish);
+      cleanup();
+    };
   }, [pathname, liteMode]);
 
   if (!visible) return null;

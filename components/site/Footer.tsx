@@ -26,6 +26,9 @@ export function Footer() {
             <Link href="/legal/policy" className={GOLD_GRADIENT}>
               Конфиденциальность
             </Link>
+            <Link href="/legal/contacts" className={GOLD_GRADIENT}>
+              Контакты и реквизиты
+            </Link>
           </nav>
         </div>
       </div>

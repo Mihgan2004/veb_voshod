@@ -34,7 +34,7 @@ export const OrbitalDock: React.FC = () => {
       );
     };
     updateTime();
-    const t = setInterval(updateTime, 1000);
+    const t = setInterval(updateTime, 60000);
     let rafId = 0;
     let prev = false;
     const onScroll = () => {

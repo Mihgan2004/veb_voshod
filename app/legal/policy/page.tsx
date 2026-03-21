@@ -61,7 +61,11 @@ export default function PolicyPage() {
             <h2 className="text-[16px] font-semibold text-white/80 mb-3">5. Права пользователя</h2>
             <p>
               Вы вправе запросить удаление своих персональных данных, обратившись по электронной
-              почте, указанной на сайте. Запрос будет обработан в течение 30 рабочих дней.
+              почте tratonis2004@mail.ru или через{" "}
+              <Link href="/legal/contacts" className="text-white/80 hover:text-gold underline underline-offset-2 transition-colors">
+                страницу контактов
+              </Link>.
+              Запрос будет обработан в течение 30 рабочих дней.
             </p>
           </section>
 
