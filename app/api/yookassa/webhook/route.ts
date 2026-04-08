@@ -1,10 +1,9 @@
 import { handleYooKassaPost } from "@/lib/yookassa/webhook-handler";
 
-/** @deprecated Используйте POST /api/yookassa/webhook — логика общая. */
 export async function POST(req: Request) {
   return handleYooKassaPost(req);
 }
 
 export async function GET() {
-  return Response.json({ status: "ok", service: "yookassa-webhook-legacy" });
+  return Response.json({ status: "ok", service: "yookassa-webhook" });
 }

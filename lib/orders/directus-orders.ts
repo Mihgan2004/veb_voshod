@@ -32,6 +32,10 @@ export type CheckoutOrderPayload = {
     address: string;
     cdekPvzCode?: string;
     cost: number;
+    /** yandex | ozon | cdek — для СДЭК-отправления после оплаты */
+    provider?: string;
+    /** Код города получателя (СДЭК), нужен для курьера и для to_location */
+    cdekCityCode?: number;
   };
 };
 
@@ -50,6 +54,38 @@ export type OrderStatus =
   | "cancelled";
 
 export type PaymentStatus = "pending" | "succeeded" | "canceled";
+
+/**
+ * Поля заказа в Directus (добавьте недостающие колонки в админке — см. комментарии в коде создания).
+ */
+export type DirectusOrderRow = {
+  id: string | number;
+  status: string;
+  payment_status?: string | null;
+  payment_id?: string | null;
+  paid_at?: string | null;
+  stock_decremented_at?: string | null;
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  total?: number | null;
+  delivery_type?: string | null;
+  delivery_address?: string | null;
+  cdek_pvz_code?: string | null;
+  delivery_cost?: number | null;
+  delivery_provider?: string | null;
+  cdek_city_code?: number | null;
+  cdek_order_uuid?: string | null;
+  cdek_number?: string | null;
+  track_number?: string | null;
+  cdek_status?: string | null;
+  cdek_waybill_url?: string | null;
+  cdek_barcode_url?: string | null;
+  shipment_created_at?: string | null;
+  shipment_error?: string | null;
+};
+
+/** Явный список не используем — читаем запись целиком, чтобы не ломать GET при отсутствии новых колонок в Directus. */
 
 type DirectusCreateResponse<T> = {
   data: T;
@@ -205,6 +241,8 @@ export async function createCheckoutOrder(
   const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
   const orderItemsCollection = process.env.DIRECTUS_ORDER_ITEMS_NAME ?? "order_items";
 
+  const deliveryProvider = payload.delivery.provider ?? "cdek";
+
   const createdOrder = await directusCreateItem<
     {
       name: string;
@@ -218,6 +256,8 @@ export async function createCheckoutOrder(
       cdek_pvz_code?: string;
       delivery_cost: number;
       payment_status: string;
+      delivery_provider?: string;
+      cdek_city_code?: number;
     },
     CreatedOrder
   >(client, ordersCollection, {
@@ -232,6 +272,10 @@ export async function createCheckoutOrder(
     cdek_pvz_code: payload.delivery.cdekPvzCode,
     delivery_cost: payload.delivery.cost,
     payment_status: "pending",
+    delivery_provider: deliveryProvider,
+    ...(payload.delivery.cdekCityCode != null
+      ? { cdek_city_code: payload.delivery.cdekCityCode }
+      : {}),
   });
 
   const orderId = createdOrder.id;
@@ -292,11 +336,22 @@ export async function updateOrderPaymentId(
 
 /**
  * Обновляет статус заказа и payment_status.
+ * @deprecated Предпочтительнее markOrderPaid / markOrderCanceled из финализации оплаты.
  */
 export async function updateOrderStatus(
   orderId: string | number,
   status: OrderStatus,
   paymentStatus?: PaymentStatus
+): Promise<void> {
+  await patchOrderFields(orderId, {
+    status,
+    ...(paymentStatus ? { payment_status: paymentStatus } : {}),
+  });
+}
+
+export async function patchOrderFields(
+  orderId: string | number,
+  fields: Partial<Record<string, string | number | boolean | null>>
 ): Promise<void> {
   const url = process.env.DIRECTUS_URL;
   const token = process.env.DIRECTUS_TOKEN;
@@ -309,15 +364,32 @@ export async function updateOrderStatus(
   const client = createDirectusClient({ url, token });
   const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
 
-  const updateData: { status: string; payment_status?: string } = { status };
-  if (paymentStatus) {
-    updateData.payment_status = paymentStatus;
-  }
-
   await client.request(`/items/${ordersCollection}/${orderId}`, {
     method: "PATCH",
-    body: JSON.stringify(updateData),
+    body: JSON.stringify(fields),
   });
+}
+
+export async function getOrderById(
+  orderId: string | number
+): Promise<DirectusOrderRow | null> {
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_TOKEN;
+
+  if (!url || !token) return null;
+
+  const client = createDirectusClient({ url, token });
+  const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
+
+  type Res = { data: DirectusOrderRow };
+  try {
+    const res = await client.request<Res>(
+      `/items/${ordersCollection}/${encodeURIComponent(String(orderId))}`
+    );
+    return res.data ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -325,7 +397,7 @@ export async function updateOrderStatus(
  */
 export async function getOrderByPaymentId(
   paymentId: string
-): Promise<{ id: string | number } | null> {
+): Promise<DirectusOrderRow | null> {
   const url = process.env.DIRECTUS_URL;
   const token = process.env.DIRECTUS_TOKEN;
 
@@ -338,7 +410,7 @@ export async function getOrderByPaymentId(
   const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
 
   type OrdersResponse = {
-    data: Array<{ id: string | number }>;
+    data: DirectusOrderRow[];
   };
 
   const res = await client.request<OrdersResponse>(
@@ -352,38 +424,101 @@ export async function getOrderByPaymentId(
   return null;
 }
 
+export async function markOrderPaid(
+  orderId: string | number,
+  opts: { paymentId?: string; paidAt?: string }
+): Promise<void> {
+  const paidAt = opts.paidAt ?? new Date().toISOString();
+  await patchOrderFields(orderId, {
+    status: "paid",
+    payment_status: "succeeded",
+    paid_at: paidAt,
+    ...(opts.paymentId ? { payment_id: opts.paymentId } : {}),
+  });
+}
+
+export async function markOrderCanceled(orderId: string | number): Promise<void> {
+  await patchOrderFields(orderId, {
+    status: "payment_failed",
+    payment_status: "canceled",
+  });
+}
+
+export async function markStockDecremented(orderId: string | number): Promise<void> {
+  await patchOrderFields(orderId, {
+    stock_decremented_at: new Date().toISOString(),
+  });
+}
+
+export async function markCdekShipmentCreated(
+  orderId: string | number,
+  data: {
+    cdekOrderUuid: string;
+    cdekNumber?: string | null;
+    trackNumber?: string | null;
+    cdekStatus?: string | null;
+    waybillUrl?: string | null;
+    barcodeUrl?: string | null;
+  }
+): Promise<void> {
+  await patchOrderFields(orderId, {
+    cdek_order_uuid: data.cdekOrderUuid,
+    ...(data.cdekNumber != null ? { cdek_number: data.cdekNumber } : {}),
+    ...(data.trackNumber != null ? { track_number: data.trackNumber } : {}),
+    ...(data.cdekStatus != null ? { cdek_status: data.cdekStatus } : {}),
+    ...(data.waybillUrl != null ? { cdek_waybill_url: data.waybillUrl } : {}),
+    ...(data.barcodeUrl != null ? { cdek_barcode_url: data.barcodeUrl } : {}),
+    shipment_created_at: new Date().toISOString(),
+    shipment_error: null,
+  });
+}
+
+export async function markCdekShipmentError(
+  orderId: string | number,
+  message: string
+): Promise<void> {
+  await patchOrderFields(orderId, {
+    shipment_error: message.slice(0, 4000),
+  });
+}
+
+/**
+ * Данные заказа для сборки отправления СДЭК (после оплаты).
+ */
+export async function getOrderFullForShipment(
+  orderId: string | number
+): Promise<DirectusOrderRow | null> {
+  return getOrderById(orderId);
+}
+
 /**
  * Получить статус заказа и payment_status по orderId (для success page).
  */
 export async function getOrderStatus(
   orderId: string | number
-): Promise<{ status: OrderStatus; payment_status: PaymentStatus | null; payment_id?: string } | null> {
-  const url = process.env.DIRECTUS_URL;
-  const token = process.env.DIRECTUS_TOKEN;
-
-  if (!url || !token) return null;
-
-  const client = createDirectusClient({ url, token });
-  const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
-
-  type Row = { id: string | number; status: string; payment_status?: string; payment_id?: string };
-  type Res = { data: Row };
-
-  try {
-    const res = await client.request<Res>(
-      `/items/${ordersCollection}/${encodeURIComponent(String(orderId))}?fields=id,status,payment_status,payment_id`
-    );
-    return {
-      status: (res.data.status || "new") as OrderStatus,
-      payment_status: (res.data.payment_status as PaymentStatus) || null,
-      payment_id: res.data.payment_id || undefined,
-    };
-  } catch {
-    return null;
-  }
+): Promise<{
+  status: OrderStatus;
+  payment_status: PaymentStatus | null;
+  payment_id?: string;
+  paid_at?: string | null;
+} | null> {
+  const row = await getOrderById(orderId);
+  if (!row) return null;
+  return {
+    status: (row.status || "new") as OrderStatus,
+    payment_status: (row.payment_status as PaymentStatus) || null,
+    payment_id: row.payment_id || undefined,
+    paid_at: row.paid_at ?? null,
+  };
 }
 
-type OrderItemRow = { product: string | number | null; size: string; qty: number };
+export type OrderItemRow = {
+  product: string | number | null;
+  size: string;
+  qty: number;
+  product_name?: string | null;
+  price?: number | null;
+};
 
 /**
  * Получить позиции заказа (product id, size, qty) для списания остатков.
@@ -401,7 +536,7 @@ export async function getOrderItems(
 
   type Res = { data: OrderItemRow[] };
   const res = await client.request<Res>(
-    `/items/${orderItemsCollection}?filter[order][_eq]=${encodeURIComponent(String(orderId))}&fields=product,size,qty`
+    `/items/${orderItemsCollection}?filter[order][_eq]=${encodeURIComponent(String(orderId))}&fields=product,size,qty,product_name,price`
   );
   return res.data ?? [];
 }
@@ -456,6 +591,14 @@ export async function decrementStockForOrder(
     return;
   }
 
+  const existing = await getOrderById(orderId);
+  if (existing?.stock_decremented_at) {
+    console.log(
+      `[orders/finalize] Stock already decremented for order ${orderId} at ${existing.stock_decremented_at}, skip`
+    );
+    return;
+  }
+
   const client = createDirectusClient({ url, token });
   const items = await getOrderItems(orderId);
 
@@ -488,5 +631,7 @@ export async function decrementStockForOrder(
       console.error(`[orders] Failed to decrement stock for product ${productId} size ${size}:`, e);
     }
   }
+
+  await markStockDecremented(orderId);
 }
 

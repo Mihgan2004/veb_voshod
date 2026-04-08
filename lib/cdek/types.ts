@@ -128,3 +128,19 @@ export type CdekWidgetPoint = {
   workTime: string;
   phone?: string;
 };
+
+/** Ответ POST /v2/orders (упрощённо под поля entity) */
+export type CdekOrderEntity = {
+  uuid?: string;
+  cdek_number?: string;
+  number?: string;
+  status?: string;
+  tracking_number?: string;
+};
+
+export type CdekOrdersApiResponse = {
+  entity?: CdekOrderEntity;
+  requests?: Array<{ request_uuid?: string; type?: string; number?: string; status?: string }>;
+  related_entities?: unknown[];
+  errors?: Array<{ code?: string; message?: string }>;
+};

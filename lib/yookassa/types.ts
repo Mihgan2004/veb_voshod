@@ -76,3 +76,10 @@ export type YooWebhookEvent = {
   event: YooWebhookEventType;
   object: YooPayment;
 };
+
+/** Тело HTTP-уведомления ЮKassa: поле `type` = notification */
+export type YooHttpNotification = {
+  type: "notification";
+  event: YooWebhookEventType;
+  object: YooPayment;
+};

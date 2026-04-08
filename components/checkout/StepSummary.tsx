@@ -32,6 +32,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
   const deliveryDays = useCheckout((s) => s.deliveryDays);
   const getDeliveryAddress = useCheckout((s) => s.getDeliveryAddress);
   const cdekPoint = useCheckout((s) => s.cdekPoint);
+  const courierAddress = useCheckout((s) => s.courierAddress);
   const agreedToTerms = useCheckout((s) => s.agreedToTerms);
   const setAgreedToTerms = useCheckout((s) => s.setAgreedToTerms);
 
@@ -56,6 +57,11 @@ export function StepSummary({ onBack }: StepSummaryProps) {
     setError(null);
 
     try {
+      const cdekCityCode =
+        deliveryProvider === "cdek"
+          ? (cdekPoint?.cityCode ?? courierAddress?.cityCode)
+          : undefined;
+
       const payload = {
         customer: {
           name: contacts.name.trim(),
@@ -69,6 +75,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
           provider: deliveryProvider,
           address: getDeliveryAddress(),
           cdekPvzCode: cdekPoint?.code,
+          cdekCityCode,
           cost: deliveryCost,
         },
       };

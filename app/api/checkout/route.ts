@@ -24,6 +24,8 @@ type CheckoutRequestBody = {
     address: string;
     cdekPvzCode?: string;
     cost: number;
+    provider?: string;
+    cdekCityCode?: number;
   };
 };
 
@@ -44,6 +46,8 @@ function validateCheckoutBody(body: unknown): body is CheckoutRequestBody {
   if (!["pvz", "postamat", "courier"].includes(delivery.type as string)) return false;
   if (typeof delivery.address !== "string" || delivery.address.trim().length === 0) return false;
   if (typeof delivery.cost !== "number" || delivery.cost < 0) return false;
+  if (delivery.provider != null && typeof delivery.provider !== "string") return false;
+  if (delivery.cdekCityCode != null && typeof delivery.cdekCityCode !== "number") return false;
 
   return true;
 }
@@ -104,6 +108,8 @@ export async function POST(req: Request) {
         address: delivery.address,
         cdekPvzCode: delivery.cdekPvzCode,
         cost: delivery.cost,
+        provider: delivery.provider,
+        cdekCityCode: delivery.cdekCityCode,
       },
     };
 

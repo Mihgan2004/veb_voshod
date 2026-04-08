@@ -6,6 +6,7 @@ import type {
   CdekPackage,
   CdekTariffCode,
   CdekOfficeType,
+  CdekOrdersApiResponse,
 } from "./types";
 
 const CDEK_PROD_BASE = "https://api.cdek.ru/v2";
@@ -221,4 +222,72 @@ export function getDefaultPackage(): CdekPackage {
     width: 20,
     height: 5,
   };
+}
+
+/**
+ * Создание заказа на доставку (отправление) в СДЭК.
+ * @see https://api-docs.cdek.ru/29923926.html
+ */
+export async function createOrder(
+  body: Record<string, unknown>
+): Promise<CdekOrdersApiResponse> {
+  const token = await getToken();
+  const baseUrl = getCdekBaseUrl();
+
+  console.log(`[cdek/create-order] POST /orders number=${String(body.number ?? "")}`);
+
+  const response = await fetch(`${baseUrl}/orders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+
+  const text = await response.text();
+  let data: CdekOrdersApiResponse;
+  try {
+    data = JSON.parse(text) as CdekOrdersApiResponse;
+  } catch {
+    throw new Error(`[cdek] createOrder invalid JSON: ${response.status} ${text.slice(0, 500)}`);
+  }
+
+  if (!response.ok) {
+    const msg = data.errors?.map((e) => e.message).join("; ") || text.slice(0, 500);
+    throw new Error(`[cdek] createOrder failed: ${response.status} ${msg}`);
+  }
+
+  return data;
+}
+
+/**
+ * Информация о заказе СДЭК по uuid сущности.
+ */
+export async function getOrder(uuid: string): Promise<CdekOrdersApiResponse> {
+  const token = await getToken();
+  const baseUrl = getCdekBaseUrl();
+
+  const response = await fetch(`${baseUrl}/orders/${encodeURIComponent(uuid)}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  const text = await response.text();
+  let data: CdekOrdersApiResponse;
+  try {
+    data = JSON.parse(text) as CdekOrdersApiResponse;
+  } catch {
+    throw new Error(`[cdek] getOrder invalid JSON: ${response.status} ${text.slice(0, 500)}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(`[cdek] getOrder failed: ${response.status} ${text.slice(0, 500)}`);
+  }
+
+  return data;
 }

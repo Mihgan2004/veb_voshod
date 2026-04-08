@@ -118,9 +118,20 @@ function isIpInCidr(ip: string, cidr: string): boolean {
   return ip === cidr;
 }
 
+/**
+ * ЮKassa notification IPv6 range (см. документацию). Проверка по префиксу /32 без полноценного парсинга IPv6.
+ */
+function isYooKassaIpv6(ip: string): boolean {
+  const s = ip.trim().toLowerCase();
+  if (!s.includes(":")) return false;
+  return s.startsWith("2a02:5180:");
+}
+
 export function verifyWebhookIp(ip: string): boolean {
-  if (!ip || ip.includes(":")) {
-    return YOOKASSA_WEBHOOK_IPS.some((cidr) => cidr.includes(":"));
+  if (!ip) return false;
+
+  if (ip.includes(":")) {
+    return isYooKassaIpv6(ip);
   }
 
   return YOOKASSA_WEBHOOK_IPS.some((cidr) => {
