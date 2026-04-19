@@ -12,15 +12,29 @@ import {
   finalizeOrderAfterPaymentSucceeded,
 } from "@/lib/orders/order-finalize";
 
+/**
+ * Извлекает клиентский IP для сверки с allowlist ЮKassa.
+ *
+ * ВАЖНО: `x-forwarded-for` / `x-real-ip` доверяйте только если запрос проходит через
+ * ваш reverse proxy, который перезаписывает эти заголовки и отбрасывает клиентские.
+ * Иначе злоумышленник может подставить IP из подсети ЮKassa и обойти проверку.
+ */
 export function getWebhookClientIp(headersList: Headers): string {
   const forwarded = headersList.get("x-forwarded-for");
   if (forwarded) {
-    return forwarded.split(",")[0].trim();
+    const first = forwarded.split(",")[0]?.trim() ?? "";
+    if (/^[\d.:a-fA-F]+$/.test(first)) {
+      return first;
+    }
+    return "";
   }
 
   const realIp = headersList.get("x-real-ip");
   if (realIp) {
-    return realIp;
+    const t = realIp.trim();
+    if (/^[\d.:a-fA-F]+$/.test(t)) {
+      return t;
+    }
   }
 
   return "";

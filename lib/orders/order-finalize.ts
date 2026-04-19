@@ -1,8 +1,8 @@
 import {
   getOrderById,
-  markOrderPaid,
-  markOrderCanceled,
   decrementStockForOrder,
+  tryMarkOrderPaidFromPending,
+  tryMarkOrderCanceledFromPending,
   type DirectusOrderRow,
 } from "@/lib/orders/directus-orders";
 import { createCdekShipmentForPaidOrder } from "@/lib/cdek/order-service";
@@ -11,11 +11,13 @@ const finalizeChains = new Map<string, Promise<unknown>>();
 
 function runOrderExclusive<T>(orderKey: string, fn: () => Promise<T>): Promise<T> {
   const prev = finalizeChains.get(orderKey) ?? Promise.resolve();
-  const next = prev.then(fn);
-  finalizeChains.set(
-    orderKey,
-    next.then(() => undefined).catch(() => undefined)
-  );
+  const next = prev.then(() => fn());
+  const cleaned = next.finally(() => {
+    if (finalizeChains.get(orderKey) === cleaned) {
+      finalizeChains.delete(orderKey);
+    }
+  });
+  finalizeChains.set(orderKey, cleaned);
   return next;
 }
 
@@ -35,14 +37,17 @@ async function ensureCdekShipment(order: DirectusOrderRow): Promise<void> {
     return;
   }
 
-  if (order.cdek_order_uuid || order.shipment_created_at) {
+  const latest = await getOrderById(order.id);
+  const o = latest ?? order;
+
+  if (o.cdek_order_uuid || o.shipment_created_at) {
     console.log(
-      `[orders/finalize] CDEK shipment already present for order ${order.id} (uuid=${order.cdek_order_uuid ?? "n/a"}), skip`
+      `[orders/finalize] CDEK shipment already present for order ${o.id} (uuid=${o.cdek_order_uuid ?? "n/a"}), skip`
     );
     return;
   }
 
-  await createCdekShipmentForPaidOrder(order);
+  await createCdekShipmentForPaidOrder(o);
 }
 
 /**
@@ -84,8 +89,24 @@ export async function finalizeOrderAfterPaymentSucceeded(
       return;
     }
 
+    const paidAt = new Date().toISOString();
     console.log(`[orders/finalize] Marking order ${orderId} paid (${source})`);
-    await markOrderPaid(orderId, { paymentId, paidAt: new Date().toISOString() });
+    const marked = await tryMarkOrderPaidFromPending(orderId, { paymentId, paidAt });
+    if (!marked) {
+      const again = await getOrderById(orderId);
+      const already =
+        again?.status === "paid" &&
+        again?.payment_status === "succeeded";
+      if (!already) {
+        console.warn(
+          `[orders/finalize] tryMarkOrderPaidFromPending lost race and order ${orderId} still not paid (${source})`
+        );
+        return;
+      }
+      console.log(
+        `[orders/finalize] Order ${orderId} paid by another replica (${source}), continuing idempotent path`
+      );
+    }
     await ensureStockDecremented(orderId);
     const fresh = await getOrderById(orderId);
     if (fresh) await ensureCdekShipment(fresh);
@@ -124,6 +145,18 @@ export async function finalizeOrderAfterPaymentCanceled(
     }
 
     console.log(`[orders/finalize] Marking order ${orderId} payment_failed (${source})`);
-    await markOrderCanceled(orderId);
+    const canceled = await tryMarkOrderCanceledFromPending(orderId);
+    if (!canceled) {
+      const again = await getOrderById(orderId);
+      const alreadyFailed =
+        again?.status === "payment_failed" && again?.payment_status === "canceled";
+      if (alreadyFailed) {
+        console.log(`[orders/finalize] Order ${orderId} already canceled (${source})`);
+        return;
+      }
+      console.warn(
+        `[orders/finalize] tryMarkOrderCanceledFromPending lost race for order ${orderId} (${source})`
+      );
+    }
   });
 }

@@ -1,18 +1,13 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef, Suspense } from "react";
+import React, { useEffect, useState, useCallback, useRef, Suspense, startTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/lib/cart/cart-store";
 import { useCheckout } from "@/lib/checkout/checkout-store";
 import { PageShell } from "@/components/site/PageShell";
 
-type UiState =
-  | "loading"
-  | "pending"
-  | "paid"
-  | "failed_confirmed"
-  | "technical_issue";
+type UiState = "loading" | "pending" | "paid" | "failed_confirmed" | "technical_issue";
 
 const POLL_INTERVAL_MS = 3_000;
 const MAX_POLLS = 40;
@@ -30,13 +25,13 @@ function SuccessContent() {
   const clear = useCart((s) => s.clear);
   const resetCheckout = useCheckout((s) => s.reset);
 
-  const [uiState, setUiState] = useState<UiState>("loading");
+  const [uiState, setUiState] = useState<UiState>(() => (orderId ? "loading" : "pending"));
+  const [pollSession, setPollSession] = useState(0);
   const pollCount = useRef(0);
   const clearedRef = useRef(false);
 
   const checkStatus = useCallback(async () => {
     if (!orderId) {
-      setUiState("pending");
       return true;
     }
 
@@ -80,8 +75,17 @@ function SuccessContent() {
   }, [orderId]);
 
   useEffect(() => {
+    if (!orderId) {
+      return;
+    }
+
     let timer: ReturnType<typeof setTimeout>;
     let cancelled = false;
+
+    pollCount.current = 0;
+    startTransition(() => {
+      setUiState("loading");
+    });
 
     async function poll() {
       if (cancelled) return;
@@ -101,7 +105,7 @@ function SuccessContent() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [checkStatus]);
+  }, [checkStatus, orderId, pollSession]);
 
   useEffect(() => {
     if (uiState === "paid" && !clearedRef.current) {
@@ -110,6 +114,43 @@ function SuccessContent() {
       resetCheckout();
     }
   }, [uiState, clear, resetCheckout]);
+
+  if (!orderId) {
+    return (
+      <div className="animate-fade-in min-h-[60vh] flex items-center justify-center">
+        <div className="max-w-md w-full text-center">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+            <svg className="w-10 h-10 text-white/35" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M4.93 4.93l14.14 14.14M12 2a10 10 0 100 20 10 10 0 000-20z" />
+            </svg>
+          </div>
+
+          <h1 className="text-[24px] sm:text-[30px] font-semibold tracking-[-0.02em] text-white mb-3">
+            Заказ не указан
+          </h1>
+
+          <p className="text-[15px] text-white/50 mb-8 leading-relaxed">
+            В адресе страницы нет номера заказа. Откройте ссылку из письма после оплаты или вернитесь в каталог.
+          </p>
+
+          <div className="space-y-3">
+            <Link
+              href="/catalog"
+              className="block w-full h-12 rounded-xl bg-gold text-graphite font-mono text-[12px] uppercase tracking-[0.2em] hover:bg-gold/90 transition-all flex items-center justify-center"
+            >
+              В каталог
+            </Link>
+            <Link
+              href="/"
+              className="block w-full h-12 rounded-xl border border-white/10 bg-white/[0.02] font-mono text-[12px] uppercase tracking-[0.2em] text-white/60 hover:bg-white/[0.05] hover:text-white/80 transition-all flex items-center justify-center"
+            >
+              На главную
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (uiState === "loading") {
     return (
@@ -211,10 +252,8 @@ function SuccessContent() {
           <div className="space-y-3">
             <button
               type="button"
-              onClick={async () => {
-                setUiState("loading");
-                pollCount.current = 0;
-                await checkStatus();
+              onClick={() => {
+                setPollSession((s) => s + 1);
               }}
               className="block w-full h-12 rounded-xl bg-gold text-graphite font-mono text-[12px] uppercase tracking-[0.2em] hover:bg-gold/90 transition-all flex items-center justify-center"
             >

@@ -123,6 +123,7 @@ export function HighlightsCollections({
         {/* Carousel */}
         <div
           ref={scrollRef}
+          data-lenis-prevent
           className="mt-10 sm:mt-12 md:mt-14 lg:mt-16 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 px-5 sm:px-6 lg:px-12 xl:px-16 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {collections.map((col) => (

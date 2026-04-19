@@ -207,6 +207,7 @@ export function LookbookSlider() {
         {/* Photo strip */}
         <div
           ref={scrollRef}
+          data-lenis-prevent
           className="mt-10 sm:mt-12 md:mt-14 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-3 sm:gap-4 md:gap-5 px-5 sm:px-6 lg:px-10 xl:px-12 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {LOOKBOOK_IMAGES.map((src, i) => (

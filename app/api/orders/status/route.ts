@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
+  /** Временные сбои ЮKassa/Directus при финализации → `pending` + `degraded`, без `failed`. */
   if (result.status === "pending_payment" && result.payment_id && result.payment_status !== "succeeded") {
     try {
       const payment = await getPayment(result.payment_id);

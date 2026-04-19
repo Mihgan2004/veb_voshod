@@ -1,7 +1,11 @@
 import {
+  getOrderById,
   getOrderItems,
   markCdekShipmentCreated,
   markCdekShipmentError,
+  tryAcquireCdekShipmentCreationLock,
+  releaseCdekShipmentCreationLock,
+  CDEK_SHIPMENT_LOCK_PLACEHOLDER,
   type DirectusOrderRow,
 } from "@/lib/orders/directus-orders";
 import { createOrder, getFromCityCode, getDefaultPackage } from "@/lib/cdek/client";
@@ -118,12 +122,51 @@ async function buildCdekOrderPayload(
 export async function createCdekShipmentForPaidOrder(order: DirectusOrderRow): Promise<void> {
   const orderId = order.id;
 
+  const latest = (await getOrderById(orderId)) ?? order;
+
+  if ((latest.delivery_provider ?? "cdek") !== "cdek") {
+    return;
+  }
+
+  if (latest.shipment_created_at) {
+    return;
+  }
+
+  if (latest.cdek_order_uuid && latest.cdek_order_uuid !== CDEK_SHIPMENT_LOCK_PLACEHOLDER) {
+    return;
+  }
+
+  if (latest.cdek_order_uuid === CDEK_SHIPMENT_LOCK_PLACEHOLDER) {
+    console.log(
+      `[cdek/create-order] Order ${orderId} has creation lock placeholder — another worker may be creating shipment, skip`
+    );
+    return;
+  }
+
+  const acquired = await tryAcquireCdekShipmentCreationLock(orderId);
+  if (!acquired) {
+    const again = await getOrderById(orderId);
+    if (again?.cdek_order_uuid && again.cdek_order_uuid !== CDEK_SHIPMENT_LOCK_PLACEHOLDER) {
+      return;
+    }
+    if (again?.shipment_created_at) {
+      return;
+    }
+    console.log(
+      `[cdek/create-order] Could not acquire CDEK creation lock for order ${orderId} — likely concurrent finalize, skip`
+    );
+    return;
+  }
+
+  const working = (await getOrderById(orderId)) ?? latest;
+
   try {
-    const payload = await buildCdekOrderPayload(order);
+    const payload = await buildCdekOrderPayload(working);
     if (!payload) {
       console.warn(
         `[cdek/create-order] Skip order ${orderId} — insufficient data (ПВЗ/город/позиции) для СДЭК`
       );
+      await releaseCdekShipmentCreationLock(orderId);
       return;
     }
 
@@ -151,6 +194,11 @@ export async function createCdekShipmentForPaidOrder(order: DirectusOrderRow): P
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error(`[cdek/create-order] Failed for site order ${orderId}:`, e);
+    try {
+      await releaseCdekShipmentCreationLock(orderId);
+    } catch (releaseErr) {
+      console.error(`[cdek/create-order] Failed to release lock for ${orderId}:`, releaseErr);
+    }
     await markCdekShipmentError(orderId, msg);
   }
 }

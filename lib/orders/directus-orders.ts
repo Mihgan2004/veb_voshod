@@ -370,6 +370,116 @@ export async function patchOrderFields(
   });
 }
 
+/**
+ * Условное обновление строк в `orders` по filter (Directus REST: PATCH /items/:collection).
+ * Используется как «compare-and-swap» между несколькими инстансами приложения.
+ */
+export async function patchOrdersWhere(
+  filter: Record<string, unknown>,
+  data: Record<string, unknown>
+): Promise<{ updatedCount: number; rows: DirectusOrderRow[] }> {
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_TOKEN;
+
+  if (!url || !token) {
+    throw new Error("[orders] DIRECTUS_URL or DIRECTUS_TOKEN not set for patchOrdersWhere");
+  }
+
+  const client = createDirectusClient({ url, token });
+  const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
+
+  type Res = { data?: DirectusOrderRow | DirectusOrderRow[] };
+  const res = await client.request<Res>(`/items/${ordersCollection}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      query: { filter, limit: 1 },
+      data,
+    }),
+  });
+
+  const raw = res.data;
+  const rows = Array.isArray(raw) ? raw : raw != null ? [raw] : [];
+  return { updatedCount: rows.length, rows };
+}
+
+/** «Замок» создания отправления: не валидный UUID СДЭК, только для координации реплик. */
+export const CDEK_SHIPMENT_LOCK_PLACEHOLDER = "00000000-0000-4000-8000-00000000cde1";
+
+/**
+ * Переводит заказ в paid только если он ещё в `pending_payment` (один победитель среди реплик).
+ */
+export async function tryMarkOrderPaidFromPending(
+  orderId: string | number,
+  opts: { paymentId: string; paidAt: string }
+): Promise<boolean> {
+  const filter = {
+    _and: [
+      { id: { _eq: orderId } },
+      { status: { _eq: "pending_payment" } },
+    ],
+  };
+  const { updatedCount } = await patchOrdersWhere(filter, {
+    status: "paid",
+    payment_status: "succeeded",
+    paid_at: opts.paidAt,
+    payment_id: opts.paymentId,
+  });
+  return updatedCount > 0;
+}
+
+/**
+ * Отмечает отмену оплаты только для заказа, всё ещё находящегося в `pending_payment`.
+ */
+export async function tryMarkOrderCanceledFromPending(orderId: string | number): Promise<boolean> {
+  const filter = {
+    _and: [
+      { id: { _eq: orderId } },
+      { status: { _eq: "pending_payment" } },
+    ],
+  };
+  const { updatedCount } = await patchOrdersWhere(filter, {
+    status: "payment_failed",
+    payment_status: "canceled",
+  });
+  return updatedCount > 0;
+}
+
+/**
+ * Атомарно ставит `stock_decremented_at`, только если поле ещё пустое (защита от двойного списания между репликами).
+ */
+export async function tryMarkStockDecrementedIfUnset(orderId: string | number): Promise<boolean> {
+  const filter = {
+    _and: [{ id: { _eq: orderId } }, { stock_decremented_at: { _null: true } }],
+  };
+  const { updatedCount } = await patchOrdersWhere(filter, {
+    stock_decremented_at: new Date().toISOString(),
+  });
+  return updatedCount > 0;
+}
+
+/**
+ * Захват слота под создание отправления СДЭК: `cdek_order_uuid` пустой и нет `shipment_created_at`.
+ */
+export async function tryAcquireCdekShipmentCreationLock(orderId: string | number): Promise<boolean> {
+  const filter = {
+    _and: [
+      { id: { _eq: orderId } },
+      { cdek_order_uuid: { _null: true } },
+      { shipment_created_at: { _null: true } },
+    ],
+  };
+  const { updatedCount } = await patchOrdersWhere(filter, {
+    cdek_order_uuid: CDEK_SHIPMENT_LOCK_PLACEHOLDER,
+  });
+  return updatedCount > 0;
+}
+
+export async function releaseCdekShipmentCreationLock(orderId: string | number): Promise<void> {
+  await patchOrderFields(orderId, {
+    cdek_order_uuid: null,
+  });
+}
+
 export async function getOrderById(
   orderId: string | number
 ): Promise<DirectusOrderRow | null> {
@@ -603,6 +713,14 @@ export async function decrementStockForOrder(
   const items = await getOrderItems(orderId);
 
   for (const row of items) {
+    const snapshot = await getOrderById(orderId);
+    if (snapshot?.stock_decremented_at) {
+      console.log(
+        `[orders/finalize] stock_decremented_at appeared mid-loop for order ${orderId}, stop duplicate work`
+      );
+      return;
+    }
+
     const productId = row.product;
     const size = row.size?.trim();
     const qty = Math.max(0, Number(row.qty) || 0);
@@ -632,6 +750,19 @@ export async function decrementStockForOrder(
     }
   }
 
-  await markStockDecremented(orderId);
+  const stamped = await tryMarkStockDecrementedIfUnset(orderId);
+  if (!stamped) {
+    const after = await getOrderById(orderId);
+    if (after?.stock_decremented_at) {
+      console.log(
+        `[orders/finalize] stock_decremented_at set by another replica for order ${orderId}, skip duplicate stamp`
+      );
+      return;
+    }
+    console.warn(
+      `[orders/finalize] Could not stamp stock_decremented_at for order ${orderId} (Directus filter PATCH?) — falling back to unconditional mark`
+    );
+    await markStockDecremented(orderId);
+  }
 }
 
