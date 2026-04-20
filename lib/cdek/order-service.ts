@@ -22,11 +22,11 @@ function normalizeRuPhone(raw: string | null | undefined): string {
 
 async function buildCdekOrderPayload(
   order: DirectusOrderRow
-): Promise<Record<string, unknown> | null> {
+): Promise<{ payload: Record<string, unknown> | null; error?: string }> {
   const deliveryType = order.delivery_type;
   if (deliveryType !== "pvz" && deliveryType !== "postamat" && deliveryType !== "courier") {
     console.warn(`[cdek/create-order] Unsupported delivery_type=${deliveryType} for order ${order.id}`);
-    return null;
+    return { payload: null, error: `Unsupported delivery_type=${String(deliveryType)}` };
   }
 
   const fromCode = getFromCityCode();
@@ -35,7 +35,7 @@ async function buildCdekOrderPayload(
   const items = await getOrderItems(order.id);
   if (items.length === 0) {
     console.warn(`[cdek/create-order] No order_items for order ${order.id}`);
-    return null;
+    return { payload: null, error: "No order_items" };
   }
 
   const pkgTemplate = getDefaultPackage();
@@ -93,7 +93,7 @@ async function buildCdekOrderPayload(
       console.warn(
         `[cdek/create-order] Courier order ${order.id} missing cdek_city_code or delivery_address`
       );
-      return null;
+      return { payload: null, error: "Courier missing cdek_city_code or delivery_address" };
     }
     payload.to_location = {
       code,
@@ -103,7 +103,7 @@ async function buildCdekOrderPayload(
     const pvz = order.cdek_pvz_code?.trim();
     if (!pvz) {
       console.warn(`[cdek/create-order] PVZ order ${order.id} missing cdek_pvz_code`);
-      return null;
+      return { payload: null, error: "PVZ missing cdek_pvz_code" };
     }
     payload.delivery_point = pvz;
   }
@@ -113,7 +113,7 @@ async function buildCdekOrderPayload(
     payload.shipment_point = shipmentPoint;
   }
 
-  return payload;
+  return { payload };
 }
 
 /**
@@ -161,10 +161,16 @@ export async function createCdekShipmentForPaidOrder(order: DirectusOrderRow): P
   const working = (await getOrderById(orderId)) ?? latest;
 
   try {
-    const payload = await buildCdekOrderPayload(working);
+    const built = await buildCdekOrderPayload(working);
+    const payload = built.payload;
     if (!payload) {
+      const reason = built.error ? ` (${built.error})` : "";
       console.warn(
-        `[cdek/create-order] Skip order ${orderId} — insufficient data (ПВЗ/город/позиции) для СДЭК`
+        `[cdek/create-order] Skip order ${orderId} — insufficient data (ПВЗ/город/позиции) для СДЭК${reason}`
+      );
+      await markCdekShipmentError(
+        orderId,
+        `CDEK shipment not created: insufficient order data${reason}`
       );
       await releaseCdekShipmentCreationLock(orderId);
       return;

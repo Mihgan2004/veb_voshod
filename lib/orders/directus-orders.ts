@@ -406,6 +406,32 @@ export async function patchOrdersWhere(
 export const CDEK_SHIPMENT_LOCK_PLACEHOLDER = "00000000-0000-4000-8000-00000000cde1";
 
 /**
+ * Lock для списания остатков между репликами.
+ *
+ * Поля должны быть заведены в Directus (иначе будет безопасный fallback без distributed lock):
+ * - `stock_decrement_lock_id` (string, nullable)
+ * - `stock_decrement_lock_at` (datetime, nullable)
+ */
+export const STOCK_DECREMENT_LOCK_FIELDS = {
+  id: "stock_decrement_lock_id",
+  at: "stock_decrement_lock_at",
+} as const;
+
+async function tryPatchOptionalOrderFields(
+  orderId: string | number,
+  fields: Record<string, unknown>
+): Promise<boolean> {
+  try {
+    await patchOrderFields(orderId, fields as Partial<Record<string, string | number | boolean | null>>);
+    return true;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.warn(`[orders] Optional patch failed for order ${orderId}: ${msg}`);
+    return false;
+  }
+}
+
+/**
  * Переводит заказ в paid только если он ещё в `pending_payment` (один победитель среди реплик).
  */
 export async function tryMarkOrderPaidFromPending(
@@ -418,13 +444,14 @@ export async function tryMarkOrderPaidFromPending(
       { status: { _eq: "pending_payment" } },
     ],
   };
-  const { updatedCount } = await patchOrdersWhere(filter, {
+  await patchOrdersWhere(filter, {
     status: "paid",
     payment_status: "succeeded",
     paid_at: opts.paidAt,
     payment_id: opts.paymentId,
   });
-  return updatedCount > 0;
+  const after = await getOrderById(orderId);
+  return after?.status === "paid" && after?.payment_status === "succeeded";
 }
 
 /**
@@ -437,11 +464,12 @@ export async function tryMarkOrderCanceledFromPending(orderId: string | number):
       { status: { _eq: "pending_payment" } },
     ],
   };
-  const { updatedCount } = await patchOrdersWhere(filter, {
+  await patchOrdersWhere(filter, {
     status: "payment_failed",
     payment_status: "canceled",
   });
-  return updatedCount > 0;
+  const after = await getOrderById(orderId);
+  return after?.status === "payment_failed" && after?.payment_status === "canceled";
 }
 
 /**
@@ -451,10 +479,11 @@ export async function tryMarkStockDecrementedIfUnset(orderId: string | number): 
   const filter = {
     _and: [{ id: { _eq: orderId } }, { stock_decremented_at: { _null: true } }],
   };
-  const { updatedCount } = await patchOrdersWhere(filter, {
+  await patchOrdersWhere(filter, {
     stock_decremented_at: new Date().toISOString(),
   });
-  return updatedCount > 0;
+  const after = await getOrderById(orderId);
+  return !!after?.stock_decremented_at;
 }
 
 /**
@@ -468,15 +497,46 @@ export async function tryAcquireCdekShipmentCreationLock(orderId: string | numbe
       { shipment_created_at: { _null: true } },
     ],
   };
-  const { updatedCount } = await patchOrdersWhere(filter, {
+  await patchOrdersWhere(filter, {
     cdek_order_uuid: CDEK_SHIPMENT_LOCK_PLACEHOLDER,
   });
-  return updatedCount > 0;
+  const after = await getOrderById(orderId);
+  return after?.cdek_order_uuid === CDEK_SHIPMENT_LOCK_PLACEHOLDER;
 }
 
 export async function releaseCdekShipmentCreationLock(orderId: string | number): Promise<void> {
   await patchOrderFields(orderId, {
     cdek_order_uuid: null,
+  });
+}
+
+export async function tryAcquireStockDecrementLock(
+  orderId: string | number,
+  lockId: string
+): Promise<"acquired" | "busy" | "unsupported"> {
+  const existing = await getOrderById(orderId);
+  if (existing?.stock_decremented_at) return "busy";
+
+  const ok = await tryPatchOptionalOrderFields(orderId, {
+    [STOCK_DECREMENT_LOCK_FIELDS.id]: lockId,
+    [STOCK_DECREMENT_LOCK_FIELDS.at]: new Date().toISOString(),
+  });
+  if (!ok) return "unsupported";
+
+  const after = await getOrderById(orderId);
+  if (after?.[STOCK_DECREMENT_LOCK_FIELDS.id as keyof DirectusOrderRow] === lockId) {
+    return "acquired";
+  }
+  return "busy";
+}
+
+export async function releaseStockDecrementLock(orderId: string | number, lockId: string): Promise<void> {
+  const row = await getOrderById(orderId);
+  const current = row?.[STOCK_DECREMENT_LOCK_FIELDS.id as keyof DirectusOrderRow];
+  if (current !== lockId) return;
+  await tryPatchOptionalOrderFields(orderId, {
+    [STOCK_DECREMENT_LOCK_FIELDS.id]: null,
+    [STOCK_DECREMENT_LOCK_FIELDS.at]: null,
   });
 }
 
@@ -709,6 +769,23 @@ export async function decrementStockForOrder(
     return;
   }
 
+  const lockId = crypto.randomUUID();
+  const lock = await tryAcquireStockDecrementLock(orderId, lockId);
+  if (lock === "busy") {
+    const again = await getOrderById(orderId);
+    if (again?.stock_decremented_at) return;
+    console.log(
+      `[orders/finalize] Stock decrement lock busy for order ${orderId}, skip duplicate work`
+    );
+    return;
+  }
+
+  if (lock === "unsupported") {
+    console.warn(
+      `[orders/finalize] Stock decrement lock fields not available in Directus for order ${orderId}; falling back to best-effort in-process checks (risk of cross-replica double decrement)`
+    );
+  }
+
   const client = createDirectusClient({ url, token });
   const items = await getOrderItems(orderId);
 
@@ -718,6 +795,9 @@ export async function decrementStockForOrder(
       console.log(
         `[orders/finalize] stock_decremented_at appeared mid-loop for order ${orderId}, stop duplicate work`
       );
+      if (lock === "acquired") {
+        await releaseStockDecrementLock(orderId, lockId);
+      }
       return;
     }
 
@@ -763,6 +843,10 @@ export async function decrementStockForOrder(
       `[orders/finalize] Could not stamp stock_decremented_at for order ${orderId} (Directus filter PATCH?) — falling back to unconditional mark`
     );
     await markStockDecremented(orderId);
+  }
+
+  if (lock === "acquired") {
+    await releaseStockDecrementLock(orderId, lockId);
   }
 }
 
