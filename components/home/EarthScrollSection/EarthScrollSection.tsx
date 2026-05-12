@@ -1,140 +1,65 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useRef } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
-import { PHASE, clamp, smoothstep } from "./earthScrollConfig";
-import { SpaceBackground } from "./SpaceBackground";
-import { VoshodGeoOverlay } from "./VoshodGeoOverlay";
+import { useScroll } from "framer-motion";
+import { SmoothScrollProvider } from "./SmoothScrollProvider";
+import styles from "./earth-scroll-section.module.css";
 
-import "./earth-scroll-section.css";
+/* Canvas — только на клиенте (Three.js не имеет SSR-вывода).
+ * Локальный <Suspense fallback={null}> ниже не пускает chunk-loading
+ * EarthCanvas в родительский Suspense на app/page.tsx. */
+const EarthCanvas = dynamic(
+  () => import("./EarthCanvas").then((m) => ({ default: m.EarthCanvas })),
+  { ssr: false },
+);
 
-const EarthScene = dynamic(() => import("./EarthScene"), { ssr: false });
-
-const PROGRESS_EPS = 0.002;
-
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReduced(mql.matches);
-    onChange();
-    mql.addEventListener?.("change", onChange);
-    return () => mql.removeEventListener?.("change", onChange);
-  }, []);
-  return reduced;
-}
-
-function useIsMobileLayout() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia("(max-width: 768px)");
-    const onChange = () => setIsMobile(mql.matches);
-    onChange();
-    mql.addEventListener?.("change", onChange);
-    return () => mql.removeEventListener?.("change", onChange);
-  }, []);
-  return isMobile;
-}
-
+/**
+ * EarthScrollSection
+ *
+ * Минимальная (100vh) секция с 3D-Землёй, которая проезжает сквозь
+ * viewport за один экран скролла. Никаких sticky-пинов, никаких
+ * длинных тёмных хвостов после анимации.
+ *
+ * Структура:
+ *   <section ref={sectionRef} height: 100vh>
+ *     <div.canvasWrap position: absolute; inset: 0>
+ *       <EarthCanvas scrollYProgress={...} />
+ *
+ * offset ["start end", "end start"] — прогресс растёт пока секция
+ * вообще видна в viewport:
+ *   - 0     — верх секции коснулся низа viewport
+ *             (пользователь ещё докручивает Hero, Земля начинает
+ *             всплывать снизу);
+ *   - 0.5   — секция ровно совпала с viewport (Земля по центру);
+ *   - 1     — низ секции коснулся верха viewport
+ *             (Земля ушла наверх, начинается следующий блок).
+ *
+ * Итого: Земля рисуется и крутится на протяжении ~двух viewport
+ * скролла (последний экран Hero + секция), но в документ
+ * добавляется только 100vh высоты — никакого пустого пространства.
+ */
 export function EarthScrollSection() {
-  const reducedMotion = usePrefersReducedMotion();
-  const isMobile = useIsMobileLayout();
-
   const sectionRef = useRef<HTMLElement | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const lastProgress = useRef(0);
-  const [progress, setProgress] = useState(0);
 
-  const lite = reducedMotion;
-  const effectiveProgress = lite ? 1 : progress;
-
-  const sectionMinHeightVh = useMemo(() => (isMobile ? 560 : 520), [isMobile]);
-
-  useEffect(() => {
-    if (lite) return;
-
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const update = () => {
-      const section = el;
-      const rect = section.getBoundingClientRect();
-      const total = section.offsetHeight - window.innerHeight;
-      const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(0, total));
-      const next = total > 0 ? scrolled / total : 0;
-      const clamped = clamp(Number.isFinite(next) ? next : 0, 0, 1);
-
-      const prev = lastProgress.current;
-      if (Math.abs(clamped - prev) > PROGRESS_EPS) {
-        lastProgress.current = clamped;
-        setProgress(clamped);
-      }
-      rafRef.current = null;
-    };
-
-    const request = () => {
-      if (rafRef.current != null) return;
-      rafRef.current = requestAnimationFrame(update);
-    };
-
-    request();
-    window.addEventListener("scroll", request, { passive: true });
-    window.addEventListener("resize", request);
-    return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-      window.removeEventListener("scroll", request);
-      window.removeEventListener("resize", request);
-    };
-  }, [lite]);
-
-  const showCta = effectiveProgress >= PHASE.finalCta[0];
-
-  const canvasOpacity = useMemo(() => {
-    if (lite) return 1;
-    return smoothstep(PHASE.bgEarthFade[0], PHASE.bgEarthFade[1], progress);
-  }, [lite, progress]);
-
-  /** Затемнение 3D перед HUD (не трогает SVG — отдельный слой под overlay) */
-  const earthDimOpacity = useMemo(() => {
-    if (lite) return 0.82;
-    return smoothstep(PHASE.earthDimHudRussia[0], PHASE.earthDimHudRussia[1] + 0.04, progress) * 0.78;
-  }, [lite, progress]);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
 
   return (
-    <section
-      ref={(node) => {
-        sectionRef.current = node;
-      }}
-      className="earth-scroll-section vx-section-seams"
-      style={{ minHeight: `${sectionMinHeightVh}vh` }}
-      aria-label="Локация проекта ВОСХОД"
-    >
-      <div className="earth-scroll-sticky">
-        <SpaceBackground isMobile={isMobile} />
-
-        <div className="earth-scroll-canvas-wrap">
-          <div className="earth-scroll-canvas-inner" style={{ opacity: canvasOpacity }}>
-            {!lite && <EarthScene progress={effectiveProgress} isMobile={isMobile} />}
-            {lite && <div className="earth-scroll-canvas-lite" aria-hidden />}
-          </div>
-          <div
-            className="earth-scroll-scene-dim"
-            aria-hidden
-            style={{ opacity: earthDimOpacity }}
-          />
+    <SmoothScrollProvider>
+      <section
+        ref={sectionRef}
+        className={styles.section}
+        aria-label="Earth scroll animation"
+      >
+        <div className={styles.canvasWrap}>
+          <Suspense fallback={null}>
+            <EarthCanvas scrollYProgress={scrollYProgress} />
+          </Suspense>
         </div>
-
-        <VoshodGeoOverlay progress={effectiveProgress} isMobile={isMobile} />
-
-        {showCta && (
-          <div className="earth-scroll-catalog-button">
-            <Link href="/catalog" className="vx-cta-btn" prefetch>
-              Перейти в каталог
-            </Link>
-          </div>
-        )}
-      </div>
-    </section>
+      </section>
+    </SmoothScrollProvider>
   );
 }

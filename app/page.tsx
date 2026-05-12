@@ -26,9 +26,14 @@ export default function HomePage() {
   return (
     <div className="animate-fade-in">
       <Hero />
+      {/* EarthScrollSection вынесен из общего Suspense: его внутренний
+          dynamic(EarthCanvas, { ssr:false }) раньше пробивал родительский
+          Suspense и подменял всю 300vh-секцию на пустой 100vh fallback
+          ⇒ «пустой чёрный экран» после Hero. Локальный Suspense
+          живёт уже внутри самой EarthScrollSection. */}
+      <EarthScrollSection />
       <HomeScrollProvider>
         <Suspense fallback={<HomeScrollFallback />}>
-          <EarthScrollSection />
           <TeeIntroBlock />
         </Suspense>
       </HomeScrollProvider>
