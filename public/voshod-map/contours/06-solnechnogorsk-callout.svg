@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none" role="img" aria-label="Solnechnogorsk callout for Voshod animation">
+<defs>
+  <filter id="voshodGlow" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="3.2" result="blur"/>
+    <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.25 0 0 0 0 0.72 0 0 0 0 1 0 0 0 0.75 0" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="voshodLine" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#6FD6FF"/>
+    <stop offset="1" stop-color="#EAF8FF" stop-opacity=".95"/>
+  </linearGradient>
+  <radialGradient id="voshodPin" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#F2FCFF" stop-opacity="1"/>
+    <stop offset="0.35" stop-color="#7FDCFF" stop-opacity=".9"/>
+    <stop offset="1" stop-color="#2A7DFF" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<style>
+  .voshod-region{fill:#061421;fill-opacity:.74;stroke:#8FDDFF;stroke-width:2.1;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:url(#voshodGlow)}
+  .voshod-region--active{fill:#08233A;fill-opacity:.86;stroke:#A7EAFF;stroke-width:2.45;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:url(#voshodGlow)}
+  .voshod-dot{fill:#EAF8FF;filter:url(#voshodGlow)}
+  .voshod-line{fill:none;stroke:url(#voshodLine);stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;filter:url(#voshodGlow)}
+  .voshod-text-primary{fill:#F2FAFF;font-family:Inter,Arial,sans-serif;font-size:30px;letter-spacing:.02em}
+  .voshod-text-secondary{fill:#9EB8CC;font-family:Inter,Arial,sans-serif;font-size:18px;letter-spacing:.05em;text-transform:uppercase}
+</style>
+<circle cx="430" cy="420" r="96" fill="url(#voshodPin)" opacity=".82"/>
+<circle cx="430" cy="420" r="30" fill="none" stroke="#9AE4FF" stroke-width="1.6" opacity=".8" filter="url(#voshodGlow)"/>
+<circle class="voshod-dot" cx="430" cy="420" r="6"/>
+<path class="voshod-line" d="M 430 420 L 575 245 L 855 245"/>
+<text class="voshod-text-primary" x="865" y="236" text-anchor="end">город Солнечногорск</text>
+<text class="voshod-text-secondary" x="865" y="272" text-anchor="end">дислокация проекта ВОСХОД</text>
+</svg>

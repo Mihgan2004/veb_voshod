@@ -1,4 +1,3 @@
-import nextDynamic from "next/dynamic";
 import { Suspense } from "react";
 import Hero from "@/components/hero/Hero";
 import { MarqueeStrip } from "@/components/sections/MarqueeStrip";
@@ -6,13 +5,11 @@ import { HighlightsCollections } from "@/components/sections/HighlightsCollectio
 import { LookbookSlider } from "@/components/sections/LookbookSlider";
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
 import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
+import { EarthScrollSection } from "@/components/home/EarthScrollSection/EarthScrollSection";
 
-const WelcomeBlock = nextDynamic(
-  () => import("@/components/blocks/WelcomeBlock").then((m) => ({ default: m.WelcomeBlock })),
-  { ssr: true }
-);
+import dynamic from "next/dynamic";
 
-const TeeIntroBlock = nextDynamic(
+const TeeIntroBlock = dynamic(
   () => import("@/components/blocks/TeeIntroBlock").then((m) => ({ default: m.TeeIntroBlock })),
   { ssr: true }
 );
@@ -31,7 +28,7 @@ export default function HomePage() {
       <Hero />
       <HomeScrollProvider>
         <Suspense fallback={<HomeScrollFallback />}>
-          <WelcomeBlock />
+          <EarthScrollSection />
           <TeeIntroBlock />
         </Suspense>
       </HomeScrollProvider>

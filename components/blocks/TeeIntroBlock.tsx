@@ -78,7 +78,6 @@ export const TeeIntroBlock: React.FC = () => {
   const liteMode = useLiteMode();
 
   const noScrollOnMobile = isMobile;
-  const noHeavyEffects = animationsDisabled || liteMode;
   const effectiveCompact = compact || noScrollOnMobile;
 
   useEffect(() => {
@@ -137,22 +136,21 @@ export const TeeIntroBlock: React.FC = () => {
   const e3 = smoothstep(0.08, 0.23, p);
   const e4 = smoothstep(0.11, 0.27, p);
 
-  const mkStyle = (enter: number, slideFrom = 28): React.CSSProperties => ({
-    opacity: enter * fadeOut,
-    transform: `translateY(${lerp(slideFrom, 0, enter)}px)`,
-    transition: 'opacity 0.1s, transform 0.1s',
-    ...(animationsDisabled ? {} : { willChange: 'opacity, transform' }),
-  });
+  const mkStyle = (enter: number, slideFrom = 28): React.CSSProperties => {
+    const opacity = enter * fadeOut;
+    const translateY = lerp(slideFrom, 0, enter);
+    return {
+      opacity: Math.round(opacity * 1e5) / 1e5,
+      transform: `translateY(${Math.round(translateY * 100) / 100}px)`,
+      transition: 'opacity 0.1s, transform 0.1s',
+    };
+  };
 
   return (
     <section
       ref={sectionRef}
-      className="relative w-full border-t border-white/5 tee-intro-mobile-height"
-      style={
-        isMobile
-          ? undefined
-          : { height: effectiveCompact ? '100vh' : (isDesktop ? '180vh' : '220vh') }
-      }
+      data-compact={compact ? true : undefined}
+      className="tee-intro-block relative w-full border-t border-white/5 tee-intro-mobile-height tee-intro-scroll-height"
     >
       <style>{`
         @keyframes teeGlowBreathe {
@@ -185,12 +183,10 @@ export const TeeIntroBlock: React.FC = () => {
       <div className="sticky top-0 min-h-[100vh] sm:min-h-screen overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[#0B0D10]" />
-          {!isMobile && (
-            <div
-              className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-b from-transparent to-[#07090c] pointer-events-none"
-              aria-hidden
-            />
-          )}
+          <div
+            className="hidden md:block absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-b from-transparent to-[#07090c] pointer-events-none"
+            aria-hidden
+          />
           <div
             className="absolute inset-0 opacity-[0.22]"
             style={{
@@ -200,7 +196,11 @@ export const TeeIntroBlock: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/35" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0.78)_78%)]" />
-          {!liteMode && <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay bg-noise" />}
+          <div
+            className="absolute inset-0 mix-blend-overlay bg-noise"
+            style={{ opacity: liteMode ? 0 : 0.06 }}
+            aria-hidden
+          />
         </div>
 
         <div className="relative z-10 h-full min-h-[100vh] sm:min-h-0 sm:h-full max-w-7xl lg:max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-10 sm:py-0">
@@ -209,7 +209,7 @@ export const TeeIntroBlock: React.FC = () => {
             <div
               className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
             >
-              {isMobile ? (
+              {!isDesktop ? (
                 /* Мобилка: футболка по центру + оверлеи (виньетка, дымка) как было */
                 <div className="absolute inset-0 flex items-center justify-center overflow-visible">
                   <div
@@ -293,32 +293,29 @@ export const TeeIntroBlock: React.FC = () => {
             <div className="col-span-12 md:col-span-8 order-2 md:order-none flex flex-col justify-center items-center md:items-start -mt-20 sm:-mt-8 md:mt-0 pt-0 pb-6 sm:py-0 relative">
               {/* Мобильные градиенты (затемнение футболки) */}
               <div
-                className="absolute md:hidden pointer-events-none"
+                className="tee-intro-mobile-fog absolute md:hidden pointer-events-none blur-[12px] motion-reduce:blur-[12px]"
                 style={{
                   inset: '-35% -25% -20% -25%',
-                  background: 'radial-gradient(ellipse 88% 72% at 50% 36%, rgba(11,13,16,0.97) 0%, rgba(11,13,16,0.88) 25%, rgba(11,13,16,0.55) 50%, rgba(11,13,16,0.18) 72%, transparent 92%)',
-                  filter: noHeavyEffects ? 'blur(12px)' : 'blur(24px)',
-                  animation: noHeavyEffects ? 'none' : 'teeGlowBreathe 7s ease-in-out infinite',
+                  background:
+                    'radial-gradient(ellipse 88% 72% at 50% 36%, rgba(11,13,16,0.97) 0%, rgba(11,13,16,0.88) 25%, rgba(11,13,16,0.55) 50%, rgba(11,13,16,0.18) 72%, transparent 92%)',
                 }}
                 aria-hidden
               />
               <div
-                className="absolute md:hidden pointer-events-none"
+                className="tee-intro-mobile-fog absolute md:hidden pointer-events-none blur-[16px] motion-reduce:blur-[16px]"
                 style={{
                   inset: '-15% -12% -8% -12%',
-                  background: 'radial-gradient(ellipse 55% 40% at 52% 28%, rgba(198,144,46,0.08) 0%, rgba(198,144,46,0.03) 45%, transparent 75%)',
-                  filter: noHeavyEffects ? 'blur(16px)' : 'blur(32px)',
-                  animation: noHeavyEffects ? 'none' : 'teeGoldShimmer 9s ease-in-out infinite',
+                  background:
+                    'radial-gradient(ellipse 55% 40% at 52% 28%, rgba(198,144,46,0.08) 0%, rgba(198,144,46,0.03) 45%, transparent 75%)',
                 }}
                 aria-hidden
               />
               <div
-                className="absolute md:hidden pointer-events-none"
+                className="tee-intro-mobile-fog absolute md:hidden pointer-events-none blur-[8px] motion-reduce:blur-[8px]"
                 style={{
                   inset: '-10% -8% -5% -8%',
-                  background: 'radial-gradient(ellipse 95% 85% at 50% 45%, transparent 30%, rgba(11,13,16,0.4) 65%, rgba(11,13,16,0.7) 90%)',
-                  filter: noHeavyEffects ? 'blur(8px)' : 'blur(14px)',
-                  animation: noHeavyEffects ? 'none' : 'teeVignettePulse 11s ease-in-out infinite',
+                  background:
+                    'radial-gradient(ellipse 95% 85% at 50% 45%, transparent 30%, rgba(11,13,16,0.4) 65%, rgba(11,13,16,0.7) 90%)',
                 }}
                 aria-hidden
               />
@@ -331,7 +328,7 @@ export const TeeIntroBlock: React.FC = () => {
 
               <div className="relative z-10">
                 <div className="text-[10px] sm:text-[11px] lg:text-[11px] font-mono tracking-[0.2em] lg:tracking-[0.24em] text-white/30 lg:text-white/35 mb-3 sm:mb-4 lg:mb-4" style={mkStyle(e0, 20)}>
-                  {isMobile ? (
+                  {!isDesktop ? (
                     <TypewriterLine disabled={false} />
                   ) : (
                     <>
@@ -344,31 +341,24 @@ export const TeeIntroBlock: React.FC = () => {
                 </div>
 
                 <h2 className="text-[22px] sm:text-[28px] md:text-[44px] lg:text-[40px] xl:text-[48px] font-light tracking-[0.06em] lg:tracking-[0.07em] leading-[1.1]" style={mkStyle(e1, 32)}>
-                  {isMobile ? 'ПРОЕКТ' : 'КОНЦЕРН'}{' '}
-                  <span
-                    className={
-                      animationsDisabled
-                        ? 'bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-clip-text text-transparent'
-                        : 'bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent'
-                    }
-                  >
+                  {!isDesktop ? 'ПРОЕКТ' : 'КОНЦЕРН'}{' '}
+                  <span className="tee-intro-title-shimmer bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
                     ВОСХОД
                   </span>
                 </h2>
 
                 <p
-                  className={`mt-4 sm:mt-5 lg:mt-6 max-w-xl lg:max-w-2xl text-[13px] sm:text-sm md:text-[15px] lg:text-[15px] leading-[1.7] lg:leading-[1.75] ${isMobile ? 'text-white/80' : 'text-white/48 lg:text-white/55'}`}
+                  className={`mt-4 sm:mt-5 lg:mt-6 max-w-xl lg:max-w-2xl text-[13px] sm:text-sm md:text-[15px] lg:text-[15px] leading-[1.7] lg:leading-[1.75] ${!isDesktop ? 'text-white/80' : 'text-white/48 lg:text-white/55'}`}
                   style={mkStyle(e2, 26)}
                 >
-                  {isMobile
+                  {!isDesktop
                     ? 'Тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы, "бетон/графит" и контроль качества: паспорт, партия, проверка.'
                     : 'Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы, "бетон/графит" и контроль качества: паспорт, партия, проверка.'}
                 </p>
 
                 <div className="mt-5 sm:mt-7 lg:mt-8 grid grid-cols-2 gap-2.5 sm:gap-3 lg:gap-4 max-w-xl lg:max-w-2xl" style={mkStyle(e3, 36)}>
                   <div
-                    className="vx-spec-card"
-                    style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat1 6s ease-in-out infinite' }}
+                    className="vx-spec-card max-md:!animate-none md:[animation:teeCardFloat1_6s_ease-in-out_infinite]"
                   >
                     <div className="vx-spec-card-label">CODE</div>
                     <div className="vx-spec-card-value">VSHD-TEE</div>
@@ -376,8 +366,7 @@ export const TeeIntroBlock: React.FC = () => {
                     <div className="vx-spec-card-value">IN STOCK</div>
                   </div>
                   <div
-                    className="vx-spec-card"
-                    style={{ animation: animationsDisabled ? 'none' : 'teeCardFloat2 7s ease-in-out infinite 0.5s' }}
+                    className="vx-spec-card max-md:!animate-none md:[animation:teeCardFloat2_7s_ease-in-out_infinite_0.5s]"
                   >
                     <div className="vx-spec-card-label">MATERIAL</div>
                     <div className="vx-spec-card-value">GRAPHITE</div>

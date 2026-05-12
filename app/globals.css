@@ -22,6 +22,35 @@ body {
   touch-action: pan-y;
 }
 
+/*
+ * TeeIntroBlock: высота секции только через классы (без inline height),
+ * чтобы дерево SSR и первый клиентский рендер совпадали; реальная высота задаётся viewport через media queries.
+ */
+.tee-intro-scroll-height {
+  height: 220vh;
+}
+
+@media (min-width: 1024px) {
+  .tee-intro-scroll-height {
+    height: 180vh;
+  }
+}
+
+.tee-intro-scroll-height[data-compact="true"] {
+  height: 100vh !important;
+}
+
+@media (max-width: 768px) {
+  .tee-intro-block .vx-spec-card {
+    animation: none !important;
+  }
+
+  .tee-intro-block .tee-intro-title-shimmer.animate-gold-shimmer {
+    animation: none !important;
+    background-size: auto !important;
+  }
+}
+
 /* На мобилке TeeIntroBlock и WelcomeBlock — без скролла, 100vh (до гидрации) */
 /* На мобилке все анимации отключены — контент показывается сразу */
 @media (max-width: 768px) {
