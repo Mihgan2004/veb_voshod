@@ -1,27 +1,38 @@
 /*
- * EarthScrollSection — минимальная 100vh секция с 3D-Землёй.
+ * EarthScrollSection — кинематографический скролл-сторителлинг
+ * «Земля → Россия → Московская область → Солнечногорск».
  *
- * Никаких sticky-обёрток, никаких 200/300vh высоток. Секция занимает
- * ровно один viewport в документе; Земля рисуется на этом viewport и
- * крутится за счёт useScroll offset ["start end", "end start"] —
- * вращение распределено на весь промежуток, пока секция вообще видна
- * (последняя часть Hero + сама секция + начало следующего блока).
+ * Архитектура CSS:
+ *   - .section / .sticky / .canvasWrap / .overlayRoot — каркас.
+ *   - .panel             — общий контейнер для текстовых фаз.
+ *   - .heroEyebrow / .heroTitle / ... — типографика по фазам.
  *
- * Следующий блок (TeeIntroBlock) начинается прямо за секцией без
- * пустого пространства.
+ * Все КРИТИЧНЫЕ layout-свойства (position, inset, display, flex)
+ * также продублированы инлайн-стилями в JSX. Это страховка на случай,
+ * если CSS-модуль не догрузится — секция всё равно выглядит корректно.
  */
 
 .section {
   position: relative;
   width: 100%;
+  height: 340vh;
+  background: #02050d;
+  isolation: isolate;
+  /*
+   * Без overflow-* на секции — иначе браузер ограничивает sticky дочерний
+   * слой и зрительно «полотно» уезжает вместо фиксации на весь скролл
+   * 340vh ⇒ пустой нижний экран после первых пикселей скрола.
+   */
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
   height: 100vh;
   height: 100svh;
-  /* Чисто-чёрный космический фон. Сами звёзды рендерятся внутри
-   * Canvas через @react-three/drei <Stars/> — это даёт настоящий
-   * 3D-параллакс при вращении Земли, а не плоский CSS-узор. */
-  background: #000000;
-  isolation: isolate;
   overflow: hidden;
+  background: #02050d;
 }
 
 .canvasWrap {
@@ -29,6 +40,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 1;
 }
 
 .canvasWrap > canvas,
@@ -36,4 +48,173 @@
   display: block;
   width: 100% !important;
   height: 100% !important;
+}
+
+.overlayRoot {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  color: #ffffff;
+  font-family: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ============================================================== *
+ *  PHASE 1 — HERO («Добро пожаловать ВОСХОД»)
+ * ============================================================== */
+
+.heroEyebrow {
+  font-size: 13px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(220, 232, 255, 0.7);
+  font-weight: 300;
+}
+
+.heroTitle {
+  font-size: clamp(48px, 9vw, 132px);
+  font-weight: 200;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  color: #f6fbff;
+  text-shadow:
+    0 0 36px rgba(120, 180, 255, 0.42),
+    0 0 12px rgba(255, 255, 255, 0.25);
+}
+
+.scrollCue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: rgba(220, 232, 255, 0.55);
+}
+
+.scrollCueLabel {
+  font-size: 10px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+}
+
+.scrollCueLine {
+  width: 1px;
+  height: 44px;
+  background: linear-gradient(
+    to bottom,
+    rgba(220, 232, 255, 0.6),
+    rgba(220, 232, 255, 0)
+  );
+  animation: scrollLineGlow 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollLineGlow {
+  0%, 100% { opacity: 0.45; transform: scaleY(1); }
+  50%      { opacity: 0.95; transform: scaleY(1.2); }
+}
+
+/* ============================================================== *
+ *  PHASE 4 — Солнечногорск + CTA
+ * ============================================================== */
+
+.calloutLabel {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: rgba(230, 240, 255, 0.92);
+  padding: 6px 14px;
+  background: rgba(8, 14, 28, 0.55);
+  border: 1px solid rgba(154, 216, 255, 0.45);
+  border-radius: 4px;
+  white-space: nowrap;
+  box-shadow:
+    0 0 0 1px rgba(154, 216, 255, 0.08) inset,
+    0 0 24px rgba(120, 180, 255, 0.18);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 30px;
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(10, 18, 34, 0.45);
+  border: 1px solid rgba(154, 216, 255, 0.55);
+  border-radius: 4px;
+  text-decoration: none;
+  pointer-events: auto;
+  transition: border-color 0.22s ease, background 0.22s ease,
+    transform 0.22s ease, box-shadow 0.22s ease;
+  box-shadow:
+    0 0 0 1px rgba(154, 216, 255, 0.08) inset,
+    0 0 28px rgba(120, 180, 255, 0.22);
+}
+
+.cta:hover {
+  border-color: rgba(180, 220, 255, 0.95);
+  background: rgba(20, 36, 70, 0.55);
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px rgba(180, 220, 255, 0.15) inset,
+    0 0 38px rgba(120, 180, 255, 0.4);
+}
+
+.ctaArrow {
+  display: inline-block;
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  position: relative;
+}
+
+.ctaArrow::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: rotate(45deg);
+  transform-origin: right top;
+}
+
+/* Glow-обводка SVG-контуров (Россия / МО). */
+.outlineGlow {
+  filter:
+    drop-shadow(0 0 6px rgba(154, 216, 255, 0.6))
+    drop-shadow(0 0 18px rgba(120, 180, 255, 0.35));
+}
+
+/* Pulse-кольцо вокруг точки города в SVG-оверлее. */
+.svgPulse {
+  transform-origin: center;
+  animation: svgPulseAnim 2.2s ease-in-out infinite;
+}
+
+@keyframes svgPulseAnim {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.45); }
+}
+
+/* ============================================================== *
+ *  RESPONSIVE / REDUCED MOTION
+ * ============================================================== */
+
+@media (max-width: 768px) {
+  .section { height: 320vh; }
+  .heroTitle { font-size: clamp(40px, 14vw, 88px); letter-spacing: 0.12em; }
+  .calloutLabel { font-size: 10px; padding: 5px 10px; letter-spacing: 0.14em; }
+  .cta { padding: 12px 24px; font-size: 11px; letter-spacing: 0.22em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section { height: 140vh; }
+  .scrollCueLine, .svgPulse { animation: none; }
 }
