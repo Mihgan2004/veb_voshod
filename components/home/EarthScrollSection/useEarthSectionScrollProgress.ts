@@ -12,16 +12,9 @@ function clamp01(t: number): number {
 }
 
 /**
- * Прогресс скролла по секции с тем же смыслом, что у framer-motion:
- *   offset: ["start start", "end end"]
- *
- *   0 — верх секции у верхнего края viewport
- *   1 — низ секции у нижнего края viewport
- *
- * Считается через `getBoundingClientRect()` — корректно при Lenis
- * (в т. ч. когда View Timeline / useScroll расходится с реальным скроллом).
- *
- * Также держится в синхроне с `lenis.on("scroll")`, если Lenis уже создан.
+ * Прогресс pinned-секции: строго 0 когда верх у верха viewport,
+ * 1 когда последний скролл через (offsetHeight − innerHeight).
+ * Совместимо с Lenis через lenis.on + window scroll на всякий случай.
  */
 export function useEarthSectionScrollProgress(
   sectionRef: RefObject<HTMLElement | null>,
@@ -32,40 +25,25 @@ export function useEarthSectionScrollProgress(
   useLayoutEffect(() => {
     const compute = (): void => {
       const el = sectionRef.current;
-      if (!el) return;
+      if (!el || typeof window === "undefined") return;
 
-      const vh =
-        typeof window !== "undefined"
-          ? window.visualViewport?.height ?? window.innerHeight
-          : 0;
-
+      const vh = window.visualViewport?.height ?? window.innerHeight;
+      const total = Math.max(el.offsetHeight - vh, 0);
       const rect = el.getBoundingClientRect();
-      const h = rect.height;
-      const denom = h - vh;
 
-      if (denom <= 1) {
+      if (total <= 0) {
         scrollYProgress.set(0);
         return;
       }
 
-      /*
-       * Когда rect.top === 0   → начало дорожки (прогресс 0).
-       * Когда rect.bottom === vh → конец дорожки (прогресс 1).
-       * Тождественно: p = -rect.top / (h - vh).
-       */
-      const raw = -rect.top / denom;
-      scrollYProgress.set(clamp01(raw));
+      const scrolled = Math.min(Math.max(-rect.top, 0), total);
+      scrollYProgress.set(clamp01(scrolled / total));
     };
 
     compute();
 
     let unsubLenis: void | (() => void);
 
-    /*
-     * LenisProvider ставит экземпляр в ref в том же использованием
-     * useLayoutEffect, но РОДИТЕЛЬ выполняется раньше потомков — к моменту
-     * этого эффекта ref уже обычно заполнен.
-     */
     const lenis = lenisRef?.current ?? null;
     if (lenis) {
       unsubLenis = lenis.on("scroll", compute);

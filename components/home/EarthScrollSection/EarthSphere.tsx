@@ -41,6 +41,8 @@ export const EarthSphere = forwardRef<
     night.anisotropy = 8;
 
     return new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: true,
       uniforms: {
         uDay: { value: day },
         uNight: { value: night },
@@ -50,6 +52,7 @@ export const EarthSphere = forwardRef<
         uAmbient: { value: 0.03 },
         uDayDarkness: { value: 0.32 },
         uNightBoost: { value: 2.1 },
+        uOpacity: { value: 1 },
       },
       vertexShader: /* glsl */ `
         varying vec2 vUv;
@@ -72,6 +75,7 @@ export const EarthSphere = forwardRef<
         uniform float     uAmbient;
         uniform float     uDayDarkness;
         uniform float     uNightBoost;
+        uniform float     uOpacity;
 
         varying vec2 vUv;
         varying vec3 vWorldNormal;
@@ -111,7 +115,8 @@ export const EarthSphere = forwardRef<
           float spec = pow(max(dot(N, H), 0.0), 64.0) * water * 0.35 * dayMix;
           color += uMoonColor * spec;
 
-          gl_FragColor = vec4(color, 1.0);
+          vec3 RGB = clamp(color * uOpacity, vec3(0.0), vec3(1.0));
+          gl_FragColor = vec4(RGB, uOpacity);
 
           #include <tonemapping_fragment>
           #include <colorspace_fragment>

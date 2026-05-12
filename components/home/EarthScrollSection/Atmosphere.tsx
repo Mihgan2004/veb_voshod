@@ -49,6 +49,7 @@ function AtmoLayer({
         uColor: { value: new THREE.Color(color) },
         uIntensity: { value: intensity },
         uPower: { value: power },
+        uOpacity: { value: 1 },
       },
       transparent: true,
       blending: THREE.AdditiveBlending,
@@ -68,11 +69,12 @@ function AtmoLayer({
         uniform vec3  uColor;
         uniform float uIntensity;
         uniform float uPower;
+        uniform float uOpacity;
         varying vec3  vNormal;
         varying vec3  vView;
         void main() {
           float fresnel = pow(max(0.0, dot(-vNormal, vView)), uPower);
-          gl_FragColor = vec4(uColor * uIntensity, fresnel);
+          gl_FragColor = vec4(uColor * uIntensity, fresnel * uOpacity);
         }
       `,
     });
