@@ -7,7 +7,7 @@ import { earthScrollBridge } from "./earthScrollBridge";
 import { clamp01 } from "./earthScrollProgress";
 
 /**
- * Прогресс прокрутки секции для лого (MotionValue) и для Earth (earthScrollBridge).
+ * Прогресс скролла секции — только по событиям scroll/resize (без вечного RAF).
  */
 export function useSectionScrollProgress(
   sectionRef: RefObject<HTMLElement | null>
@@ -16,6 +16,8 @@ export function useSectionScrollProgress(
   const lenisRef = useLenisRef();
 
   useEffect(() => {
+    let rafId = 0;
+
     const update = () => {
       const el = sectionRef.current;
       if (!el) return;
@@ -35,26 +37,27 @@ export function useSectionScrollProgress(
       progress.set(value);
     };
 
+    const scheduleUpdate = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        update();
+      });
+    };
+
     update();
 
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-
-    let rafId = 0;
-    const tick = () => {
-      update();
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
 
     const lenis = lenisRef?.current;
-    lenis?.on?.("scroll", update);
+    lenis?.on?.("scroll", scheduleUpdate);
 
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-      cancelAnimationFrame(rafId);
-      lenis?.off?.("scroll", update);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      lenis?.off?.("scroll", scheduleUpdate);
+      if (rafId) cancelAnimationFrame(rafId);
       earthScrollBridge.set(0);
     };
   }, [sectionRef, progress, lenisRef]);

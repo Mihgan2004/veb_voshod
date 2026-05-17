@@ -2,16 +2,28 @@
 
 import { useEffect, useRef } from "react";
 
+import { getEarthSceneProfile } from "./earthSceneProfile";
 import styles from "./earth-scroll-section.module.scss";
 
-/** Тихий звёздный фон под WebGL: градиент + случайные точки, перерисовка при resize/DPR. */
+function mulberry32(seed: number) {
+  return () => {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Чёрный фон + звёзды (без синего градиента). Рисуется один раз при resize. */
 export function StarfieldBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
     const paint = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
@@ -19,40 +31,28 @@ export function StarfieldBackground() {
       const h = canvas.clientHeight;
       if (w < 2 || h < 2) return;
 
-      const dpr = Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2);
+      const profile = getEarthSceneProfile();
+      const dpr = profile.isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.75);
+
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const g = ctx.createRadialGradient(w * 0.5, 0, 0, w * 0.45, h * 0.55, Math.max(w, h) * 0.95);
-      g.addColorStop(0, "#10121c");
-      g.addColorStop(0.38, "#07080e");
-      g.addColorStop(1, "#020204");
-      ctx.fillStyle = g;
+      ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, w, h);
 
-      const count = Math.min(1400, Math.floor((w * h) / 2200));
-      const stars = Array.from({ length: count }, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        r: Math.random() < 0.9 ? 0.3 + Math.random() * 0.55 : 0.9 + Math.random() * 1.1,
-        a: 0.12 + Math.random() * 0.72,
-      }));
-
-      for (const s of stars) {
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(220, 228, 255, ${s.a})`;
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fill();
+      const rand = mulberry32(42);
+      for (let i = 0; i < profile.starCount; i++) {
+        const x = rand() * w;
+        const y = rand() * h;
+        const r = rand() < 0.92 ? 0.35 + rand() * 0.45 : 0.75 + rand() * 0.5;
+        const a = 0.18 + rand() * 0.55;
+        ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+        ctx.fillRect(x, y, r, r);
       }
     };
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ro = new ResizeObserver(() => {
-      requestAnimationFrame(paint);
-    });
+    const ro = new ResizeObserver(() => requestAnimationFrame(paint));
     ro.observe(canvas);
     paint();
 
