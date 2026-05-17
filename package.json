@@ -30,6 +30,8 @@
     "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "imagetracerjs": "^1.2.6",
+    "sass": "^1.99.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

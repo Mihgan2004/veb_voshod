@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState, useCallback, useEffect } from "react";
 import type { Collection } from "@/lib/catalog";
+import { useHorizontalCarouselWheel } from "@/lib/hooks/useHorizontalCarouselWheel";
 
 function FadeImage({
   src,
@@ -103,6 +104,7 @@ export function HighlightsCollections({
   collections: Collection[];
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  useHorizontalCarouselWheel(scrollRef);
 
   return (
     <section className="vx-section-seams vx-section-pad lg:py-16 xl:py-20">
@@ -123,8 +125,7 @@ export function HighlightsCollections({
         {/* Carousel */}
         <div
           ref={scrollRef}
-          data-lenis-prevent
-          className="mt-10 sm:mt-12 md:mt-14 lg:mt-16 flex overflow-x-auto scrollbar-none snap-x snap-mandatory gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 px-5 sm:px-6 lg:px-12 xl:px-16 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
+          className="mt-10 sm:mt-12 md:mt-14 lg:mt-16 flex overflow-x-auto overscroll-x-contain scrollbar-none snap-x snap-mandatory gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 px-5 sm:px-6 lg:px-12 xl:px-16 min-[1320px]:px-[max(1.5rem,calc((100vw-1280px)/2+48px))] opacity-0 md:opacity-100 animate-mobile-enter animate-mobile-enter-delay-1"
         >
           {collections.map((col) => (
             <Link
