@@ -1,0 +1,142 @@
+.section {
+  position: relative;
+  overflow: hidden;
+  background: #0b0d10;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+  opacity: 0.38;
+  transform: scale(1.04);
+}
+
+.backgroundOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(7, 9, 12, 0.82) 0%, rgba(7, 9, 12, 0.55) 42%, rgba(7, 9, 12, 0.88) 100%),
+    radial-gradient(ellipse 90% 80% at 72% 50%, rgba(0, 0, 0, 0.15) 0%, rgba(7, 9, 12, 0.75) 68%);
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1.25rem, 4vw, 2.5rem);
+  min-height: min(72vh, 40rem);
+  padding: clamp(4rem, 14vh, 7rem) 0 clamp(2.5rem, 8vw, 5rem);
+}
+
+.topSpacer {
+  height: clamp(3rem, 10vh, 6rem);
+}
+
+.slideViewport {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.slide {
+  display: flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.phrase {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  padding: 0 clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.text {
+  margin: 0;
+  font-size: clamp(2rem, 7.5vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.52);
+  font-family: var(--font-nfs), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.textAccent {
+  color: rgba(228, 205, 150, 0.98);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 24px rgba(198, 144, 46, 0.28);
+}
+
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(5rem, 16vw, 10rem);
+  width: clamp(5rem, 16vw, 10rem);
+  flex-shrink: 0;
+}
+
+.iconWrapTall {
+  height: clamp(6.5rem, 20vw, 13rem);
+  width: clamp(4rem, 12vw, 8rem);
+}
+
+.icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.12));
+}
+
+.imageWrap {
+  position: relative;
+  height: clamp(2rem, 7.5vw, 6rem);
+  aspect-ratio: 4 / 2;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.spacer {
+  height: min(40vh, 24rem);
+}
+
+@media (max-width: 768px) {
+  .topSpacer {
+    height: clamp(5.5rem, 20vh, 9rem);
+  }
+
+  .container {
+    min-height: min(78vh, 36rem);
+    justify-content: flex-end;
+    padding-top: clamp(6rem, 22vh, 10rem);
+    padding-bottom: clamp(3rem, 12vh, 5rem);
+  }
+
+  .text {
+    letter-spacing: 0.03em;
+  }
+}

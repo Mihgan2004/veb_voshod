@@ -2,10 +2,10 @@ import { Suspense } from "react";
 import Hero from "@/components/hero/Hero";
 import { MarqueeStrip } from "@/components/sections/MarqueeStrip";
 import { HighlightsCollections } from "@/components/sections/HighlightsCollections";
-import { LookbookSlider } from "@/components/sections/LookbookSlider";
+import { GalleryZoomParallax } from "@/components/sections/GalleryZoomParallax/GalleryZoomParallax";
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
 import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
-import { EarthScrollSection } from "@/components/home/EarthScrollSection/EarthScrollSection";
+import { TextParallaxSection } from "@/components/home/TextParallaxSection/TextParallaxSection";
 
 import dynamic from "next/dynamic";
 
@@ -26,8 +26,8 @@ export default function HomePage() {
   return (
     <div className="animate-fade-in">
       <Hero />
-      {/* 3D Earth + projects: клиентский блок с dynamic(Canvas); без общего Suspense — см. EarthScrollSection. */}
-      <EarthScrollSection />
+      {/* Text parallax on scroll — см. TextParallaxSection */}
+      <TextParallaxSection />
       <HomeScrollProvider>
         <Suspense fallback={<HomeScrollFallback />}>
           <TeeIntroBlock />
@@ -38,8 +38,9 @@ export default function HomePage() {
 
       <div className="vx-below-fold vx-brutal-bg">
         <HighlightsCollections collections={STATIC_COLLECTIONS} />
-        <LookbookSlider />
       </div>
+
+      <GalleryZoomParallax />
     </div>
   );
 }

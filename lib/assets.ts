@@ -19,6 +19,14 @@ export const ASSETS = {
     heroMobile540: "/video/hero-mobile-540.mp4",
     heroMobile1280: "/video/hero-mobile-1280.mp4",
   },
+  textParallax: {
+    background: "/text-parallax/background-calligraphy.png",
+    icons: {
+      tacticalMerch: "/text-parallax/icons/tactical-merch.png",
+      rassvet: "/text-parallax/icons/rassvet.png",
+      solnechnogorsk: "/text-parallax/icons/solnechnogorsk.png",
+    },
+  },
   lookbook: [
     "/lookbook/lookbook-01.avif",
     "/lookbook/lookbook-02.avif",

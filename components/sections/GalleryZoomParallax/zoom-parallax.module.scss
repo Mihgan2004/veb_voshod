@@ -1,0 +1,96 @@
+.container {
+  height: 300vh;
+  position: relative;
+}
+
+.sticky {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  z-index: 5;
+  background: #0b0d10;
+}
+
+.el {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  z-index: 1;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.centerEl {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  margin: auto;
+  overflow: hidden;
+  width: 25vw;
+  height: 25vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  will-change: width, height;
+}
+
+.imageContainer {
+  position: relative;
+  width: 25vw;
+  height: 25vh;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.slot2 .imageContainer {
+  top: -30vh;
+  left: 5vw;
+  width: 35vw;
+  height: 30vh;
+}
+
+.slot3 .imageContainer {
+  top: -10vh;
+  left: -25vw;
+  width: 20vw;
+  height: 45vh;
+}
+
+.slot4 .imageContainer {
+  left: 27.5vw;
+  width: 25vw;
+  height: 25vh;
+}
+
+.slot5 .imageContainer {
+  top: 27.5vh;
+  left: 5vw;
+  width: 20vw;
+  height: 25vh;
+}
+
+.slot6 .imageContainer {
+  top: 27.5vh;
+  left: -22.5vw;
+  width: 30vw;
+  height: 25vh;
+}
+
+.slot7 .imageContainer {
+  top: 22.5vh;
+  left: 25vw;
+  width: 15vw;
+  height: 15vh;
+}
