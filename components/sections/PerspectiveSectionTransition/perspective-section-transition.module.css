@@ -1,6 +1,6 @@
 .wrapper {
   position: relative;
-  background: transparent;
+  background: #0b0d10;
   overflow-x: clip;
   touch-action: pan-y;
   content-visibility: visible;
@@ -16,6 +16,8 @@
   justify-content: center;
   overflow: hidden;
   padding: 24px 0;
+  background: #0b0d10;
+  isolation: isolate;
 }
 
 .stage {
@@ -55,7 +57,7 @@
 .swipeHintWrap {
   position: absolute;
   left: 50%;
-  bottom: clamp(18px, 5svh, 42px);
+  bottom: max(16px, calc(env(safe-area-inset-bottom, 0px) + 14px));
   z-index: 999;
   width: min(86%, 520px);
   transform: translate3d(-50%, 0, 0);
@@ -66,25 +68,12 @@
   pointer-events: auto;
   width: 100%;
   margin: 0;
-  padding: 0.62rem 1.25rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(8, 10, 12, 0.68);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color: rgba(255, 255, 255, 0.86);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-  font-size: 10px;
-  line-height: 1.45;
-  letter-spacing: 0.14em;
+  min-height: 44px;
+  padding: 0 1.25rem;
   text-align: center;
   text-transform: lowercase;
-  cursor: pointer;
-}
-
-.swipeHint:active {
-  border-color: rgba(255, 255, 255, 0.34);
-  color: rgba(255, 255, 255, 0.96);
+  letter-spacing: 0.08em;
+  white-space: normal;
 }
 
 .staticFallback {
@@ -134,13 +123,12 @@
 
   .swipeHintWrap {
     width: min(90%, 380px);
-    bottom: clamp(88px, 16svh, 120px);
+    bottom: max(14px, calc(env(safe-area-inset-bottom, 0px) + 12px));
   }
 
   .swipeHint {
-    padding: 0.58rem 1rem;
-    font-size: 9px;
-    letter-spacing: 0.13em;
+    padding: 0 1rem;
+    font-size: 10px;
   }
 
   .staticFallback {

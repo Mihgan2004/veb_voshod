@@ -136,7 +136,7 @@ export const OrbitalDock: React.FC = () => {
               <Link
                 href="/cart"
                 aria-label={`Корзина${cartCount > 0 ? `, товаров: ${cartCount}` : ""}`}
-                className={`relative shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-white/55 hover:text-white/80 transition-all duration-200 z-10 ${stampVisible ? "animate-cart-pulse" : ""}`}
+                className={`vx-btn-icon relative z-10 ${stampVisible ? "animate-cart-pulse" : ""}`}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
@@ -144,15 +144,16 @@ export const OrbitalDock: React.FC = () => {
                   <path d="M16 10a4 4 0 0 1-8 0" />
                 </svg>
                 {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-0.5 flex items-center justify-center rounded-full bg-gold text-graphite text-[9px] font-bold tabular-nums leading-none">
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-0.5 flex items-center justify-center rounded-full border border-white/10 bg-white/12 text-white/90 text-[9px] font-medium tabular-nums leading-none">
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
               </Link>
               <button
+                type="button"
                 onClick={() => setMenuOpen(!menuOpen)}
                 aria-label="Menu"
-                className="shrink-0 w-8 h-8 flex flex-col items-center justify-center gap-[3.5px] text-white/55 hover:text-white/80 rounded-full transition-colors duration-200"
+                className="vx-btn-icon flex flex-col items-center justify-center gap-[3.5px]"
               >
                 <span className={`block w-[14px] h-[1.2px] bg-current transition-all duration-300 origin-center ${menuOpen ? "rotate-45 translate-y-[4.7px]" : ""}`} />
                 <span className={`block w-[14px] h-[1.2px] bg-current transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""}`} />

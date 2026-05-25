@@ -10,7 +10,7 @@ export function ManifestoCtaActions() {
           href={VK_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className={styles.ctaBtn}
+          className={`vx-btn-primary ${styles.ctaPrimary}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -26,7 +26,7 @@ export function ManifestoCtaActions() {
           href={TELEGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className={styles.ctaBtn}
+          className={`vx-btn-primary ${styles.ctaPrimary}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -38,11 +38,11 @@ export function ManifestoCtaActions() {
           />
           <span>телеграм</span>
         </a>
-        <Link href="/catalog" className={styles.ctaBtn}>
-          <span className={styles.ctaCatalogMark} aria-hidden>
+        <Link href="/catalog" className="vx-btn-secondary">
+          <span>в каталог</span>
+          <span className="vx-btn-secondary__arrow" aria-hidden>
             →
           </span>
-          <span>в КАТАЛОГ</span>
         </Link>
       </nav>
     </div>

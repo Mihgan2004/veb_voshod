@@ -6,9 +6,90 @@ import { ASSETS } from '@/lib/assets';
 import { useHomeScrollCompact } from '@/components/home/HomeScrollContext';
 import { useLiteMode } from '@/lib/useLiteMode';
 
+// ========== КОПИРАЙТ ИНТРО ==========
+const INTRO_MONO = '// RSVT / PEOPLE · CITY';
+const INTRO_BODY = [
+  'Мы собираем вокруг себя эстетику тёмного города, строгих линий.',
+  'Это не просто вещи и визуальный стиль. Это попытка создать пространство для своих: для тех, кому близки сдержанность, андеграундная культура и ощущение общего знака.',
+] as const;
+
+const SPEC_CARDS = [
+  {
+    rows: [
+      { label: 'CODE', value: 'RSVT-001' },
+      { label: 'STATE', value: 'IN ROTATION' },
+    ],
+  },
+  {
+    rows: [
+      { label: 'SURFACE', value: 'GRAPHITE' },
+      { label: 'DROP', value: 'LIMITED RUN' },
+    ],
+  },
+] as const;
+
 // ========== ПЕЧАТНАЯ МАШИНКА (мобилка) ==========
-const TYPEWRITER_TEXT = '// ПРОЕКТ РАССВЕТ / DROP';
+const TYPEWRITER_TEXT = INTRO_MONO;
 const TYPEWRITER_MS = 55;
+
+function IntroTitle({ className = '', style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <h2 className={className} style={style}>
+      <span className="tee-intro-title-shimmer bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
+        РАССВЕТ
+      </span>
+      {' '}
+      <span className="text-white/90">— это проект о людях.</span>
+    </h2>
+  );
+}
+
+function IntroBody({ className = '', style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <div className={className} style={style}>
+      {INTRO_BODY.map((paragraph) => (
+        <p key={paragraph.slice(0, 24)} className="text-pretty">
+          {paragraph}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+const SPEC_CARD_FLOAT = [
+  'md:[animation:teeCardFloat1_6s_ease-in-out_infinite]',
+  'md:[animation:teeCardFloat2_7s_ease-in-out_infinite_0.5s]',
+] as const;
+
+function SpecCardsGrid({
+  className = '',
+  cardClassName = 'vx-spec-card',
+  desktopFloat = false,
+  style,
+}: {
+  className?: string;
+  cardClassName?: string;
+  desktopFloat?: boolean;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <div className={className} style={style}>
+      {SPEC_CARDS.map((card, i) => (
+        <div
+          key={card.rows[0].label}
+          className={`${cardClassName}${desktopFloat ? ` ${SPEC_CARD_FLOAT[i]}` : ''}`}
+        >
+          {card.rows.map((row, i) => (
+            <React.Fragment key={row.label}>
+              <div className={`vx-spec-card-label${i > 0 ? ' mt-2.5 sm:mt-3' : ''}`}>{row.label}</div>
+              <div className="vx-spec-card-value">{row.value}</div>
+            </React.Fragment>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function TypewriterLine({ disabled }: { disabled: boolean }) {
   const [visible, setVisible] = useState(0);
@@ -42,10 +123,36 @@ function TypewriterLine({ disabled }: { disabled: boolean }) {
 }
 
 // ========== НАСТРОЙКИ РАЗМЕРОВ (десктоп из референса) ==========
+const TEE_CUTOUT_MASK = (src: string): React.CSSProperties => ({
+  WebkitMaskImage: `url(${src})`,
+  maskImage: `url(${src})`,
+  WebkitMaskRepeat: 'no-repeat',
+  maskRepeat: 'no-repeat',
+  WebkitMaskSize: '100% 100%',
+  maskSize: '100% 100%',
+  WebkitMaskPosition: 'center',
+  maskPosition: 'center',
+});
+
+/**
+ * Mobile-футболка: подстройка вручную (только ≤768px, блок TeeIntroBlock).
+ * offsetX — больше = влево (арт к центру экрана); меньше / отрицательный = вправо.
+ * offsetY — больше = вниз, меньше = вверх.
+ * scale — размер; heightVh / heightMaxPx — высота картинки.
+ */
+const MOBILE_TEE = {
+  heightVh: 70,
+  heightMaxPx: 800,
+  scale:3,
+  offsetX: 140,
+  offsetY: 0,
+  originX: 50,
+  originY: 36,
+} as const;
+
 const TEE_INTRO = {
   mobile: {
-    teeHeight: 'h-[min(38vh,260px)]',
-    teeMaxHeight: 'max-h-[260px]',
+    teeMaxWidth: 'max-w-[100vw]',
     containerMinHeight: '',
   },
   tablet: {
@@ -90,7 +197,7 @@ export const TeeIntroBlock: React.FC = () => {
   // Скролл-логика как в референсе (getBoundingClientRect, без кэша)
   useEffect(() => {
     if (effectiveCompact) {
-      setP(0.85);
+      setP(noScrollOnMobile ? 0.15 : 0.85);
       return;
     }
     const el = sectionRef.current;
@@ -125,10 +232,13 @@ export const TeeIntroBlock: React.FC = () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, [effectiveCompact]);
+  }, [effectiveCompact, noScrollOnMobile]);
 
   const out = smoothstep(0.78, 0.98, p);
   const fadeOut = lerp(1, 0.35, out);
+  const backdropFade = isMobile
+    ? 1
+    : lerp(1, 0, smoothstep(0.68, 0.92, p));
 
   const e0 = smoothstep(0, 0.12, p);
   const e1 = smoothstep(0.02, 0.15, p);
@@ -137,6 +247,9 @@ export const TeeIntroBlock: React.FC = () => {
   const e4 = smoothstep(0.11, 0.27, p);
 
   const mkStyle = (enter: number, slideFrom = 28): React.CSSProperties => {
+    if (isMobile) {
+      return { opacity: 1, transform: 'none' };
+    }
     const opacity = enter * fadeOut;
     const translateY = lerp(slideFrom, 0, enter);
     return {
@@ -181,11 +294,15 @@ export const TeeIntroBlock: React.FC = () => {
         }
       `}</style>
 
-      <div className="relative md:sticky md:top-0 md:min-h-screen md:overflow-hidden">
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
+      <div className="relative overflow-hidden md:sticky md:top-0 md:min-h-screen">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ opacity: backdropFade }}
+          aria-hidden
+        >
           <div className="absolute inset-0 bg-[#0B0D10]" />
           <div
-            className="hidden md:block absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-b from-transparent to-[#07090c] pointer-events-none"
+            className="hidden md:block absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-b from-transparent to-[#07090c] pointer-events-none"
             aria-hidden
           />
           <div
@@ -195,8 +312,12 @@ export const TeeIntroBlock: React.FC = () => {
                 'repeating-linear-gradient(135deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 38px, rgba(0,0,0,0.0) 38px, rgba(0,0,0,0.0) 76px)',
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/35" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0.78)_78%)]" />
+          <div className="absolute inset-x-0 top-0 h-[32%] bg-gradient-to-b from-black/25 to-transparent md:h-[22%] md:from-black/15" />
+          <div className="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-black/40 to-transparent md:h-[32%] md:from-black/30" />
+          <div
+            className="absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.04)_0%,rgba(0,0,0,0.55)_82%)]"
+            aria-hidden
+          />
           <div
             className="absolute inset-0 mix-blend-overlay bg-noise"
             style={{ opacity: liteMode ? 0 : 0.06 }}
@@ -215,80 +336,133 @@ export const TeeIntroBlock: React.FC = () => {
                   <TypewriterLine disabled={false} />
                 </div>
 
-                <h2
-                  className="max-w-[18rem] text-[clamp(1.375rem,6vw,1.75rem)] font-light tracking-[0.06em] leading-[1.15] text-pretty text-balance"
+                <IntroTitle
+                  className="max-w-[21rem] text-[clamp(1.25rem,5.5vw,1.65rem)] font-light tracking-[0.05em] leading-[1.2] text-pretty text-balance"
                   style={mkStyle(e1, 32)}
-                >
-                  проект{' '}
-                  <span className="tee-intro-title-shimmer bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
-                    РАССВЕТ
-                  </span>
-                </h2>
+                />
 
-                <p
-                  className="max-w-[20rem] text-[13px] sm:text-sm leading-[1.55] text-white/80 text-pretty"
+                <IntroBody
+                  className="max-w-[21rem] flex flex-col gap-3 text-[13px] sm:text-sm leading-[1.6] text-white/75"
                   style={mkStyle(e2, 26)}
-                >
-                  Тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы,
-                  &quot;бетон/графит&quot; и контроль качества: паспорт, партия, проверка.
-                </p>
-              </div>
-
-              <div
-                className="relative flex w-full justify-center py-1 pointer-events-none select-none"
-                style={mkStyle(e1, 16)}
-                aria-hidden
-              >
-                <img
-                  src={ASSETS.tee.cutout}
-                  alt=""
-                  width={512}
-                  height={768}
-                  className={`${TEE_INTRO.mobile.teeHeight} ${TEE_INTRO.mobile.teeMaxHeight} w-auto object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)] opacity-90`}
-                  style={{ filter: 'brightness(0.96) contrast(1.06) saturate(0.95)' }}
-                  draggable={false}
                 />
               </div>
 
               <div
-                className="grid w-full max-w-md grid-cols-2 gap-2.5 sm:gap-3"
-                style={mkStyle(e3, 36)}
+                className="relative w-full overflow-hidden py-0 pointer-events-none select-none"
+                style={mkStyle(e1, 16)}
+                aria-hidden
               >
-                <div className="vx-spec-card max-md:!animate-none">
-                  <div className="vx-spec-card-label">CODE</div>
-                  <div className="vx-spec-card-value">VSHD-TEE</div>
-                  <div className="vx-spec-card-label mt-2.5 sm:mt-3">STATUS</div>
-                  <div className="vx-spec-card-value">IN STOCK</div>
-                </div>
-                <div className="vx-spec-card max-md:!animate-none">
-                  <div className="vx-spec-card-label">MATERIAL</div>
-                  <div className="vx-spec-card-value">GRAPHITE</div>
-                  <div className="vx-spec-card-label mt-2.5 sm:mt-3">TAG</div>
-                  <div className="vx-spec-card-value">LIMITED DROP</div>
+                <div
+                  className="pointer-events-none absolute inset-0 z-0"
+                  style={{
+                    background: `
+                      radial-gradient(ellipse 130% 100% at 50% 44%, rgba(0,0,0,0) 12%, rgba(0,0,0,0.48) 50%, rgba(11,13,16,0.92) 100%),
+                      linear-gradient(90deg, #0b0d10 0%, rgba(11,13,16,0.92) 14%, rgba(11,13,16,0.5) 30%, transparent 54%),
+                      linear-gradient(to top, rgba(11,13,16,0.55) 0%, transparent 36%)`,
+                  }}
+                  aria-hidden
+                />
+                <div className="teeVisual relative z-[1] w-full overflow-hidden">
+                  <div
+                    className="teeImageWrap relative left-1/2 z-10 w-max overflow-hidden"
+                    style={{
+                      isolation: 'isolate',
+                      transform: `translate(calc(-50% - ${MOBILE_TEE.offsetX}px), ${MOBILE_TEE.offsetY}px) scale(${MOBILE_TEE.scale})`,
+                      transformOrigin: `${MOBILE_TEE.originX}% ${MOBILE_TEE.originY}%`,
+                    }}
+                  >
+                    <div
+                      className="pointer-events-none absolute -inset-[18%] z-0"
+                      style={{
+                        background: `
+                          radial-gradient(ellipse 98% 88% at 50% 36%, rgba(0,0,0,0) 18%, rgba(0,0,0,0.55) 58%, rgba(11,13,16,0.96) 100%),
+                          linear-gradient(90deg, rgba(11,13,16,0.85) 0%, rgba(11,13,16,0.35) 35%, transparent 58%),
+                          linear-gradient(to bottom, rgba(11,13,16,0) 40%, rgba(11,13,16,0.72) 100%)`,
+                      }}
+                      aria-hidden
+                    />
+                    <img
+                      src={ASSETS.tee.cutout}
+                      alt=""
+                      width={512}
+                      height={768}
+                      className={`block ${TEE_INTRO.mobile.teeMaxWidth} w-auto object-contain drop-shadow-[0_32px_64px_rgba(0,0,0,0.6)]`}
+                      style={{
+                        height: `min(${MOBILE_TEE.heightVh}vh, ${MOBILE_TEE.heightMaxPx}px)`,
+                        maxHeight: `${MOBILE_TEE.heightMaxPx}px`,
+                        filter: 'brightness(0.96) contrast(1.06) saturate(0.95)',
+                      }}
+                      draggable={false}
+                    />
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        ...TEE_CUTOUT_MASK(ASSETS.tee.cutout),
+                        background: `
+                          radial-gradient(ellipse 76% 74% at 50% 20%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.38) 40%, rgba(0,0,0,0.78) 92%),
+                          linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 32%, transparent 52%),
+                          linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.32) 42%, rgba(0,0,0,0.85) 100%),
+                          radial-gradient(ellipse 125% 92% at 50% 48%, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.52) 100%)`,
+                        mixBlendMode: 'multiply',
+                        opacity: 0.97,
+                      }}
+                      aria-hidden
+                    />
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        ...TEE_CUTOUT_MASK(ASSETS.tee.cutout),
+                        background:
+                          'radial-gradient(ellipse 62% 48% at 70% 22%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 35%, rgba(255,255,255,0) 70%)',
+                        mixBlendMode: 'screen',
+                        opacity: 0.22,
+                      }}
+                      aria-hidden
+                    />
+                  </div>
                 </div>
               </div>
+
+              <SpecCardsGrid
+                className="grid w-full max-w-md grid-cols-2 gap-2.5 sm:gap-3"
+                cardClassName="vx-spec-card max-md:!animate-none"
+                style={mkStyle(e3, 36)}
+              />
 
               <div className="flex w-full justify-center pt-2 sm:pt-4" style={mkStyle(e4, 24)}>
                 <Link
                   href="/catalog"
-                  className="vx-cta-btn w-full max-w-[280px] sm:max-w-[320px]"
+                  className="vx-btn-primary w-full max-w-[280px] sm:max-w-[320px]"
                 >
-                  СМОТРЕТЬ КАТАЛОГ →
+                  <span>СМОТРЕТЬ КАТАЛОГ</span>
+                  <span className="vx-btn-primary__arrow" aria-hidden>
+                    →
+                  </span>
                 </Link>
               </div>
             </div>
           ) : (
             <div className="h-full grid grid-cols-12 items-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
               <div
-                className={`col-span-12 md:col-span-4 relative overflow-visible min-h-0 ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
+                className={`col-span-12 md:col-span-4 relative overflow-hidden md:overflow-visible min-h-0 ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
               >
-                <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
+                <div className="absolute inset-0 overflow-hidden md:overflow-visible flex items-center justify-center md:justify-start">
+                  <div
+                    className="pointer-events-none absolute inset-0 z-0"
+                    style={{
+                      background: `
+                        radial-gradient(ellipse 90% 80% at 40% 38%, rgba(0,0,0,0) 14%, rgba(0,0,0,0.52) 54%, rgba(11,13,16,0.94) 100%),
+                        linear-gradient(100deg, #0b0d10 0%, rgba(11,13,16,0.95) 16%, rgba(11,13,16,0.55) 34%, transparent 58%),
+                        linear-gradient(to bottom, rgba(11,13,16,0) 38%, rgba(11,13,16,0.65) 100%)`,
+                    }}
+                    aria-hidden
+                  />
                   <img
                     src={ASSETS.tee.cutout}
                     alt="Футболка РАССВЕТ"
                     width={512}
                     height={768}
-                    className={`absolute left-1/2 -translate-x-[calc(50%+90px)] md:left-[-80vw] md:translate-x-0 top-1/2 -translate-y-1/2 w-auto max-w-none pointer-events-none select-none object-contain
+                    className={`absolute z-[1] left-1/2 -translate-x-[calc(50%+90px)] md:left-[-80vw] md:translate-x-0 top-1/2 -translate-y-1/2 w-auto max-w-none pointer-events-none select-none object-contain
                       scale-[1.75] sm:scale-[1.5] md:scale-[1.2] origin-[50%_40%]
                       ${TEE_INTRO.tablet.teeHeight} ${TEE_INTRO.tablet.teeMaxHeight} ${TEE_INTRO.desktop.teeHeight} ${TEE_INTRO.desktop.teeMaxHeight}
                       drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] md:drop-shadow-[0_50px_90px_rgba(0,0,0,0.65)]`}
@@ -306,47 +480,34 @@ export const TeeIntroBlock: React.FC = () => {
 
                 <div className="relative z-10">
                   <div className="text-[10px] sm:text-[11px] lg:text-[11px] font-mono tracking-[0.2em] lg:tracking-[0.24em] text-white/30 lg:text-white/35 mb-3 sm:mb-4 lg:mb-4" style={mkStyle(e0, 20)}>
-                    {'// ПРОЕКТ РАССВЕТ / DROP'}
+                    {INTRO_MONO}
                     {!animationsDisabled && (
                       <span className="inline-block w-[5px] h-[1em] bg-white/30 ml-1 align-middle" style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }} />
                     )}
                   </div>
 
-                  <h2 className="text-[22px] sm:text-[28px] md:text-[44px] lg:text-[40px] xl:text-[48px] font-light tracking-[0.06em] lg:tracking-[0.07em] leading-[1.1]" style={mkStyle(e1, 32)}>
-                    проект{' '}
-                    <span className="tee-intro-title-shimmer bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
-                      РАССВЕТ
-                    </span>
-                  </h2>
+                  <IntroTitle
+                    className="text-[22px] sm:text-[28px] md:text-[44px] lg:text-[40px] xl:text-[48px] font-light tracking-[0.06em] lg:tracking-[0.07em] leading-[1.1]"
+                    style={mkStyle(e1, 32)}
+                  />
 
-                  <p
-                    className="mt-4 sm:mt-5 lg:mt-6 max-w-xl lg:max-w-2xl text-[13px] sm:text-sm md:text-[15px] lg:text-[15px] leading-[1.7] lg:leading-[1.75] text-white/48 lg:text-white/55"
+                  <IntroBody
+                    className="mt-4 sm:mt-5 lg:mt-6 max-w-xl lg:max-w-2xl flex flex-col gap-4 text-[13px] sm:text-sm md:text-[15px] lg:text-[15px] leading-[1.7] lg:leading-[1.75] text-white/48 lg:text-white/55"
                     style={mkStyle(e2, 26)}
-                  >
-                    Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы, &quot;бетон/графит&quot; и контроль качества: паспорт, партия, проверка.
-                  </p>
+                  />
 
-                  <div className="mt-5 sm:mt-7 lg:mt-8 grid grid-cols-2 gap-2.5 sm:gap-3 lg:gap-4 max-w-xl lg:max-w-2xl" style={mkStyle(e3, 36)}>
-                    <div className="vx-spec-card md:[animation:teeCardFloat1_6s_ease-in-out_infinite]">
-                      <div className="vx-spec-card-label">CODE</div>
-                      <div className="vx-spec-card-value">VSHD-TEE</div>
-                      <div className="vx-spec-card-label mt-2.5 sm:mt-3">STATUS</div>
-                      <div className="vx-spec-card-value">IN STOCK</div>
-                    </div>
-                    <div className="vx-spec-card md:[animation:teeCardFloat2_7s_ease-in-out_infinite_0.5s]">
-                      <div className="vx-spec-card-label">MATERIAL</div>
-                      <div className="vx-spec-card-value">GRAPHITE</div>
-                      <div className="vx-spec-card-label mt-2.5 sm:mt-3">TAG</div>
-                      <div className="vx-spec-card-value">LIMITED DROP</div>
-                    </div>
-                  </div>
+                  <SpecCardsGrid
+                    className="mt-5 sm:mt-7 lg:mt-8 grid grid-cols-2 gap-2.5 sm:gap-3 lg:gap-4 max-w-xl lg:max-w-2xl"
+                    desktopFloat
+                    style={mkStyle(e3, 36)}
+                  />
 
                   <div className="mt-5 sm:mt-7 lg:mt-8" style={mkStyle(e4, 24)}>
-                    <Link
-                      href="/catalog"
-                      className="vx-cta-btn lg:!h-12 lg:!px-10 lg:!text-xs lg:!tracking-[0.24em] lg:border-white/[0.1] lg:hover:border-gold/25"
-                    >
-                      СМОТРЕТЬ КАТАЛОГ →
+                    <Link href="/catalog" className="vx-btn-primary">
+                      <span>СМОТРЕТЬ КАТАЛОГ</span>
+                      <span className="vx-btn-primary__arrow" aria-hidden>
+                        →
+                      </span>
                     </Link>
                   </div>
                 </div>

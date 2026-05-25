@@ -55,7 +55,11 @@ export function getCollectionCoverImage(
   collection: Collection,
   isMobile: boolean,
 ): string {
+  /* Первая карточка: mobile PNG с тяжёлой верхней плашкой — на витрине используем AVIF */
   if (isMobile && collection.mobileCoverImage) {
+    if (collection.slug === "solnce-pomozhet-nam") {
+      return collection.coverImage ?? collection.mobileCoverImage;
+    }
     return collection.mobileCoverImage;
   }
   return collection.coverImage ?? "/globe.svg";

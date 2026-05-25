@@ -127,6 +127,15 @@
     linear-gradient(180deg, #050607 0%, #090b0e 50%, #030405 100%);
 }
 
+/*
+ * Коллекции: sticky-карточка фиксирована, а backdrop на всю высоту секции (N×100svh)
+ * прокручивается сзади — даёт «чёрный прямоугольник», тянущийся с прошлого блока.
+ * Декоративные слои отключены; фон только плоский цвет секции.
+ */
+.collections .backdrop {
+  display: none;
+}
+
 .collections .content > section {
   padding-top: 3rem;
 }
@@ -140,10 +149,6 @@
 @media (min-width: 768px) {
   .collections .content > section {
     padding-top: 5rem;
-  }
-
-  .collections .warmGlow {
-    opacity: 0.4;
   }
 }
 
@@ -171,9 +176,8 @@
     opacity: 0.055;
   }
 
-  .collections .warmGlow {
-    opacity: 0.32;
-    filter: blur(14px);
+  .collections .content > section {
+    padding-top: 0;
   }
 }
 

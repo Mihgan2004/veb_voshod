@@ -30,7 +30,7 @@ export function CollectionSwipeHint({
   return (
     <button
       type="button"
-      className={styles.swipeHint}
+      className={`vx-btn-primary ${styles.swipeHint}`}
       onClick={navigate}
       aria-label="Перейти в коллекцию"
     >

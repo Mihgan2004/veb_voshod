@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Hero from "@/components/hero/Hero";
 import { MarqueeStrip } from "@/components/sections/MarqueeStrip";
 import { HighlightsCollections } from "@/components/sections/HighlightsCollections";
-import { RassvetWaveOnScroll } from "@/components/sections/RassvetWaveOnScroll/RassvetWaveOnScroll";
+import RassvetWaveOnScroll from "@/components/sections/RassvetWaveOnScroll/RassvetWaveOnScroll";
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
 import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
 import { TextParallaxSection } from "@/components/home/TextParallaxSection/TextParallaxSection";

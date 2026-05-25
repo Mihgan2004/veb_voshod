@@ -37,6 +37,11 @@ h6,
  * TeeIntroBlock: высота секции только через классы (без inline height),
  * чтобы дерево SSR и первый клиентский рендер совпадали; реальная высота задаётся viewport через media queries.
  */
+.tee-intro-block {
+  overflow: hidden;
+  isolation: isolate;
+}
+
 .tee-intro-scroll-height {
   height: 220vh;
 }
@@ -762,59 +767,184 @@ h6,
   line-height: 1.3;
 }
 
-/* ========== 6) CTA BUTTON — premium tactical style ========== */
+/* ========== 6) EDITORIAL BUTTONS — dark editorial / underground fashion ========== */
+
+/* Shared focus ring */
+.vx-btn-primary:focus,
+.vx-btn-secondary:focus,
+.vx-btn-icon:focus {
+  outline: none;
+}
+
+.vx-btn-primary:focus-visible,
+.vx-btn-secondary:focus-visible,
+.vx-btn-icon:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 3px;
+}
+
+/* Primary — calm dark pill */
+.vx-btn-primary,
 .vx-cta-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  padding: 0 28px;
+  gap: 0.35em;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 1.5rem;
   border-radius: 9999px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: linear-gradient(180deg, rgba(20,24,33,0.85) 0%, rgba(14,17,22,0.92) 100%);
-  font-size: 10px;
-  letter-spacing: 0.2em;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  font-family: var(--font-onest), Onest, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(245,245,245,0.9);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 @media (min-width: 640px) {
+  .vx-btn-primary,
   .vx-cta-btn {
-    height: 48px;
-    padding: 0 32px;
-    font-size: 11px;
+    min-height: 48px;
+    padding: 0 1.75rem;
   }
 }
 
-@media (min-width: 768px) {
-  .vx-cta-btn {
-    height: 52px;
-    padding: 0 40px;
-    font-size: 12px;
-  }
+.vx-btn-primary--rect {
+  border-radius: 4px;
 }
 
+.vx-btn-primary:hover,
 .vx-cta-btn:hover {
-  border-color: rgba(198,144,46,0.3);
-  background: linear-gradient(180deg, rgba(26,31,42,0.9) 0%, rgba(18,22,28,0.95) 100%);
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.07);
   color: #fff;
 }
 
-.vx-cta-btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(ellipse at 50% 0%, rgba(198,144,46,0.06) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.vx-btn-primary__arrow {
+  display: inline-block;
+  opacity: 0.7;
+  transition: transform 0.25s ease, opacity 0.2s ease;
 }
 
-.vx-cta-btn:hover::after {
+.vx-btn-primary:hover .vx-btn-primary__arrow {
   opacity: 1;
+  transform: translateX(3px);
+}
+
+/* Secondary — text CTA with underline reveal */
+.vx-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0.25rem 0;
+  font-family: var(--font-onest), Onest, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-size 0.35s ease;
+}
+
+.vx-btn-secondary:hover {
+  color: rgba(255, 255, 255, 0.92);
+  background-size: 100% 1px;
+}
+
+.vx-btn-secondary__arrow {
+  display: inline-block;
+  line-height: 1;
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+.vx-btn-secondary:hover .vx-btn-secondary__arrow {
+  transform: translateX(3px);
+}
+
+/* Header / hero icon button */
+.vx-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.vx-btn-icon:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.vx-btn-icon--scroll {
+  width: 40px;
+  height: 56px;
+  min-height: 56px;
+  border-radius: 9999px;
+}
+
+@media (min-width: 1024px) {
+  .vx-btn-icon--scroll {
+    width: 48px;
+    height: 64px;
+    min-height: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vx-btn-primary__arrow,
+  .vx-btn-secondary__arrow {
+    transition: none;
+  }
+
+  .vx-btn-primary:hover .vx-btn-primary__arrow,
+  .vx-btn-secondary:hover .vx-btn-secondary__arrow {
+    transform: none;
+  }
+
+  .vx-btn-secondary {
+    transition: color 0.2s ease;
+  }
+
+  .vx-btn-secondary:hover {
+    background-size: 100% 1px;
+  }
 }
 
 /* ========== 6b) PRIMARY BUTTON — белый приглушённый фон ========== */
