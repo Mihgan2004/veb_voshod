@@ -129,7 +129,7 @@ function MaskRevealTitle({ progress, reducedMotion }: MaskRevealTitleProps) {
   return (
     <div className={styles.titleMask}>
       <motion.h2 className={styles.title} style={{ y, opacity }}>
-        Проект РАССВЕТ
+        проект РАССВЕТ
       </motion.h2>
     </div>
   );
@@ -176,7 +176,6 @@ export function RassvetManifestoSection() {
     getReducedMotionSnapshot,
     getReducedMotionServerSnapshot,
   );
-
   const paragraphWords = useMemo(
     () => buildManifestoParagraphWords(MANIFESTO_PARAGRAPHS),
     [],

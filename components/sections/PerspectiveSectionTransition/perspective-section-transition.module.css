@@ -50,6 +50,21 @@
   object-fit: cover;
 }
 
+@media (max-width: 768px) {
+  .wrapper[data-mobile-cards="true"] .section1,
+  .wrapper[data-mobile-cards="true"] .section2,
+  .wrapper[data-mobile-cards="true"] .staticSlide {
+    width: calc(100% - 1rem);
+    max-width: 420px;
+    border-radius: 12px;
+  }
+
+  .wrapper[data-mobile-cards="true"] .image {
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
 .staticSlide {
   position: relative;
   height: 100vh;

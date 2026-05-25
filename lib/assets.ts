@@ -2,7 +2,12 @@
  * Единый маппинг всех локальных ассетов из /public.
  * Источник правды для путей — если файл переименован,
  * обновляем ТОЛЬКО здесь.
+ *
+ * После замены файлов в public/lookbook/ увеличь LOOKBOOK_VERSION,
+ * иначе Cache-Control: immutable отдаёт старые кадры.
  */
+const LOOKBOOK_VERSION = "2";
+
 export const ASSETS = {
   brand: {
     logoDesktop: "/brand/project-voshod_2x.webp",
@@ -21,6 +26,7 @@ export const ASSETS = {
   },
   textParallax: {
     background: "/text-parallax/background-calligraphy.png",
+    backgroundVertical: "/text-parallax/background-calligraphy-vertical.webp",
     icons: {
       tacticalMerch: "/text-parallax/icons/tactical-merch.png",
       rassvet: "/text-parallax/icons/rassvet.png",
@@ -28,14 +34,14 @@ export const ASSETS = {
     },
   },
   lookbook: [
-    "/lookbook/lookbook-01.avif",
-    "/lookbook/lookbook-02.avif",
-    "/lookbook/lookbook-03.avif",
-    "/lookbook/lookbook-04.avif",
-    "/lookbook/lookbook-05.avif",
-    "/lookbook/lookbook-06.avif",
-    "/lookbook/lookbook-07.avif",
-    "/lookbook/lookbook-08.avif",
-    "/lookbook/lookbook-09.avif",
+    `/lookbook/lookbook-01.avif?v=${LOOKBOOK_VERSION}`,
+    `/lookbook/lookbook-02.avif?v=${LOOKBOOK_VERSION}`,
+    `/lookbook/lookbook-03.avif?v=${LOOKBOOK_VERSION}`,
+    `/lookbook/lookbook-04.avif?v=${LOOKBOOK_VERSION}`,
+    `/lookbook/lookbook-05.avif?v=${LOOKBOOK_VERSION}`,
+    `/lookbook/lookbook-06.avif?v=${LOOKBOOK_VERSION}`,
+    `/lookbook/lookbook-07.avif?v=${LOOKBOOK_VERSION}`,
+    `/lookbook/lookbook-08.avif?v=${LOOKBOOK_VERSION}`,
+    `/lookbook/lookbook-09.avif?v=${LOOKBOOK_VERSION}`,
   ],
 } as const;

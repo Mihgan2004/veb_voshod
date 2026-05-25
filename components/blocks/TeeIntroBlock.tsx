@@ -7,7 +7,7 @@ import { useHomeScrollCompact } from '@/components/home/HomeScrollContext';
 import { useLiteMode } from '@/lib/useLiteMode';
 
 // ========== ПЕЧАТНАЯ МАШИНКА (мобилка) ==========
-const TYPEWRITER_TEXT = '// PROJECT VOSKHOD / DROP';
+const TYPEWRITER_TEXT = '// ПРОЕКТ РАССВЕТ / DROP';
 const TYPEWRITER_MS = 55;
 
 function TypewriterLine({ disabled }: { disabled: boolean }) {
@@ -225,7 +225,7 @@ export const TeeIntroBlock: React.FC = () => {
                   >
                     <img
                       src={ASSETS.tee.cutout}
-                      alt="VOSKHOD tee"
+                      alt="Футболка РАССВЕТ"
                       width={512}
                       height={768}
                       className="block h-full w-auto max-w-none object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
@@ -276,7 +276,7 @@ export const TeeIntroBlock: React.FC = () => {
                 <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
                   <img
                     src={ASSETS.tee.cutout}
-                    alt="VOSKHOD tee"
+                    alt="Футболка РАССВЕТ"
                     width={512}
                     height={768}
                     className={`absolute left-1/2 -translate-x-[calc(50%+90px)] md:left-[-80vw] md:translate-x-0 top-1/2 -translate-y-1/2 w-auto max-w-none pointer-events-none select-none object-contain
@@ -332,7 +332,7 @@ export const TeeIntroBlock: React.FC = () => {
                     <TypewriterLine disabled={false} />
                   ) : (
                     <>
-                      {'// PROJECT VOSKHOD / DROP'}
+                      {'// ПРОЕКТ РАССВЕТ / DROP'}
                       {!animationsDisabled && (
                         <span className="inline-block w-[5px] h-[1em] bg-white/30 ml-1 align-middle" style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }} />
                       )}
@@ -341,9 +341,9 @@ export const TeeIntroBlock: React.FC = () => {
                 </div>
 
                 <h2 className="text-[22px] sm:text-[28px] md:text-[44px] lg:text-[40px] xl:text-[48px] font-light tracking-[0.06em] lg:tracking-[0.07em] leading-[1.1]" style={mkStyle(e1, 32)}>
-                  {!isDesktop ? 'ПРОЕКТ' : 'КОНЦЕРН'}{' '}
+                  проект{' '}
                   <span className="tee-intro-title-shimmer bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
-                    ВОСХОД
+                    РАССВЕТ
                   </span>
                 </h2>
 

@@ -94,3 +94,67 @@
   width: 15vw;
   height: 15vh;
 }
+
+@media (max-width: 767px) {
+  .container {
+    height: 220vh;
+  }
+
+  .centerEl {
+    width: 44vw;
+    height: 30svh;
+  }
+
+  .imageContainer {
+    width: 30vw;
+    height: 20svh;
+  }
+
+  .slot2 .imageContainer {
+    top: 2svh;
+    left: 3vw;
+    width: 30vw;
+    height: 21svh;
+  }
+
+  .slot3 .imageContainer {
+    top: 2svh;
+    left: auto;
+    right: 3vw;
+    width: 28vw;
+    height: 22svh;
+  }
+
+  .slot4 .imageContainer {
+    top: 36svh;
+    left: auto;
+    right: 3vw;
+    width: 28vw;
+    height: 19svh;
+  }
+
+  .slot5 .imageContainer {
+    top: auto;
+    bottom: 10svh;
+    left: 3vw;
+    width: 28vw;
+    height: 19svh;
+  }
+
+  .slot6 .imageContainer {
+    top: auto;
+    bottom: 9svh;
+    left: 35vw;
+    width: 30vw;
+    height: 17svh;
+  }
+
+  .slot7 .imageContainer {
+    top: auto;
+    bottom: 11svh;
+    left: auto;
+    right: 3vw;
+    width: 26vw;
+    height: 17svh;
+  }
+}

@@ -66,6 +66,8 @@ export type Collection = {
   label?: string;
 
   coverImage?: string;
+  /** Обложка для мобильного блока коллекций на главной (готовая карточка). */
+  mobileCoverImage?: string;
   isFeatured: boolean;
   sort: number;
 };

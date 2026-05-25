@@ -42,15 +42,20 @@ export function GalleryZoomParallax() {
     let retryId: number | undefined;
 
     const applyZoom = (progress: number) => {
+      const isMobile = window.innerWidth <= 768;
       const center = centerRef.current;
       if (center) {
-        center.style.width = `${lerp(25, 100, progress)}vw`;
-        center.style.height = `${lerp(25, 100, progress)}svh`;
+        const startW = isMobile ? 44 : 25;
+        const startH = isMobile ? 30 : 25;
+        center.style.width = `${lerp(startW, 100, progress)}vw`;
+        center.style.height = `${lerp(startH, 100, progress)}svh`;
       }
 
       peripheralRefs.current.forEach((el, index) => {
         if (!el) return;
-        const endScale = PERIPHERALS[index].endScale;
+        const endScale = isMobile
+          ? Math.min(PERIPHERALS[index].endScale, 4)
+          : PERIPHERALS[index].endScale;
         el.style.transform = `scale(${lerp(1, endScale, progress)})`;
         el.style.opacity = String(clamp01(1 - (progress - 0.2) / 0.35));
       });
@@ -137,7 +142,7 @@ export function GalleryZoomParallax() {
     <section className={`vx-section-seams ${sectionStyles.section}`} aria-label="Галерея">
       <div className={sectionStyles.header}>
         <span className="vx-tag bg-gradient-to-r from-amber-700/70 via-yellow-500/70 to-amber-700/70 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent block mb-2.5">
-          @VOSHOD
+          @РАССВЕТ
         </span>
         <h2 className="vx-section-title">Галерея</h2>
       </div>

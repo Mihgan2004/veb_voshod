@@ -4,7 +4,7 @@ import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
-import type { Collection } from "@/lib/catalog";
+import { getCollectionCoverImage, type Collection } from "@/lib/catalog";
 import { CollectionSwipeHint } from "./CollectionSwipeHint";
 import { LarosePair } from "./LarosePair";
 import { useSwipeRightNavigate } from "./useSwipeRightNavigate";
@@ -21,6 +21,22 @@ function getReducedMotion() {
 }
 
 function getReducedMotionServer() {
+  return false;
+}
+
+const MOBILE_MEDIA = "(max-width: 768px)";
+
+function subscribeMobile(onStoreChange: () => void) {
+  const mq = window.matchMedia(MOBILE_MEDIA);
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+function getMobile() {
+  return window.matchMedia(MOBILE_MEDIA).matches;
+}
+
+function getMobileServer() {
   return false;
 }
 
@@ -63,14 +79,24 @@ function StaticSlide({ slug, image, name }: { slug: string; image: string; name:
   );
 }
 
-function StaticFallback({ collections }: { collections: Collection[] }) {
+function StaticFallback({
+  collections,
+  isMobile,
+}: {
+  collections: Collection[];
+  isMobile: boolean;
+}) {
   return (
-    <section className={styles.wrapper} aria-label="Коллекции">
+    <section
+      className={styles.wrapper}
+      aria-label="Коллекции"
+      data-mobile-cards={isMobile ? "true" : undefined}
+    >
       {collections.map((col) => (
         <StaticSlide
           key={col.id}
           slug={col.slug}
-          image={col.coverImage || "/globe.svg"}
+          image={getCollectionCoverImage(col, isMobile)}
           name={col.name}
         />
       ))}
@@ -95,6 +121,8 @@ export function PerspectiveSectionTransition({
     getReducedMotion,
     getReducedMotionServer
   );
+
+  const isMobile = useSyncExternalStore(subscribeMobile, getMobile, getMobileServer);
 
   const updateActiveSlug = useCallback(() => {
     const viewportCenter = window.innerHeight / 2;
@@ -131,7 +159,7 @@ export function PerspectiveSectionTransition({
   );
 
   if (reducedMotion || collections.length < 2) {
-    return <StaticFallback collections={collections} />;
+    return <StaticFallback collections={collections} isMobile={isMobile} />;
   }
 
   return (
@@ -139,6 +167,7 @@ export function PerspectiveSectionTransition({
       ref={wrapperRef}
       className={styles.wrapper}
       aria-label="Коллекции"
+      data-mobile-cards={isMobile ? "true" : undefined}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
@@ -148,8 +177,8 @@ export function PerspectiveSectionTransition({
           <LarosePair
             key={top.id}
             pairIndex={index}
-            topImage={top.coverImage || "/globe.svg"}
-            bottomImage={bottom.coverImage || "/globe.svg"}
+            topImage={getCollectionCoverImage(top, isMobile)}
+            bottomImage={getCollectionCoverImage(bottom, isMobile)}
             topSlug={top.slug}
             bottomSlug={bottom.slug}
             topAlt={top.name}

@@ -2,10 +2,7 @@
 import type { CatalogRepo } from "./repo";
 import { createMockRepo } from "./mock-repo";
 import { createDirectusRepo } from "./directus-repo";
-import {
-  STATIC_COLLECTIONS,
-  getStaticCollectionBySlug,
-} from "./static-collections";
+import { STATIC_COLLECTIONS, getStaticCollectionBySlug } from "./static-collections";
 
 export * from "./types";
 export type { CatalogRepo } from "./repo";
@@ -113,4 +110,4 @@ function pickRepo(): CatalogRepo {
 }
 
 export const catalog: CatalogRepo = pickRepo();
-export { STATIC_COLLECTIONS } from "./static-collections";
+export { STATIC_COLLECTIONS, getCollectionCoverImage } from "./static-collections";

@@ -2,9 +2,9 @@
 
 import { useRef } from "react";
 import { useScroll } from "framer-motion";
-import { ASSETS } from "@/lib/assets";
 import { TEXT_PARALLAX_SLIDES } from "./config";
 import { nfsFont } from "./nfsFont";
+import { BackgroundVerticalMarquee } from "./BackgroundVerticalMarquee";
 import { Slide } from "./Slide";
 import styles from "./text-parallax-section.module.css";
 
@@ -21,11 +21,9 @@ export function TextParallaxSection() {
       className={`${styles.section} ${nfsFont.variable}`}
       aria-label="Text parallax"
     >
-      <div
-        className={styles.background}
-        style={{ backgroundImage: `url(${ASSETS.textParallax.background})` }}
-        aria-hidden
-      />
+      <div className={styles.background} aria-hidden>
+        <BackgroundVerticalMarquee progress={scrollYProgress} />
+      </div>
       <div className={styles.backgroundOverlay} aria-hidden />
 
       <div className={styles.content}>

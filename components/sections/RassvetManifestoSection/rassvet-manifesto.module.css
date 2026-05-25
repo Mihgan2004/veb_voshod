@@ -317,6 +317,45 @@
   background: #0b0d10;
 }
 
+@media (max-width: 767px) {
+  .sticky {
+    overflow: visible;
+    align-items: flex-start;
+    padding: 5.5rem 1rem 4rem;
+  }
+
+  .frame {
+    padding: 2rem 1rem 2.25rem;
+  }
+
+  .inner {
+    text-align: center;
+  }
+
+  .label {
+    text-align: center;
+  }
+
+  .titleMask {
+    text-align: center;
+  }
+
+  .title {
+    text-align: center;
+    font-size: clamp(1.625rem, calc(6.5vw - 2px), calc(3.25rem - 2px));
+  }
+
+  .paragraph {
+    text-align: center;
+    font-size: clamp(1.375rem, calc(5.2vw - 2px), calc(2rem - 2px));
+  }
+
+  .ctaZone {
+    min-height: auto;
+    padding: 1.25rem 1.25rem 3rem;
+  }
+}
+
 @media (min-width: 768px) {
   .ctaZone {
     min-height: min(65vh, 560px);

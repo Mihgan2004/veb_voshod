@@ -22,6 +22,17 @@ body {
   touch-action: pan-y;
 }
 
+/* Onest — основной текст; заголовки остаются на Inter */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.vx-section-title {
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+}
+
 /*
  * TeeIntroBlock: высота секции только через классы (без inline height),
  * чтобы дерево SSR и первый клиентский рендер совпадали; реальная высота задаётся viewport через media queries.
