@@ -2,19 +2,13 @@ import { Suspense } from "react";
 import Hero from "@/components/hero/Hero";
 import { MarqueeStrip } from "@/components/sections/MarqueeStrip";
 import { HighlightsCollections } from "@/components/sections/HighlightsCollections";
-import { GalleryZoomParallax } from "@/components/sections/GalleryZoomParallax/GalleryZoomParallax";
+import { RassvetWaveOnScroll } from "@/components/sections/RassvetWaveOnScroll/RassvetWaveOnScroll";
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
 import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
 import { TextParallaxSection } from "@/components/home/TextParallaxSection/TextParallaxSection";
 import { RassvetDarkVeil } from "@/components/backgrounds/RassvetDarkVeil";
 import { RassvetManifestoSection } from "@/components/sections/RassvetManifestoSection/RassvetManifestoSection";
-
-import dynamic from "next/dynamic";
-
-const TeeIntroBlock = dynamic(
-  () => import("@/components/blocks/TeeIntroBlock").then((m) => ({ default: m.TeeIntroBlock })),
-  { ssr: true }
-);
+import { TeeIntroBlock } from "@/components/blocks/TeeIntroBlock";
 
 export const revalidate = 300;
 
@@ -38,11 +32,13 @@ export default function HomePage() {
 
       <MarqueeStrip />
 
-      <div className="vx-below-fold vx-brutal-bg">
-        <HighlightsCollections collections={STATIC_COLLECTIONS} />
+      <div className="vx-below-fold">
+        <RassvetDarkVeil variant="collections">
+          <HighlightsCollections collections={STATIC_COLLECTIONS} />
+        </RassvetDarkVeil>
       </div>
 
-      <GalleryZoomParallax />
+      <RassvetWaveOnScroll />
 
       <RassvetDarkVeil variant="manifesto">
         <RassvetManifestoSection />

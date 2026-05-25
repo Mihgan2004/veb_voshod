@@ -3,6 +3,9 @@
 import {
   type ReactNode,
   useCallback,
+  useEffect,
+  useRef,
+  useState,
   useSyncExternalStore,
 } from "react";
 import { DarkVeil, type DarkVeilProps } from "./DarkVeil";
@@ -82,6 +85,9 @@ export function RassvetDarkVeil({
   children,
   variant = "collections",
 }: RassvetDarkVeilProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+
   const isMobile = useSyncExternalStore(
     useCallback((onStoreChange) => subscribeMedia(MOBILE_MEDIA, onStoreChange), []),
     getMobileSnapshot,
@@ -97,17 +103,33 @@ export function RassvetDarkVeil({
     getServerSnapshot,
   );
 
-  const showCanvas = !isMobile && !reducedMotion;
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(Boolean(entry?.isIntersecting));
+      },
+      { rootMargin: "120px 0px", threshold: 0.01 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const showCanvas = !isMobile && !reducedMotion && inView;
   const darkVeilProps = getDarkVeilProps(variant);
 
   return (
     <section
+      ref={sectionRef}
       className={`${styles.section} ${getVariantClass(variant)}`}
     >
       <div className={styles.backdrop} aria-hidden>
         {showCanvas ? (
           <div className={styles.canvasLayer}>
-            <DarkVeil {...darkVeilProps} />
+            <DarkVeil {...darkVeilProps} active={inView} />
           </div>
         ) : null}
         <div className={styles.mobileFallback} />

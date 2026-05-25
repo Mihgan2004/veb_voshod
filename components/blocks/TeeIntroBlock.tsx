@@ -44,9 +44,9 @@ function TypewriterLine({ disabled }: { disabled: boolean }) {
 // ========== НАСТРОЙКИ РАЗМЕРОВ (десктоп из референса) ==========
 const TEE_INTRO = {
   mobile: {
-    teeHeight: 'h-[70vh]',
-    teeMaxHeight: 'max-h-[480px]',
-    containerMinHeight: 'min-h-[50vh]',
+    teeHeight: 'h-[min(38vh,260px)]',
+    teeMaxHeight: 'max-h-[260px]',
+    containerMinHeight: '',
   },
   tablet: {
     teeHeight: 'sm:h-[75vh]',
@@ -148,6 +148,7 @@ export const TeeIntroBlock: React.FC = () => {
 
   return (
     <section
+      id="intro"
       ref={sectionRef}
       data-compact={compact ? true : undefined}
       className="tee-intro-block relative w-full border-t border-white/5 tee-intro-mobile-height tee-intro-scroll-height"
@@ -180,8 +181,8 @@ export const TeeIntroBlock: React.FC = () => {
         }
       `}</style>
 
-      <div className="sticky top-0 min-h-[100vh] sm:min-h-screen overflow-hidden">
-        <div className="absolute inset-0">
+      <div className="relative md:sticky md:top-0 md:min-h-screen md:overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div className="absolute inset-0 bg-[#0B0D10]" />
           <div
             className="hidden md:block absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-b from-transparent to-[#07090c] pointer-events-none"
@@ -203,76 +204,84 @@ export const TeeIntroBlock: React.FC = () => {
           />
         </div>
 
-        <div className="relative z-10 h-full min-h-[100vh] sm:min-h-0 sm:h-full max-w-7xl lg:max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-10 sm:py-0">
-          <div className="h-full grid grid-cols-12 md:grid-cols-12 lg:grid-cols-12 items-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
-            {/* Колонка с футболкой: мобилка — с оверлеями как раньше; десктоп — простая картинка из референса */}
-            <div
-              className={`col-span-12 md:col-span-4 relative order-1 md:order-none overflow-visible min-h-0 ${TEE_INTRO.mobile.containerMinHeight} ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
-            >
-              {!isDesktop ? (
-                /* Мобилка: футболка по центру + оверлеи (виньетка, дымка) как было */
-                <div className="absolute inset-0 flex items-center justify-center overflow-visible">
-                  <div
-                    className={`
-                      relative inline-block pointer-events-none select-none
-                      left-1/2 -translate-x-[calc(50%+90px)]
-                      top-1/2 -translate-y-1/2
-                      scale-[1.75] sm:scale-[1.5] origin-[50%_40%]
-                      ${TEE_INTRO.mobile.teeHeight} ${TEE_INTRO.mobile.teeMaxHeight}
-                      ${TEE_INTRO.tablet.teeHeight} ${TEE_INTRO.tablet.teeMaxHeight}
-                    `}
-                    style={{ isolation: 'isolate' }}
-                  >
-                    <img
-                      src={ASSETS.tee.cutout}
-                      alt="Футболка РАССВЕТ"
-                      width={512}
-                      height={768}
-                      className="block h-full w-auto max-w-none object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
-                      style={{ filter: 'brightness(0.96) contrast(1.06) saturate(0.95)' }}
-                      draggable={false}
-                    />
-                    <div
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background: `
-                          radial-gradient(ellipse 70% 65% at 72% 18%, rgba(0,0,0,0.00) 0%, rgba(0,0,0,0.18) 40%, rgba(0,0,0,0.58) 78%, rgba(0,0,0,0.92) 110%),
-                          linear-gradient(to bottom, rgba(0,0,0,0.00) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0.75) 100%),
-                          linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.08) 55%, rgba(0,0,0,0.35) 100%)`,
-                        mixBlendMode: 'multiply',
-                        opacity: 0.92,
-                        WebkitMaskImage: `url(${ASSETS.tee.cutout})`,
-                        maskImage: `url(${ASSETS.tee.cutout})`,
-                        WebkitMaskRepeat: 'no-repeat',
-                        maskRepeat: 'no-repeat',
-                        WebkitMaskSize: '100% 100%',
-                        maskSize: '100% 100%',
-                        WebkitMaskPosition: 'center',
-                        maskPosition: 'center',
-                      }}
-                      aria-hidden
-                    />
-                    <div
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background: `radial-gradient(ellipse 62% 48% at 70% 22%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 35%, rgba(255,255,255,0.00) 70%)`,
-                        mixBlendMode: 'screen',
-                        opacity: 0.22,
-                        WebkitMaskImage: `url(${ASSETS.tee.cutout})`,
-                        maskImage: `url(${ASSETS.tee.cutout})`,
-                        WebkitMaskRepeat: 'no-repeat',
-                        maskRepeat: 'no-repeat',
-                        WebkitMaskSize: '100% 100%',
-                        maskSize: '100% 100%',
-                        WebkitMaskPosition: 'center',
-                        maskPosition: 'center',
-                      }}
-                      aria-hidden
-                    />
-                  </div>
+        <div className="relative z-10 max-w-7xl lg:max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-8 pb-10 sm:py-10 md:py-0 md:min-h-screen md:h-full">
+          {!isDesktop ? (
+            <div className="mx-auto flex w-full max-w-lg flex-col items-center gap-7 sm:gap-8">
+              <div className="flex w-full flex-col items-center gap-5 text-center">
+                <div
+                  className="text-[10px] sm:text-[11px] font-mono tracking-[0.2em] text-white/30"
+                  style={mkStyle(e0, 20)}
+                >
+                  <TypewriterLine disabled={false} />
                 </div>
-              ) : (
-                /* Десктоп: простая картинка, настройки из референса */
+
+                <h2
+                  className="max-w-[18rem] text-[clamp(1.375rem,6vw,1.75rem)] font-light tracking-[0.06em] leading-[1.15] text-pretty text-balance"
+                  style={mkStyle(e1, 32)}
+                >
+                  проект{' '}
+                  <span className="tee-intro-title-shimmer bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
+                    РАССВЕТ
+                  </span>
+                </h2>
+
+                <p
+                  className="max-w-[20rem] text-[13px] sm:text-sm leading-[1.55] text-white/80 text-pretty"
+                  style={mkStyle(e2, 26)}
+                >
+                  Тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы,
+                  &quot;бетон/графит&quot; и контроль качества: паспорт, партия, проверка.
+                </p>
+              </div>
+
+              <div
+                className="relative flex w-full justify-center py-1 pointer-events-none select-none"
+                style={mkStyle(e1, 16)}
+                aria-hidden
+              >
+                <img
+                  src={ASSETS.tee.cutout}
+                  alt=""
+                  width={512}
+                  height={768}
+                  className={`${TEE_INTRO.mobile.teeHeight} ${TEE_INTRO.mobile.teeMaxHeight} w-auto object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)] opacity-90`}
+                  style={{ filter: 'brightness(0.96) contrast(1.06) saturate(0.95)' }}
+                  draggable={false}
+                />
+              </div>
+
+              <div
+                className="grid w-full max-w-md grid-cols-2 gap-2.5 sm:gap-3"
+                style={mkStyle(e3, 36)}
+              >
+                <div className="vx-spec-card max-md:!animate-none">
+                  <div className="vx-spec-card-label">CODE</div>
+                  <div className="vx-spec-card-value">VSHD-TEE</div>
+                  <div className="vx-spec-card-label mt-2.5 sm:mt-3">STATUS</div>
+                  <div className="vx-spec-card-value">IN STOCK</div>
+                </div>
+                <div className="vx-spec-card max-md:!animate-none">
+                  <div className="vx-spec-card-label">MATERIAL</div>
+                  <div className="vx-spec-card-value">GRAPHITE</div>
+                  <div className="vx-spec-card-label mt-2.5 sm:mt-3">TAG</div>
+                  <div className="vx-spec-card-value">LIMITED DROP</div>
+                </div>
+              </div>
+
+              <div className="flex w-full justify-center pt-2 sm:pt-4" style={mkStyle(e4, 24)}>
+                <Link
+                  href="/catalog"
+                  className="vx-cta-btn w-full max-w-[280px] sm:max-w-[320px]"
+                >
+                  СМОТРЕТЬ КАТАЛОГ →
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="h-full grid grid-cols-12 items-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
+              <div
+                className={`col-span-12 md:col-span-4 relative overflow-visible min-h-0 ${TEE_INTRO.tablet.containerMinHeight} ${TEE_INTRO.desktop.containerMinHeight}`}
+              >
                 <div className="absolute inset-0 flex items-center justify-center md:justify-start overflow-visible">
                   <img
                     src={ASSETS.tee.cutout}
@@ -281,112 +290,69 @@ export const TeeIntroBlock: React.FC = () => {
                     height={768}
                     className={`absolute left-1/2 -translate-x-[calc(50%+90px)] md:left-[-80vw] md:translate-x-0 top-1/2 -translate-y-1/2 w-auto max-w-none pointer-events-none select-none object-contain
                       scale-[1.75] sm:scale-[1.5] md:scale-[1.2] origin-[50%_40%]
-                      ${TEE_INTRO.mobile.teeHeight} ${TEE_INTRO.mobile.teeMaxHeight} ${TEE_INTRO.tablet.teeHeight} ${TEE_INTRO.tablet.teeMaxHeight} ${TEE_INTRO.desktop.teeHeight} ${TEE_INTRO.desktop.teeMaxHeight}
+                      ${TEE_INTRO.tablet.teeHeight} ${TEE_INTRO.tablet.teeMaxHeight} ${TEE_INTRO.desktop.teeHeight} ${TEE_INTRO.desktop.teeMaxHeight}
                       drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] md:drop-shadow-[0_50px_90px_rgba(0,0,0,0.65)]`}
                     draggable={false}
                   />
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Текстовый блок */}
-            <div className="col-span-12 md:col-span-8 order-2 md:order-none flex flex-col justify-center items-center md:items-start -mt-20 sm:-mt-8 md:mt-0 pt-0 pb-6 sm:py-0 relative">
-              {/* Мобильные градиенты (затемнение футболки) */}
-              <div
-                className="tee-intro-mobile-fog absolute md:hidden pointer-events-none blur-[12px] motion-reduce:blur-[12px]"
-                style={{
-                  inset: '-35% -25% -20% -25%',
-                  background:
-                    'radial-gradient(ellipse 88% 72% at 50% 36%, rgba(11,13,16,0.97) 0%, rgba(11,13,16,0.88) 25%, rgba(11,13,16,0.55) 50%, rgba(11,13,16,0.18) 72%, transparent 92%)',
-                }}
-                aria-hidden
-              />
-              <div
-                className="tee-intro-mobile-fog absolute md:hidden pointer-events-none blur-[16px] motion-reduce:blur-[16px]"
-                style={{
-                  inset: '-15% -12% -8% -12%',
-                  background:
-                    'radial-gradient(ellipse 55% 40% at 52% 28%, rgba(198,144,46,0.08) 0%, rgba(198,144,46,0.03) 45%, transparent 75%)',
-                }}
-                aria-hidden
-              />
-              <div
-                className="tee-intro-mobile-fog absolute md:hidden pointer-events-none blur-[8px] motion-reduce:blur-[8px]"
-                style={{
-                  inset: '-10% -8% -5% -8%',
-                  background:
-                    'radial-gradient(ellipse 95% 85% at 50% 45%, transparent 30%, rgba(11,13,16,0.4) 65%, rgba(11,13,16,0.7) 90%)',
-                }}
-                aria-hidden
-              />
+              <div className="col-span-12 md:col-span-8 flex flex-col justify-center items-center md:items-start md:mt-0 relative">
+                <div
+                  className="absolute inset-y-0 left-0 w-56 lg:w-72 hidden md:block pointer-events-none"
+                  style={{ background: 'linear-gradient(to right, rgba(11,13,16,0.92) 0%, rgba(11,13,16,0.3) 60%, transparent 100%)' }}
+                  aria-hidden
+                />
 
-              <div
-                className="absolute inset-y-0 left-0 w-56 lg:w-72 hidden md:block pointer-events-none"
-                style={{ background: 'linear-gradient(to right, rgba(11,13,16,0.92) 0%, rgba(11,13,16,0.3) 60%, transparent 100%)' }}
-                aria-hidden
-              />
-
-              <div className="relative z-10">
-                <div className="text-[10px] sm:text-[11px] lg:text-[11px] font-mono tracking-[0.2em] lg:tracking-[0.24em] text-white/30 lg:text-white/35 mb-3 sm:mb-4 lg:mb-4" style={mkStyle(e0, 20)}>
-                  {!isDesktop ? (
-                    <TypewriterLine disabled={false} />
-                  ) : (
-                    <>
-                      {'// ПРОЕКТ РАССВЕТ / DROP'}
-                      {!animationsDisabled && (
-                        <span className="inline-block w-[5px] h-[1em] bg-white/30 ml-1 align-middle" style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }} />
-                      )}
-                    </>
-                  )}
-                </div>
-
-                <h2 className="text-[22px] sm:text-[28px] md:text-[44px] lg:text-[40px] xl:text-[48px] font-light tracking-[0.06em] lg:tracking-[0.07em] leading-[1.1]" style={mkStyle(e1, 32)}>
-                  проект{' '}
-                  <span className="tee-intro-title-shimmer bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
-                    РАССВЕТ
-                  </span>
-                </h2>
-
-                <p
-                  className={`mt-4 sm:mt-5 lg:mt-6 max-w-xl lg:max-w-2xl text-[13px] sm:text-sm md:text-[15px] lg:text-[15px] leading-[1.7] lg:leading-[1.75] ${!isDesktop ? 'text-white/80' : 'text-white/48 lg:text-white/55'}`}
-                  style={mkStyle(e2, 26)}
-                >
-                  {!isDesktop
-                    ? 'Тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы, "бетон/графит" и контроль качества: паспорт, партия, проверка.'
-                    : 'Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы, "бетон/графит" и контроль качества: паспорт, партия, проверка.'}
-                </p>
-
-                <div className="mt-5 sm:mt-7 lg:mt-8 grid grid-cols-2 gap-2.5 sm:gap-3 lg:gap-4 max-w-xl lg:max-w-2xl" style={mkStyle(e3, 36)}>
-                  <div
-                    className="vx-spec-card max-md:!animate-none md:[animation:teeCardFloat1_6s_ease-in-out_infinite]"
-                  >
-                    <div className="vx-spec-card-label">CODE</div>
-                    <div className="vx-spec-card-value">VSHD-TEE</div>
-                    <div className="vx-spec-card-label mt-2.5 sm:mt-3">STATUS</div>
-                    <div className="vx-spec-card-value">IN STOCK</div>
+                <div className="relative z-10">
+                  <div className="text-[10px] sm:text-[11px] lg:text-[11px] font-mono tracking-[0.2em] lg:tracking-[0.24em] text-white/30 lg:text-white/35 mb-3 sm:mb-4 lg:mb-4" style={mkStyle(e0, 20)}>
+                    {'// ПРОЕКТ РАССВЕТ / DROP'}
+                    {!animationsDisabled && (
+                      <span className="inline-block w-[5px] h-[1em] bg-white/30 ml-1 align-middle" style={{ animation: 'teeCursorBlink 1.1s step-end infinite' }} />
+                    )}
                   </div>
-                  <div
-                    className="vx-spec-card max-md:!animate-none md:[animation:teeCardFloat2_7s_ease-in-out_infinite_0.5s]"
-                  >
-                    <div className="vx-spec-card-label">MATERIAL</div>
-                    <div className="vx-spec-card-value">GRAPHITE</div>
-                    <div className="vx-spec-card-label mt-2.5 sm:mt-3">TAG</div>
-                    <div className="vx-spec-card-value">LIMITED DROP</div>
-                  </div>
-                </div>
 
-                <div className="mt-5 sm:mt-7 lg:mt-8" style={mkStyle(e4, 24)}>
-                  <Link
-                    href="/catalog"
-                    className="vx-cta-btn lg:!h-12 lg:!px-10 lg:!text-xs lg:!tracking-[0.24em] lg:border-white/[0.1] lg:hover:border-gold/25"
+                  <h2 className="text-[22px] sm:text-[28px] md:text-[44px] lg:text-[40px] xl:text-[48px] font-light tracking-[0.06em] lg:tracking-[0.07em] leading-[1.1]" style={mkStyle(e1, 32)}>
+                    проект{' '}
+                    <span className="tee-intro-title-shimmer bg-gradient-to-r from-amber-700 via-yellow-500 to-amber-700 bg-[length:200%_100%] animate-gold-shimmer bg-clip-text text-transparent">
+                      РАССВЕТ
+                    </span>
+                  </h2>
+
+                  <p
+                    className="mt-4 sm:mt-5 lg:mt-6 max-w-xl lg:max-w-2xl text-[13px] sm:text-sm md:text-[15px] lg:text-[15px] leading-[1.7] lg:leading-[1.75] text-white/48 lg:text-white/55"
+                    style={mkStyle(e2, 26)}
                   >
-                    СМОТРЕТЬ КАТАЛОГ →
-                  </Link>
+                    Премиальный тактический мерч и визуальная система бренда. Лимитированные дропы, строгие формы, &quot;бетон/графит&quot; и контроль качества: паспорт, партия, проверка.
+                  </p>
+
+                  <div className="mt-5 sm:mt-7 lg:mt-8 grid grid-cols-2 gap-2.5 sm:gap-3 lg:gap-4 max-w-xl lg:max-w-2xl" style={mkStyle(e3, 36)}>
+                    <div className="vx-spec-card md:[animation:teeCardFloat1_6s_ease-in-out_infinite]">
+                      <div className="vx-spec-card-label">CODE</div>
+                      <div className="vx-spec-card-value">VSHD-TEE</div>
+                      <div className="vx-spec-card-label mt-2.5 sm:mt-3">STATUS</div>
+                      <div className="vx-spec-card-value">IN STOCK</div>
+                    </div>
+                    <div className="vx-spec-card md:[animation:teeCardFloat2_7s_ease-in-out_infinite_0.5s]">
+                      <div className="vx-spec-card-label">MATERIAL</div>
+                      <div className="vx-spec-card-value">GRAPHITE</div>
+                      <div className="vx-spec-card-label mt-2.5 sm:mt-3">TAG</div>
+                      <div className="vx-spec-card-value">LIMITED DROP</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 sm:mt-7 lg:mt-8" style={mkStyle(e4, 24)}>
+                    <Link
+                      href="/catalog"
+                      className="vx-cta-btn lg:!h-12 lg:!px-10 lg:!text-xs lg:!tracking-[0.24em] lg:border-white/[0.1] lg:hover:border-gold/25"
+                    >
+                      СМОТРЕТЬ КАТАЛОГ →
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
+          )}
         </div>
       </div>
     </section>

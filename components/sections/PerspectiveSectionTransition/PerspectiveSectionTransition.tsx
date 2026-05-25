@@ -11,7 +11,11 @@ import {
 } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getCollectionCoverImage, type Collection } from "@/lib/catalog";
+import {
+  getCollectionCoverImage,
+  isPrecompressedCoverImage,
+  type Collection,
+} from "@/lib/catalog";
 import { useLenisRef } from "@/components/providers/LenisContext";
 import { CollectionSwipeHint } from "./CollectionSwipeHint";
 import { useSwipeRightNavigate } from "./useSwipeRightNavigate";
@@ -19,7 +23,7 @@ import styles from "./perspective-section-transition.module.css";
 
 const MOBILE_MEDIA = "(max-width: 768px)";
 const REDUCED_MOTION_MEDIA = "(prefers-reduced-motion: reduce)";
-const IMAGE_SIZES = "(max-width: 768px) 92vw, 720px";
+const IMAGE_SIZES = "(max-width: 768px) 96vw, 800px";
 
 function subscribeMedia(query: string, onStoreChange: () => void) {
   const media = window.matchMedia(query);
@@ -65,6 +69,7 @@ function StaticFallback({ cards }: { cards: CollectionCard[] }) {
             priority={index === 0}
             sizes={IMAGE_SIZES}
             className={styles.image}
+            unoptimized={isPrecompressedCoverImage(card.image)}
           />
 
           <div className={styles.swipeHintWrap}>
@@ -336,6 +341,7 @@ export function PerspectiveSectionTransition({
                 priority={index === 0}
                 sizes={IMAGE_SIZES}
                 className={styles.image}
+                unoptimized={isPrecompressedCoverImage(card.image)}
               />
             </article>
           ))}

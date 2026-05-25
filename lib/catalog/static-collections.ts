@@ -46,6 +46,11 @@ export const STATIC_COLLECTIONS: Collection[] = [
   },
 ];
 
+/** Уже сжатые AVIF — не гонять через next/image optimizer (sharp/HEIF → null, лаги). */
+export function isPrecompressedCoverImage(src: string): boolean {
+  return /\.avif(\?|$)/i.test(src);
+}
+
 export function getCollectionCoverImage(
   collection: Collection,
   isMobile: boolean,

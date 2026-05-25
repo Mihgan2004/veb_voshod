@@ -62,14 +62,12 @@ h6,
   }
 }
 
-/* На мобилке TeeIntroBlock и WelcomeBlock — без скролла, 100vh (до гидрации) */
-/* На мобилке все анимации отключены — контент показывается сразу */
-@media (max-width: 768px) {
-  .tee-intro-mobile-height {
-    height: 100vh !important;
-  }
-  .welcome-mobile-height {
-    height: 100vh !important;
+/* До lg: TeeIntro в потоке, без жёсткого 100vh */
+@media (max-width: 1023px) {
+  .tee-intro-mobile-height,
+  .tee-intro-scroll-height.tee-intro-mobile-height {
+    height: auto !important;
+    min-height: 100dvh;
   }
   .animate-mobile-enter,
   .animate-mobile-enter-delay-1,
@@ -538,12 +536,6 @@ h6,
   }
 }
 
-/* Добро пожаловать — контурная надпись */
-.vx-welcome-text {
-  color: transparent;
-  -webkit-text-stroke: 0.8px rgba(255, 255, 255, 0.85);
-}
-
 /* Золотой градиент + свечение для прелоадера (fallback — золотой цвет до загрузки градиента) */
 .vx-logo-gold path,
 .vx-logo-gold line,
@@ -671,46 +663,7 @@ h6,
   }
 }
 
-/* Welcome block: приветствие сверху, кнопка снизу */
-@keyframes welcomeSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-48px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes ctaSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes logoFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 @media (max-width: 768px) {
-  .welcome-entrance,
-  .logo-entrance,
-  .cta-entrance {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
   /* Бегущая строка на мобилке включена — анимация .animate-marquee не отключаем */
   .animate-gold-shimmer {
     animation: none !important;

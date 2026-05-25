@@ -110,4 +110,8 @@ function pickRepo(): CatalogRepo {
 }
 
 export const catalog: CatalogRepo = pickRepo();
-export { STATIC_COLLECTIONS, getCollectionCoverImage } from "./static-collections";
+export {
+  STATIC_COLLECTIONS,
+  getCollectionCoverImage,
+  isPrecompressedCoverImage,
+} from "./static-collections";

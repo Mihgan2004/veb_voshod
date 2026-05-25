@@ -84,6 +84,8 @@ export type DarkVeilProps = {
   scanlineFrequency?: number;
   warpAmount?: number;
   resolutionScale?: number;
+  /** false — остановить WebGL loop, когда секция вне viewport */
+  active?: boolean;
 };
 
 export function DarkVeil({
@@ -94,10 +96,13 @@ export function DarkVeil({
   scanlineFrequency = 0,
   warpAmount = 0,
   resolutionScale = 1,
+  active = true,
 }: DarkVeilProps) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (!active) return;
+
     const canvas = ref.current;
     if (!canvas) return;
 
@@ -159,6 +164,7 @@ export function DarkVeil({
       window.removeEventListener("resize", resize);
     };
   }, [
+    active,
     hueShift,
     noiseIntensity,
     scanlineIntensity,

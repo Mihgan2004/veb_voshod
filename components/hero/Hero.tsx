@@ -66,7 +66,7 @@ function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[100vh] overflow-hidden mb-0 bg-[#0B0D10] min-h-[100dvh]"
+      className="relative min-h-[100dvh] h-[100dvh] overflow-hidden mb-0 bg-[#0B0D10]"
     >
       {!videoError && (
         <>
@@ -125,9 +125,9 @@ function Hero() {
 
       {/* Узкая кнопка "вниз" в овале */}
       <a
-        href="#welcome"
+        href="#intro"
         aria-label="Вниз"
-        className="absolute top-[78%] md:top-[85%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[3] flex items-center justify-center w-10 h-14 lg:w-12 lg:h-16 rounded-full border border-white/20 lg:border-white/25 bg-white/5 lg:bg-white/[0.07] backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:bg-white/10 lg:hover:border-gold/30 lg:hover:bg-gold/[0.08] active:scale-95"
+        className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-[3] flex items-center justify-center w-10 h-14 md:bottom-14 lg:bottom-16 lg:w-12 lg:h-16 rounded-full border border-white/20 lg:border-white/25 bg-white/5 lg:bg-white/[0.07] backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:bg-white/10 lg:hover:border-gold/30 lg:hover:bg-gold/[0.08] active:scale-95 pointer-events-auto"
       >
         <svg
           width="14"

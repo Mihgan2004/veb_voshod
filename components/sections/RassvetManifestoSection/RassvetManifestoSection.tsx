@@ -13,13 +13,9 @@ import {
   countRevealWords,
   type ManifestoWord,
 } from "./manifesto-content";
-import { ASSETS } from "@/lib/assets";
 import { useLiteMode } from "@/lib/useLiteMode";
 import { ManifestoCtaActions } from "./ManifestoCtaActions";
 import styles from "./rassvet-manifesto.module.css";
-
-const GRAFFITI_Y_START = "-18vh";
-const GRAFFITI_Y_END = "22vh";
 
 const DIM_COLOR = "#4b4f55";
 const ACTIVE_COLOR = "#e8e8e8";
@@ -139,45 +135,6 @@ function MaskRevealTitle({ progress, reducedMotion }: MaskRevealTitleProps) {
   );
 }
 
-type GraffitiParallaxProps = {
-  progress: MotionValue<number>;
-  reducedMotion: boolean;
-};
-
-function GraffitiParallax({ progress, reducedMotion }: GraffitiParallaxProps) {
-  const y = useTransform(progress, [0, 1], [GRAFFITI_Y_START, GRAFFITI_Y_END]);
-  const opacity = useTransform(
-    progress,
-    [0, 0.1, 0.35, 0.72, 0.92, 1],
-    [0, 0.42, 0.78, 0.72, 0.38, 0.12],
-  );
-
-  const img = (
-    // eslint-disable-next-line @next/next/no-img-element -- прозрачная каллиграфия, parallax-слой
-    <img
-      src={ASSETS.rassvet.graffitiNadpis}
-      alt=""
-      className={styles.graffitiImg}
-      decoding="async"
-      draggable={false}
-    />
-  );
-
-  if (reducedMotion) {
-    return (
-      <div className={styles.graffitiLayer} aria-hidden>
-        {img}
-      </div>
-    );
-  }
-
-  return (
-    <motion.div className={styles.graffitiLayer} style={{ y, opacity }} aria-hidden>
-      {img}
-    </motion.div>
-  );
-}
-
 function ManifestoParagraph({
   paragraphWords,
   progress,
@@ -246,8 +203,6 @@ export function RassvetManifestoSection() {
           <div className={`${styles.corner} ${styles.cornerTr}`} aria-hidden />
           <div className={`${styles.corner} ${styles.cornerBl}`} aria-hidden />
           <div className={`${styles.corner} ${styles.cornerBr}`} aria-hidden />
-
-          <GraffitiParallax progress={scrollYProgress} reducedMotion={reducedMotion} />
 
           {!liteMode && <div className={`${styles.noise} bg-noise`} aria-hidden />}
 

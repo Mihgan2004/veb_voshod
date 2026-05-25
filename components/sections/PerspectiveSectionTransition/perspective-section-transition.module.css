@@ -1,6 +1,6 @@
 .wrapper {
   position: relative;
-  background: #0b0d10;
+  background: transparent;
   overflow-x: clip;
   touch-action: pan-y;
   content-visibility: visible;
@@ -19,14 +19,14 @@
 }
 
 .stage {
-  --stage-width: min(86vw, 720px);
+  --stage-width: min(92vw, 800px);
 
   position: relative;
   width: var(--stage-width);
-  height: min(82svh, calc(var(--stage-width) * 1.36));
+  height: min(90svh, calc(var(--stage-width) * 1.48));
   overflow: hidden;
   isolation: isolate;
-  border-radius: 28px;
+  border-radius: 36px;
   background: #0b0d10;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.46);
   transform: translateZ(0);
@@ -88,7 +88,7 @@
 }
 
 .staticFallback {
-  background: #0b0d10;
+  background: transparent;
   padding: 96px 0 120px;
   display: flex;
   flex-direction: column;
@@ -99,10 +99,10 @@
 
 .staticSlide {
   position: relative;
-  width: min(86vw, 720px);
-  height: min(82svh, calc(min(86vw, 720px) * 1.36));
+  width: min(92vw, 800px);
+  height: min(90svh, calc(min(92vw, 800px) * 1.48));
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: 36px;
   background: #0b0d10;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.46);
 }
@@ -110,26 +110,31 @@
 @media (max-width: 768px) {
   .sticky {
     height: 100svh;
-    padding-top: calc(env(safe-area-inset-top) + 72px);
-    padding-bottom: 24px;
+    padding-top: calc(env(safe-area-inset-top) + 52px);
+    padding-bottom: 8px;
   }
 
   .stage {
-    --stage-width: min(92vw, 420px);
+    --stage-width: min(96vw, 500px);
 
     width: var(--stage-width);
     height: min(
-      72svh,
-      calc(100svh - env(safe-area-inset-top) - 128px),
-      calc(var(--stage-width) * 1.48)
+      90svh,
+      calc(100svh - env(safe-area-inset-top) - 56px),
+      calc(var(--stage-width) * 1.72)
     );
-    border-radius: 18px;
+    border-radius: 44px;
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.44);
   }
 
+  .image {
+    object-fit: cover;
+    object-position: center 42%;
+  }
+
   .swipeHintWrap {
-    width: min(88%, 360px);
-    bottom: clamp(16px, 4svh, 32px);
+    width: min(90%, 380px);
+    bottom: clamp(88px, 16svh, 120px);
   }
 
   .swipeHint {
@@ -144,12 +149,16 @@
   }
 
   .staticSlide {
-    width: min(92vw, 420px);
+    width: min(96vw, 500px);
     height: min(
-      72svh,
-      calc(100svh - env(safe-area-inset-top) - 128px),
-      calc(min(92vw, 420px) * 1.48)
+      90svh,
+      calc(100svh - env(safe-area-inset-top) - 56px),
+      calc(min(96vw, 500px) * 1.72)
     );
-    border-radius: 18px;
+    border-radius: 44px;
+  }
+
+  .staticSlide .image {
+    object-position: center 42%;
   }
 }
