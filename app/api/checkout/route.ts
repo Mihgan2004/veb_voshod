@@ -2,138 +2,113 @@ import { NextResponse } from "next/server";
 import {
   createCheckoutOrder,
   updateOrderPaymentId,
-  getProductPricesById,
+  getOrderById,
   type CheckoutOrderPayload,
 } from "@/lib/orders/directus-orders";
-import { createPayment } from "@/lib/yookassa";
-import type { CartLine } from "@/lib/cart/cart-store";
-import type { CdekDeliveryType } from "@/lib/cdek/types";
+import {
+  createPayment,
+  getPayment,
+  buildPaymentReceipt,
+  isYooKassaReceiptEnabled,
+  paymentIdempotenceKey,
+} from "@/lib/yookassa";
+import { CheckoutValidationError, verifyCheckoutCart } from "@/lib/checkout/server-checkout";
+import { parseCheckoutBody } from "@/lib/checkout/validate";
 
-const MAX_PRICE_DRIFT_RUB = 1;
-
-type CheckoutRequestBody = {
-  customer: {
-    name: string;
-    email: string;
-    phone?: string;
-    comment?: string;
-  };
-  cart: CartLine[];
-  delivery: {
-    type: CdekDeliveryType;
-    address: string;
-    cdekPvzCode?: string;
-    cost: number;
-    provider?: string;
-    cdekCityCode?: number;
-  };
-};
-
-function validateCheckoutBody(body: unknown): body is CheckoutRequestBody {
-  if (!body || typeof body !== "object") return false;
-
-  const b = body as Record<string, unknown>;
-
-  if (!b.customer || typeof b.customer !== "object") return false;
-  const customer = b.customer as Record<string, unknown>;
-  if (typeof customer.name !== "string" || customer.name.trim().length < 2) return false;
-  if (typeof customer.email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) return false;
-
-  if (!Array.isArray(b.cart) || b.cart.length === 0) return false;
-
-  if (!b.delivery || typeof b.delivery !== "object") return false;
-  const delivery = b.delivery as Record<string, unknown>;
-  if (!["pvz", "postamat", "courier"].includes(delivery.type as string)) return false;
-  if (typeof delivery.address !== "string" || delivery.address.trim().length === 0) return false;
-  if (typeof delivery.cost !== "number" || delivery.cost < 0) return false;
-  if (delivery.provider != null && typeof delivery.provider !== "string") return false;
-  if (delivery.cdekCityCode != null && typeof delivery.cdekCityCode !== "number") return false;
-
-  return true;
+function checkoutReturnUrl(orderId: string | number): string {
+  const override = process.env.YOOKASSA_RETURN_URL?.trim();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const base = override || siteUrl;
+  return `${base.replace(/\/+$/, "")}/checkout/success?orderId=${orderId}`;
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    if (!validateCheckoutBody(body)) {
+    const parsed = parseCheckoutBody(body);
+    if (!parsed) {
       return NextResponse.json(
         { error: "INVALID_PAYLOAD", message: "Invalid checkout data" },
         { status: 400 }
       );
     }
 
-    const { customer, cart, delivery } = body;
-
-    // --- Server-side price verification ---
-    // Never trust client-sent prices — fetch the real ones from Directus
-    const productIds = cart.map((item) => item.product.id);
-    const realPrices = await getProductPricesById(productIds);
-
-    const verifiedCart: CartLine[] = cart.map((item) => {
-      const serverPrice = realPrices.get(String(item.product.id));
-      if (serverPrice !== undefined) {
-        const drift = Math.abs(serverPrice - item.product.price);
-        if (drift > MAX_PRICE_DRIFT_RUB) {
-          console.warn(
-            `[checkout] Price mismatch for product ${item.product.id}: client=${item.product.price}, server=${serverPrice}`
-          );
-        }
-        return {
-          ...item,
-          product: { ...item.product, price: serverPrice },
-        };
-      }
-      return item;
-    });
-
-    const subtotal = verifiedCart.reduce(
-      (sum, item) => sum + item.product.price * item.qty,
-      0
-    );
-    const total = subtotal + delivery.cost;
-
-    if (total <= 0) {
-      return NextResponse.json(
-        { error: "INVALID_TOTAL", message: "Order total must be positive" },
-        { status: 400 }
-      );
-    }
+    const verified = await verifyCheckoutCart(parsed);
 
     const orderPayload: CheckoutOrderPayload = {
-      customer,
-      cart: verifiedCart,
+      customer: parsed.customer,
+      cart: verified.cart,
       delivery: {
-        type: delivery.type,
-        address: delivery.address,
-        cdekPvzCode: delivery.cdekPvzCode,
-        cost: delivery.cost,
-        provider: delivery.provider,
-        cdekCityCode: delivery.cdekCityCode,
+        type: parsed.delivery.type,
+        address: parsed.delivery.address,
+        cdekPvzCode: parsed.delivery.cdekPvzCode,
+        cost: verified.deliveryCost,
+        provider: parsed.delivery.provider,
+        cdekCityCode: parsed.delivery.cdekCityCode,
       },
     };
 
     const order = await createCheckoutOrder(orderPayload);
     const orderId = order.id;
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const returnUrl = `${siteUrl}/checkout/success?orderId=${orderId}`;
+    console.log(
+      `[checkout] Order created id=${orderId} subtotal=${verified.subtotal} delivery=${verified.deliveryCost} total=${verified.total}`
+    );
 
-    const itemsDescription = verifiedCart
+    const existing = await getOrderById(orderId);
+    if (existing?.payment_id) {
+      try {
+        const existingPayment = await getPayment(existing.payment_id);
+        const url = existingPayment.confirmation?.confirmation_url;
+        if (url && existingPayment.status === "pending") {
+          console.log(
+            `[checkout] Reusing pending payment ${existing.payment_id} for order ${orderId}`
+          );
+          return NextResponse.json({
+            ok: true,
+            orderId,
+            confirmationUrl: url,
+          });
+        }
+      } catch (e) {
+        console.warn(
+          `[checkout] Could not reuse payment ${existing.payment_id} for order ${orderId}:`,
+          e
+        );
+      }
+    }
+
+    const returnUrl = checkoutReturnUrl(orderId);
+
+    const itemsDescription = verified.cart
       .map((item) => `${item.product.name} (${item.size}) x${item.qty}`)
       .join(", ");
     const description = `Заказ №${orderId}: ${itemsDescription}`.slice(0, 128);
 
-    const payment = await createPayment(total, description, returnUrl, {
-      orderId: String(orderId),
+    const receipt = isYooKassaReceiptEnabled()
+      ? buildPaymentReceipt({
+          email: parsed.customer.email,
+          phone: parsed.customer.phone,
+          cart: verified.cart,
+          deliveryCost: verified.deliveryCost,
+        })
+      : undefined;
+
+    const payment = await createPayment(verified.total, description, returnUrl, {
+      orderId,
+      idempotenceKey: paymentIdempotenceKey(orderId),
+      receipt,
     });
 
     await updateOrderPaymentId(orderId, payment.id);
 
+    console.log(`[checkout] Payment created id=${payment.id} for order ${orderId}`);
+
     const confirmationUrl = payment.confirmation?.confirmation_url;
 
     if (!confirmationUrl) {
-      console.error("[checkout] No confirmation URL in payment response:", payment);
+      console.error("[checkout] No confirmation URL in payment response");
       return NextResponse.json(
         { error: "PAYMENT_ERROR", message: "No confirmation URL received" },
         { status: 500 }
@@ -146,6 +121,15 @@ export async function POST(req: Request) {
       confirmationUrl,
     });
   } catch (e) {
+    if (e instanceof CheckoutValidationError) {
+      const status =
+        e.code === "DELIVERY_CALCULATION_FAILED" ? 503 : 400;
+      return NextResponse.json(
+        { error: e.code, message: e.message },
+        { status }
+      );
+    }
+
     const message = e instanceof Error ? e.message : "Unknown error";
     console.error("[checkout] POST /api/checkout failed:", e);
     return NextResponse.json(

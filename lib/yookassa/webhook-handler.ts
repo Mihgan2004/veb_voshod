@@ -4,6 +4,7 @@ import {
   getPayment,
   isPaymentSucceeded,
   isPaymentCanceled,
+  isWebhookIpAllowlistEnabled,
 } from "@/lib/yookassa/client";
 import type { YooHttpNotification, YooPayment } from "@/lib/yookassa/types";
 import { getOrderById, getOrderByPaymentId } from "@/lib/orders/directus-orders";
@@ -56,13 +57,22 @@ export async function handleYooKassaPost(req: Request): Promise<Response> {
   const headersList = req.headers;
   const clientIp = getWebhookClientIp(headersList);
 
-  const ipOk = verifyWebhookIp(clientIp);
-  if (!ipOk && process.env.NODE_ENV === "production") {
-    console.warn(`[yookassa/webhook] Rejected — invalid IP: "${clientIp}"`);
-    return NextResponse.json(
-      { error: "FORBIDDEN", message: "Invalid source IP" },
-      { status: 403 }
+  const allowlistOn = isWebhookIpAllowlistEnabled();
+  const trustProxy = process.env.TRUST_PROXY === "true";
+
+  if (allowlistOn && !trustProxy) {
+    console.warn(
+      "[yookassa/webhook] YOOKASSA_WEBHOOK_IP_ALLOWLIST_ENABLED but TRUST_PROXY is not true — skipping IP verification (configure reverse proxy to overwrite X-Forwarded-For)"
     );
+  } else if (allowlistOn) {
+    const ipOk = verifyWebhookIp(clientIp);
+    if (!ipOk) {
+      console.warn(`[yookassa/webhook] Rejected — invalid IP: "${clientIp || "—"}"`);
+      return NextResponse.json(
+        { error: "FORBIDDEN", message: "Invalid source IP" },
+        { status: 403 }
+      );
+    }
   }
 
   let raw: unknown;

@@ -1,14 +1,26 @@
 "use client";
 
-import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import Image from "next/image";
-import { useInView } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getCollectionCoverImage, type Collection } from "@/lib/catalog";
 import { CollectionSwipeHint } from "./CollectionSwipeHint";
-import { LarosePair } from "./LarosePair";
+import { PerspectiveScene } from "./PerspectiveScene";
+import {
+  usePerspectiveScenesProgress,
+  type SceneSlugPair,
+} from "./usePerspectiveScenesProgress";
 import { useSwipeRightNavigate } from "./useSwipeRightNavigate";
 import styles from "./perspective-section-transition.module.css";
+
+const IMAGE_SIZES = "(max-width: 768px) 92vw, 720px";
 
 function subscribeReducedMotion(onStoreChange: () => void) {
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -40,19 +52,6 @@ function getMobileServer() {
   return false;
 }
 
-function slugFromProgress(topSlug: string, bottomSlug: string, progress: number) {
-  return progress < 0.55 ? topSlug : bottomSlug;
-}
-
-type PairState = {
-  pairIndex: number;
-  topSlug: string;
-  bottomSlug: string;
-  progress: number;
-  inView: boolean;
-  centerY: number;
-};
-
 function StaticSlide({ slug, image, name }: { slug: string; image: string; name: string }) {
   const router = useRouter();
   const navigate = useCallback(() => {
@@ -70,9 +69,8 @@ function StaticSlide({ slug, image, name }: { slug: string; image: string; name:
         src={image}
         alt={name}
         fill
-        sizes="100vw"
+        sizes={IMAGE_SIZES}
         className={styles.image}
-        unoptimized
       />
       <CollectionSwipeHint activeSlug={slug} slug={slug} />
     </div>
@@ -87,11 +85,7 @@ function StaticFallback({
   isMobile: boolean;
 }) {
   return (
-    <section
-      className={styles.wrapper}
-      aria-label="Коллекции"
-      data-mobile-cards={isMobile ? "true" : undefined}
-    >
+    <section className={styles.wrapper} aria-label="Коллекции">
       {collections.map((col) => (
         <StaticSlide
           key={col.id}
@@ -110,43 +104,63 @@ export function PerspectiveSectionTransition({
   collections: Collection[];
 }) {
   const wrapperRef = useRef<HTMLElement>(null);
-  const sectionInView = useInView(wrapperRef, { amount: 0.08 });
-  const pairStatesRef = useRef<Map<number, PairState>>(new Map());
+  const sceneRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const activeSlugRef = useRef(collections[0]?.slug ?? "");
   const router = useRouter();
 
   const [activeSlug, setActiveSlug] = useState(collections[0]?.slug ?? "");
+  const [sectionInView, setSectionInView] = useState(false);
 
   const reducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
     getReducedMotion,
-    getReducedMotionServer
+    getReducedMotionServer,
   );
 
   const isMobile = useSyncExternalStore(subscribeMobile, getMobile, getMobileServer);
 
-  const updateActiveSlug = useCallback(() => {
-    const viewportCenter = window.innerHeight / 2;
-    const states = [...pairStatesRef.current.values()].filter((state) => state.inView);
-    if (states.length === 0) return;
-
-    const dominant = states.reduce((best, state) => {
-      const bestDist = Math.abs(best.centerY - viewportCenter);
-      const stateDist = Math.abs(state.centerY - viewportCenter);
-      return stateDist < bestDist ? state : best;
+  const scenePairs = useMemo((): SceneSlugPair[] => {
+    return collections.slice(0, -1).map((top, index) => {
+      const bottom = collections[index + 1];
+      return { topSlug: top.slug, bottomSlug: bottom.slug };
     });
+  }, [collections]);
 
-    setActiveSlug(
-      slugFromProgress(dominant.topSlug, dominant.bottomSlug, dominant.progress)
-    );
+  useEffect(() => {
+    sceneRefs.current = new Array(scenePairs.length).fill(null);
+  }, [scenePairs.length]);
+
+  const handleActiveSlugChange = useCallback((slug: string) => {
+    activeSlugRef.current = slug;
+    setActiveSlug(slug);
   }, []);
 
-  const handlePairActiveChange = useCallback(
-    (payload: PairState) => {
-      pairStatesRef.current.set(payload.pairIndex, payload);
-      updateActiveSlug();
-    },
-    [updateActiveSlug]
-  );
+  usePerspectiveScenesProgress({
+    sceneRefs,
+    scenes: scenePairs,
+    onActiveSlugChange: handleActiveSlugChange,
+    activeSlugRef,
+  });
+
+  useEffect(() => {
+    activeSlugRef.current = collections[0]?.slug ?? "";
+    setActiveSlug(collections[0]?.slug ?? "");
+  }, [collections]);
+
+  useEffect(() => {
+    const node = wrapperRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setSectionInView(entry?.isIntersecting ?? false);
+      },
+      { threshold: 0.08 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   const navigateToActive = useCallback(() => {
     if (!activeSlug) return;
@@ -155,42 +169,50 @@ export function PerspectiveSectionTransition({
 
   const { onTouchStart, onTouchEnd } = useSwipeRightNavigate(
     navigateToActive,
-    sectionInView && Boolean(activeSlug)
+    sectionInView && Boolean(activeSlug),
   );
 
   if (reducedMotion || collections.length < 2) {
     return <StaticFallback collections={collections} isMobile={isMobile} />;
   }
 
+  const pairs = collections.slice(0, -1);
+
   return (
     <section
       ref={wrapperRef}
       className={styles.wrapper}
       aria-label="Коллекции"
-      data-mobile-cards={isMobile ? "true" : undefined}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {collections.slice(0, -1).map((top, index) => {
+      {pairs.map((top, index) => {
         const bottom = collections[index + 1];
         return (
-          <LarosePair
+          <PerspectiveScene
             key={top.id}
-            pairIndex={index}
+            ref={(el) => {
+              sceneRefs.current[index] = el;
+            }}
             topImage={getCollectionCoverImage(top, isMobile)}
             bottomImage={getCollectionCoverImage(bottom, isMobile)}
-            topSlug={top.slug}
-            bottomSlug={bottom.slug}
             topAlt={top.name}
             bottomAlt={bottom.name}
-            overlap={index > 0}
             priorityTop={index === 0}
-            activeSlug={activeSlug}
-            sectionInView={sectionInView}
-            onActiveChange={handlePairActiveChange}
           />
         );
       })}
+
+      <div
+        className={styles.hintOverlay}
+        data-visible={sectionInView ? "true" : undefined}
+      >
+        <CollectionSwipeHint
+          activeSlug={activeSlug}
+          slug={activeSlug}
+          visible={sectionInView}
+        />
+      </div>
     </section>
   );
 }

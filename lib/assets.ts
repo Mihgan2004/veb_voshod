@@ -33,6 +33,9 @@ export const ASSETS = {
       solnechnogorsk: "/text-parallax/icons/solnechnogorsk.png",
     },
   },
+  rassvet: {
+    graffitiNadpis: "/images/rassvet/graffiti-nadpis-transparent.webp",
+  },
   lookbook: [
     `/lookbook/lookbook-01.avif?v=${LOOKBOOK_VERSION}`,
     `/lookbook/lookbook-02.avif?v=${LOOKBOOK_VERSION}`,

@@ -54,6 +54,23 @@ export type YooPayment = {
   cancellation_details?: YooCancellationDetails;
 };
 
+export type YooReceiptItem = {
+  description: string;
+  quantity: string;
+  amount: YooAmount;
+  vat_code: number;
+  payment_subject: string;
+  payment_mode: string;
+};
+
+export type YooReceipt = {
+  customer: {
+    email?: string;
+    phone?: string;
+  };
+  items: YooReceiptItem[];
+};
+
 export type YooCreatePaymentRequest = {
   amount: YooAmount;
   confirmation: {
@@ -63,6 +80,13 @@ export type YooCreatePaymentRequest = {
   capture?: boolean;
   description?: string;
   metadata?: Record<string, string>;
+  receipt?: YooReceipt;
+};
+
+export type CreatePaymentOptions = {
+  orderId: string | number;
+  idempotenceKey?: string;
+  receipt?: YooReceipt;
 };
 
 export type YooWebhookEventType =

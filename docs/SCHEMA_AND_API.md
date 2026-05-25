@@ -312,7 +312,7 @@
 
 ### СДЭК: прокси к API СДЭК
 
-#### `POST /api/cdek/service`
+#### `POST /api/cdek/widget` (заменяет удалённый `/api/cdek/service`)
 
 Прокси для виджета СДЭК (офисы, расчёт, города, регионы).
 
@@ -330,7 +330,7 @@
 
 **Errors:** `400` — Unknown action; `500` — SERVICE_ERROR.
 
-#### `GET /api/cdek/service`
+#### `GET /api/cdek/widget`
 
 Проверка: `{ "status": "ok", "service": "cdek-proxy" }`.
 
@@ -354,8 +354,9 @@
 | GET | `/api/payments/webhook` | Проверка webhook |
 | POST | `/api/cdek/calculate` | Расчёт стоимости доставки СДЭК |
 | GET | `/api/cdek/cities?q=...` | Поиск городов СДЭК |
-| POST | `/api/cdek/service` | Прокси к API СДЭК (офисы, калькулятор, города, регионы) |
-| GET | `/api/cdek/service` | Проверка прокси |
+| POST | `/api/cdek/widget` | Ограниченный адаптер для виджета СДЭК (offices, calculate, cities) |
+| GET | `/api/cdek/widget` | Health check |
+| GET | `/api/directus/assets/[id]` | Прокси изображений Directus без токена в URL |
 | GET | `/api/debug/images` | Диагностика каталога/картинок |
 
 Каталог (коллекции, товары) отдаётся через SSR/ISR из Directus, отдельного публичного REST API для каталога нет — данные подтягиваются в `catalog.listCollections()` и `catalog.listProducts()` на сервере.

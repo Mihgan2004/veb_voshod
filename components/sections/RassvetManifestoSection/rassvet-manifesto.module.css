@@ -54,15 +54,54 @@
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   background:
     radial-gradient(ellipse 80% 55% at 50% 0%, rgba(198, 144, 46, 0.07), transparent 62%),
     radial-gradient(ellipse 70% 50% at 50% 100%, rgba(255, 255, 255, 0.03), transparent 58%);
 }
 
+.graffitiLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint;
+  will-change: transform, opacity;
+}
+
+.graffitiImg {
+  position: absolute;
+  top: 50%;
+  right: -8vw;
+  width: min(92vw, 56rem);
+  height: auto;
+  max-height: 115%;
+  object-fit: contain;
+  object-position: right center;
+  transform: translateY(-50%);
+  user-select: none;
+}
+
+@media (max-width: 767px) {
+  .graffitiImg {
+    right: -22vw;
+    width: clamp(120vw, 130vw, 140vw);
+    max-height: 130%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graffitiLayer {
+    opacity: 0.62;
+  }
+}
+
 .noise {
   position: absolute;
   inset: 0;
+  z-index: 1;
   pointer-events: none;
   opacity: 0.16;
   mix-blend-mode: overlay;
@@ -70,6 +109,7 @@
 
 .corner {
   position: absolute;
+  z-index: 1;
   width: 1.125rem;
   height: 1.125rem;
   pointer-events: none;
@@ -198,9 +238,14 @@
   pointer-events: none;
 }
 
+.metaTop,
+.metaBottom {
+  z-index: 1;
+}
+
 .inner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .label {

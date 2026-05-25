@@ -2,6 +2,7 @@
 import type { CatalogRepo } from "./repo";
 import type { Collection, Product } from "./types";
 import { createDirectusClient } from "@/lib/directus/client";
+import { normalizeProductSizes } from "@/lib/directus/sizes";
 
 type DirectusListResponse<T> = { data: T[] };
 
@@ -15,13 +16,11 @@ function toId(v: unknown): string | undefined {
   return undefined;
 }
 
-function assetUrl(base: string, file: unknown): string | undefined {
+/** Public asset URL via same-origin proxy (no token in browser). */
+function assetUrl(_base: string, file: unknown): string | undefined {
   const id = toId(file);
   if (!id) return undefined;
-  const token = process.env.DIRECTUS_TOKEN;
-  return token
-    ? `${base}/assets/${id}?access_token=${token}`
-    : `${base}/assets/${id}`;
+  return `/api/directus/assets/${encodeURIComponent(id)}`;
 }
 
 /** Массив файлов из Directus (M2M junction или JSON) → массив URL. */
@@ -94,12 +93,11 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
         tag?: unknown;
         label?: unknown;
         coverImage?: unknown;
-        isFeatured?: unknown;
         sort?: unknown;
       };
 
       const res = await client.request<DirectusListResponse<Row>>(
-        `/items/${COLLECTIONS}?limit=-1&fields=id,slug,name,description,tag,label,coverImage,isFeatured,sort`
+        `/items/${COLLECTIONS}?limit=-1&fields=id,slug,name,description,tag,label,coverImage,sort`
       );
 
       return res.data
@@ -113,7 +111,6 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
           const description = typeof r.description === "string" ? r.description : undefined;
           const label = typeof r.label === "string" ? r.label : undefined;
           const coverImage = assetUrl(client.base, r.coverImage);
-          const isFeatured = Boolean(r.isFeatured);
           const sortRaw = r.sort;
           const sort =
             typeof sortRaw === "number"
@@ -130,7 +127,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
             tag,
             label,
             coverImage,
-            isFeatured,
+            isFeatured: false,
             sort,
           };
         })
@@ -153,7 +150,6 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
         inStock?: unknown;
         code?: unknown;
         batch?: unknown;
-        isFeatured?: unknown;
         color?: unknown;
         fabric?: unknown;
         density?: unknown;
@@ -161,7 +157,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
       };
 
       const res = await client.request<DirectusListResponse<Row>>(
-        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images.directus_files_id,sizes,inStock,code,batch,isFeatured,color,fabric,density,print,category,category.slug,category.name,collection.id`
+        `/items/${PRODUCTS}?limit=-1&fields=id,slug,name,description,price,image,images.directus_files_id,sizes,inStock,code,batch,color,fabric,density,print,category,category.slug,category.name,collection.id`
       );
 
       return res.data
@@ -174,11 +170,9 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
           const priceNum =
             typeof r.price === "number" ? r.price : typeof r.price === "string" ? Number(r.price) : 0;
 
-          const sizes =
-            Array.isArray(r.sizes) ? r.sizes.filter((x): x is string => typeof x === "string") : [];
+          const sizes = normalizeProductSizes(r.sizes);
 
           const inStock = Boolean(r.inStock);
-          const isFeatured = Boolean(r.isFeatured);
           const status: Product["status"] = inStock ? "available" : "sold_out";
 
           const mainImage = assetUrl(client.base, r.image);
@@ -200,7 +194,7 @@ export function createDirectusRepo(opts: { url: string; token?: string }): Catal
             categoryName: categoryName || undefined,
             sizes,
             inStock,
-            isFeatured,
+            isFeatured: false,
             status,
             image: mainImage ?? galleryUrls[0] ?? "",
             images: allImages.length > 0 ? allImages : undefined,

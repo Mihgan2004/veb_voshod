@@ -37,7 +37,8 @@ export type Product = {
   categoryName?: string;
 
   inStock: boolean;
-  isFeatured: boolean;
+  /** Optional in Directus; defaults to false when absent. */
+  isFeatured?: boolean;
   status: ProductStatus;
   badge?: string;
 
@@ -68,6 +69,7 @@ export type Collection = {
   coverImage?: string;
   /** Обложка для мобильного блока коллекций на главной (готовая карточка). */
   mobileCoverImage?: string;
-  isFeatured: boolean;
+  /** Optional in Directus; defaults to false when absent. */
+  isFeatured?: boolean;
   sort: number;
 };

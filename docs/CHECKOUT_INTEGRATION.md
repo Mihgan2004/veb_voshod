@@ -35,12 +35,15 @@ lib/
     └── directus-orders.ts  # Создание/обновление заказов
 
 app/api/
-├── checkout/route.ts           # POST — создание заказа + платёж
-├── payments/webhook/route.ts   # POST — webhook от ЮКасса
+├── checkout/route.ts           # POST — создание заказа + платёж (серверная цена и доставка)
+├── yookassa/webhook/route.ts   # POST — webhook от ЮKassa (канонический)
+├── payments/webhook/route.ts   # POST — legacy alias webhook
+├── directus/assets/[id]/       # GET — прокси файлов Directus без токена в URL
 └── cdek/
-    ├── calculate/route.ts      # POST — расчёт стоимости
+    ├── calculate/route.ts      # POST — расчёт стоимости (предпросмотр)
     ├── cities/route.ts         # GET — поиск городов
-    └── service/route.ts        # POST — прокси для виджета СДЭК
+    ├── offices/route.ts        # GET — ПВЗ
+    └── widget/route.ts         # POST — ограниченный адаптер для виджета СДЭК
 
 components/checkout/
 ├── CheckoutPageClient.tsx  # Главный компонент
@@ -77,8 +80,9 @@ YOOKASSA_SECRET_KEY=test_xxxxxxxxxxxxxxxxxxxxx
 ### 3. Настройка Webhook
 
 1. В личном кабинете перейдите в **Интеграция → HTTP-уведомления**
-2. Добавьте URL: `https://voshod.shop/api/payments/webhook`
-3. Выберите события:
+2. Добавьте URL: `https://voshod.shop/api/yookassa/webhook` (дубликат: `/api/payments/webhook`)
+3. На production включите `TRUST_PROXY=true`, если запросы идут через nginx/Caddy, который **перезаписывает** `X-Forwarded-For`
+4. Выберите события:
    - `payment.succeeded` — платёж завершён успешно
    - `payment.canceled` — платёж отменён
 
@@ -178,6 +182,10 @@ DIRECTUS_TOKEN=ваш-токен-directus
 # Получить в личном кабинете: https://yookassa.ru/my/merchant/integration/api-keys
 YOOKASSA_SHOP_ID=123456
 YOOKASSA_SECRET_KEY=live_xxxxxxxxxxxxxxxxxxxxx
+# YOOKASSA_RETURN_URL=https://voshod.shop/checkout/success
+# YOOKASSA_WEBHOOK_IP_ALLOWLIST_ENABLED=true
+# YOOKASSA_RECEIPT_ENABLED=false
+# TRUST_PROXY=true
 
 # ============================================
 # СДЭК (доставка)

@@ -190,7 +190,7 @@ export async function createCdekShipmentForPaidOrder(order: DirectusOrderRow): P
       cdekNumber: entity.cdek_number ?? null,
       trackNumber: entity.tracking_number ?? null,
       cdekStatus: entity.status ?? null,
-      waybillUrl: null,
+      billUrl: null,
       barcodeUrl: null,
     });
 

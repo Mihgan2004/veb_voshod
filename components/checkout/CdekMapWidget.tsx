@@ -213,8 +213,8 @@ export function CdekMapWidget({
       const yandexApiKey = process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY || "";
       const servicePath =
         typeof window !== "undefined"
-          ? `${window.location.origin}/api/cdek/service`
-          : "/api/cdek/service";
+          ? `${window.location.origin}/api/cdek/widget`
+          : "/api/cdek/widget";
 
       const config: CdekWidgetConfig = {
         from: {

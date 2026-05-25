@@ -8,6 +8,20 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
+    // После первого localPatterns остальные локальные пути блокируются — whitelist всего /public.
+    localPatterns: [
+      { pathname: "/HighlightsCollections/**" },
+      { pathname: "/header/**" },
+      { pathname: "/brand/**" },
+      { pathname: "/logo/**" },
+      { pathname: "/assets/**" },
+      { pathname: "/lookbook/**" },
+      { pathname: "/icons/**" },
+      { pathname: "/images/**" },
+      { pathname: "/text-parallax/**" },
+      { pathname: "/branding/**" },
+      { pathname: "/*" },
+    ],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "picsum.photos" },
@@ -30,6 +44,7 @@ const nextConfig: NextConfig = {
       "/header/:path*",
       "/assets/:path*",
       "/lookbook/:path*",
+      "/HighlightsCollections/:path*",
       "/video/:path*",
       "/_next/static/:path*",
     ];

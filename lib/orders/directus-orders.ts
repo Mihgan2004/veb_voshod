@@ -1,4 +1,11 @@
 import { createDirectusClient } from "@/lib/directus/client";
+import { filterIdIn, serializeDirectusFilter } from "@/lib/directus/filter";
+import { toDirectusRelationId } from "@/lib/directus/ids";
+import { normalizeProductSizes } from "@/lib/directus/sizes";
+import {
+  decrementStockLineAtomic,
+  isPgStockEnabled,
+} from "@/lib/orders/stock-pg";
 import type { CartLine } from "@/lib/cart/cart-store";
 import type { CdekDeliveryType } from "@/lib/cdek/types";
 
@@ -79,8 +86,9 @@ export type DirectusOrderRow = {
   cdek_number?: string | null;
   track_number?: string | null;
   cdek_status?: string | null;
-  cdek_waybill_url?: string | null;
+  cdek_bill_url?: string | null;
   cdek_barcode_url?: string | null;
+  stock_error?: string | null;
   shipment_created_at?: string | null;
   shipment_error?: string | null;
 };
@@ -168,15 +176,12 @@ export async function createOrderFromCart(payload: OrderPayload): Promise<Create
 
   // 2) создаём позиции заказа — ключи полей строго snake_case (как в DIRECTUS_ORDERS_SCHEMA.md)
   if (items.length > 0) {
+    const orderRelationId = toDirectusRelationId(orderId);
     const orderItemsPayload = items.map((item) => {
-      // product — Integer/M2O; мок-id вроде "p-tee-001" невалиден, отправляем null
-      const productId =
-        typeof item.product === "number" || /^\d+$/.test(String(item.product))
-          ? item.product
-          : null;
+      const productRef = toDirectusRelationId(item.product);
       return {
-        order: Number(orderId),
-        product: productId,
+        order: orderRelationId,
+        product: productRef,
         product_slug: item.productSlug ?? "",
         product_name: item.productName ?? "",
         size: item.size ?? "",
@@ -243,6 +248,8 @@ export async function createCheckoutOrder(
 
   const deliveryProvider = payload.delivery.provider ?? "cdek";
 
+  const cdekFields = buildCdekOrderFields(payload.delivery, deliveryProvider);
+
   const createdOrder = await directusCreateItem<
     {
       name: string;
@@ -253,11 +260,11 @@ export async function createCheckoutOrder(
       status: string;
       delivery_type: string;
       delivery_address: string;
-      cdek_pvz_code?: string;
       delivery_cost: number;
       payment_status: string;
       delivery_provider?: string;
-      cdek_city_code?: number;
+      cdek_city_code?: number | null;
+      cdek_pvz_code?: string | null;
     },
     CreatedOrder
   >(client, ordersCollection, {
@@ -269,26 +276,21 @@ export async function createCheckoutOrder(
     status: "pending_payment",
     delivery_type: payload.delivery.type,
     delivery_address: payload.delivery.address,
-    cdek_pvz_code: payload.delivery.cdekPvzCode,
     delivery_cost: payload.delivery.cost,
     payment_status: "pending",
     delivery_provider: deliveryProvider,
-    ...(payload.delivery.cdekCityCode != null
-      ? { cdek_city_code: payload.delivery.cdekCityCode }
-      : {}),
+    ...cdekFields,
   });
 
   const orderId = createdOrder.id;
 
   if (items.length > 0) {
+    const orderRelationId = toDirectusRelationId(orderId);
     const orderItemsPayload = items.map((item) => {
-      const productId =
-        typeof item.product === "number" || /^\d+$/.test(String(item.product))
-          ? item.product
-          : null;
+      const productRef = toDirectusRelationId(item.product);
       return {
-        order: Number(orderId),
-        product: productId,
+        order: orderRelationId,
+        product: productRef,
         product_slug: item.productSlug ?? "",
         product_name: item.productName ?? "",
         size: item.size ?? "",
@@ -308,6 +310,27 @@ export async function createCheckoutOrder(
   }
 
   return { id: orderId };
+}
+
+function buildCdekOrderFields(
+  delivery: CheckoutOrderPayload["delivery"],
+  provider: string
+): { cdek_city_code?: number | null; cdek_pvz_code?: string | null } {
+  if (provider !== "cdek") {
+    return {
+      cdek_city_code: delivery.cdekCityCode ?? null,
+      cdek_pvz_code: delivery.cdekPvzCode ?? null,
+    };
+  }
+
+  const cityCode = delivery.cdekCityCode ?? null;
+  const pvzCode = delivery.cdekPvzCode?.trim() || null;
+
+  if (delivery.type === "courier") {
+    return { cdek_city_code: cityCode, cdek_pvz_code: null };
+  }
+
+  return { cdek_city_code: cityCode, cdek_pvz_code: pvzCode };
 }
 
 /**
@@ -388,13 +411,12 @@ export async function patchOrdersWhere(
   const client = createDirectusClient({ url, token });
   const ordersCollection = process.env.DIRECTUS_ORDERS_NAME ?? "orders";
 
+  // Directus REST: filter/limit in query; body = fields to update only.
+  const query = `${serializeDirectusFilter(filter)}&limit=1`;
   type Res = { data?: DirectusOrderRow | DirectusOrderRow[] };
-  const res = await client.request<Res>(`/items/${ordersCollection}`, {
+  const res = await client.request<Res>(`/items/${ordersCollection}?${query}`, {
     method: "PATCH",
-    body: JSON.stringify({
-      query: { filter, limit: 1 },
-      data,
-    }),
+    body: JSON.stringify(data),
   });
 
   const raw = res.data;
@@ -627,7 +649,7 @@ export async function markCdekShipmentCreated(
     cdekNumber?: string | null;
     trackNumber?: string | null;
     cdekStatus?: string | null;
-    waybillUrl?: string | null;
+    billUrl?: string | null;
     barcodeUrl?: string | null;
   }
 ): Promise<void> {
@@ -636,7 +658,7 @@ export async function markCdekShipmentCreated(
     ...(data.cdekNumber != null ? { cdek_number: data.cdekNumber } : {}),
     ...(data.trackNumber != null ? { track_number: data.trackNumber } : {}),
     ...(data.cdekStatus != null ? { cdek_status: data.cdekStatus } : {}),
-    ...(data.waybillUrl != null ? { cdek_waybill_url: data.waybillUrl } : {}),
+    ...(data.billUrl != null ? { cdek_bill_url: data.billUrl } : {}),
     ...(data.barcodeUrl != null ? { cdek_barcode_url: data.barcodeUrl } : {}),
     shipment_created_at: new Date().toISOString(),
     shipment_error: null,
@@ -728,13 +750,12 @@ export async function getProductPricesById(
   const productsCollection = process.env.DIRECTUS_PRODUCTS_NAME ?? "products";
 
   const uniqueIds = [...new Set(productIds.map(String))];
-  const idsFilter = uniqueIds.join(",");
 
   type PriceRow = { id: string | number; price: number };
   type PriceRes = { data: PriceRow[] };
 
   const res = await client.request<PriceRes>(
-    `/items/${productsCollection}?filter[id][_in]=${encodeURIComponent(idsFilter)}&fields=id,price&limit=${uniqueIds.length}`
+    `/items/${productsCollection}?${filterIdIn(uniqueIds)}&fields=id,price&limit=${uniqueIds.length}`
   );
 
   for (const row of res.data ?? []) {
@@ -742,6 +763,125 @@ export async function getProductPricesById(
   }
 
   return prices;
+}
+
+export type CheckoutProductRow = {
+  id: string | number;
+  slug: string;
+  name: string;
+  price: number;
+  sizes: string[];
+  inStock: boolean;
+};
+
+/**
+ * Batch load products for checkout validation (prices, sizes, inStock).
+ */
+export async function getProductsForCheckout(
+  productIds: (string | number)[]
+): Promise<Map<string, CheckoutProductRow>> {
+  const map = new Map<string, CheckoutProductRow>();
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_TOKEN;
+
+  if (!url || !token || productIds.length === 0) return map;
+
+  const client = createDirectusClient({ url, token });
+  const productsCollection = process.env.DIRECTUS_PRODUCTS_NAME ?? "products";
+  const uniqueIds = [...new Set(productIds.map(String))];
+
+  type Row = {
+    id: string | number;
+    slug?: string;
+    name?: string;
+    price?: unknown;
+    sizes?: unknown;
+    inStock?: unknown;
+  };
+  type Res = { data: Row[] };
+
+  const res = await client.request<Res>(
+    `/items/${productsCollection}?${filterIdIn(uniqueIds)}&fields=id,slug,name,price,sizes,inStock&limit=${uniqueIds.length}`
+  );
+
+  for (const row of res.data ?? []) {
+    const id = String(row.id);
+    const slug = typeof row.slug === "string" ? row.slug : "";
+    const name = typeof row.name === "string" ? row.name : "";
+    const price =
+      typeof row.price === "number"
+        ? row.price
+        : typeof row.price === "string"
+          ? Number(row.price)
+          : 0;
+    map.set(id, {
+      id: row.id,
+      slug,
+      name,
+      price: Number.isFinite(price) ? price : 0,
+      sizes: normalizeProductSizes(row.sizes),
+      inStock: Boolean(row.inStock),
+    });
+  }
+
+  return map;
+}
+
+export type StockLineKey = { productId: string; size: string };
+
+export type StockRow = {
+  productId: string;
+  size: string;
+  quantity: number;
+  rowId: string | number | null;
+};
+
+/**
+ * Load products_sizes quantities for cart lines.
+ */
+export async function getStockByProductAndSize(
+  lines: StockLineKey[]
+): Promise<Map<string, StockRow>> {
+  const result = new Map<string, StockRow>();
+  const url = process.env.DIRECTUS_URL;
+  const token = process.env.DIRECTUS_TOKEN;
+
+  if (!url || !token || lines.length === 0) return result;
+
+  const client = createDirectusClient({ url, token });
+  const collection = process.env.DIRECTUS_PRODUCTS_SIZES_NAME ?? "products_sizes";
+
+  for (const line of lines) {
+    const key = `${line.productId}::${line.size}`;
+    if (result.has(key)) continue;
+
+    type Row = { id: string | number; quantity: number };
+    type Res = { data: Row[] };
+    const productRef = encodeURIComponent(line.productId);
+    const sizeRef = encodeURIComponent(line.size);
+
+    try {
+      const res = await client.request<Res>(
+        `/items/${collection}?filter[product_id][_eq]=${productRef}&filter[size][_eq]=${sizeRef}&fields=id,quantity&limit=1`
+      );
+      const row = res.data?.[0];
+      result.set(key, {
+        productId: line.productId,
+        size: line.size,
+        quantity: row ? Number(row.quantity) || 0 : 0,
+        rowId: row?.id ?? null,
+      });
+    } catch {
+      result.set(key, {
+        productId: line.productId,
+        size: line.size,
+        quantity: 0,
+        rowId: null,
+      });
+    }
+  }
+
+  return result;
 }
 
 const PRODUCTS_SIZES = process.env.DIRECTUS_PRODUCTS_SIZES_NAME ?? "products_sizes";
@@ -788,6 +928,14 @@ export async function decrementStockForOrder(
 
   const client = createDirectusClient({ url, token });
   const items = await getOrderItems(orderId);
+  const usePg = isPgStockEnabled();
+  const failures: string[] = [];
+
+  if (!usePg) {
+    console.warn(
+      `[orders/finalize] DIRECTUS_DATABASE_URL not set — stock decrement uses Directus REST read-modify-write; not atomic across concurrent orders on the same SKU`
+    );
+  }
 
   for (const row of items) {
     const snapshot = await getOrderById(orderId);
@@ -806,28 +954,68 @@ export async function decrementStockForOrder(
     const qty = Math.max(0, Number(row.qty) || 0);
     if (productId == null || !size || qty === 0) continue;
 
+    const pid = String(productId);
+
     try {
+      if (usePg) {
+        const result = await decrementStockLineAtomic({ productId: pid, size, qty });
+        if (!result.ok) {
+          failures.push(`${pid}/${size}: ${result.message}`);
+          console.error(
+            `[orders/finalize] PG stock decrement failed for order ${orderId} ${pid}/${size}: ${result.message}`
+          );
+          continue;
+        }
+        console.log(
+          `[orders/finalize] PG stock decremented order ${orderId} ${pid}/${size} by ${qty}, remaining ${result.remaining}`
+        );
+        continue;
+      }
+
       type StockRow = { id: string | number; quantity: number };
       type StockRes = { data: StockRow[] };
       const listRes = await client.request<StockRes>(
-        `/items/${PRODUCTS_SIZES}?filter[product_id][_eq]=${encodeURIComponent(String(productId))}&filter[size][_eq]=${encodeURIComponent(size)}&fields=id,quantity&limit=1`
+        `/items/${PRODUCTS_SIZES}?filter[product_id][_eq]=${encodeURIComponent(pid)}&filter[size][_eq]=${encodeURIComponent(size)}&fields=id,quantity&limit=1`
       );
       const stockRow = listRes.data?.[0];
       if (!stockRow) {
-        console.warn(`[orders] No products_sizes row for product ${productId} size ${size}, skip decrement`);
+        failures.push(`${pid}/${size}: no products_sizes row`);
+        console.warn(`[orders] No products_sizes row for product ${pid} size ${size}`);
         continue;
       }
-      const newQty = Math.max(0, Number(stockRow.quantity) - qty);
+      const current = Number(stockRow.quantity) || 0;
+      if (current < qty) {
+        failures.push(`${pid}/${size}: insufficient (${current} < ${qty})`);
+        console.error(
+          `[orders/finalize] Insufficient stock for order ${orderId} ${pid}/${size}: have ${current}, need ${qty}`
+        );
+        continue;
+      }
+      const newQty = current - qty;
       await client.request(`/items/${PRODUCTS_SIZES}/${stockRow.id}`, {
         method: "PATCH",
         body: JSON.stringify({ quantity: newQty }),
       });
-      if (process.env.NODE_ENV === "development") {
-        console.log(`[orders] Stock decremented: product ${productId} size ${size} by ${qty}, new quantity ${newQty}`);
-      }
+      console.log(
+        `[orders/finalize] REST stock decremented order ${orderId} ${pid}/${size} by ${qty}, new quantity ${newQty}`
+      );
     } catch (e) {
-      console.error(`[orders] Failed to decrement stock for product ${productId} size ${size}:`, e);
+      const msg = e instanceof Error ? e.message : String(e);
+      failures.push(`${pid}/${size}: ${msg}`);
+      console.error(`[orders] Failed to decrement stock for product ${pid} size ${size}:`, e);
     }
+  }
+
+  if (failures.length > 0) {
+    const errText = failures.join("; ").slice(0, 4000);
+    await tryPatchOptionalOrderFields(orderId, { stock_error: errText });
+    if (lock === "acquired") {
+      await releaseStockDecrementLock(orderId, lockId);
+    }
+    console.error(
+      `[orders/finalize] Stock decrement incomplete for order ${orderId}, not stamping stock_decremented_at`
+    );
+    return;
   }
 
   const stamped = await tryMarkStockDecrementedIfUnset(orderId);
@@ -837,12 +1025,18 @@ export async function decrementStockForOrder(
       console.log(
         `[orders/finalize] stock_decremented_at set by another replica for order ${orderId}, skip duplicate stamp`
       );
+      if (lock === "acquired") {
+        await releaseStockDecrementLock(orderId, lockId);
+      }
       return;
     }
     console.warn(
-      `[orders/finalize] Could not stamp stock_decremented_at for order ${orderId} (Directus filter PATCH?) — falling back to unconditional mark`
+      `[orders/finalize] Could not stamp stock_decremented_at for order ${orderId} via conditional PATCH — another replica may complete; not using unconditional mark`
     );
-    await markStockDecremented(orderId);
+    if (lock === "acquired") {
+      await releaseStockDecrementLock(orderId, lockId);
+    }
+    return;
   }
 
   if (lock === "acquired") {

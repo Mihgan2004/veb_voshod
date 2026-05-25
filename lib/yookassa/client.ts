@@ -2,7 +2,9 @@ import type {
   YooPayment,
   YooCreatePaymentRequest,
   YooAmount,
+  CreatePaymentOptions,
 } from "./types";
+import { buildPaymentReceipt, isYooKassaReceiptEnabled } from "./receipt";
 
 const YOOKASSA_API_URL = "https://api.yookassa.ru/v3";
 
@@ -35,19 +37,23 @@ function getAuthHeader(): string {
   return `Basic ${credentials}`;
 }
 
-function generateIdempotencyKey(): string {
-  return crypto.randomUUID();
+export function paymentIdempotenceKey(orderId: string | number): string {
+  return `order-${orderId}-payment-v1`;
 }
 
 export async function createPayment(
   amount: number,
   description: string,
   returnUrl: string,
-  metadata?: Record<string, string>
+  options: CreatePaymentOptions
 ): Promise<YooPayment> {
   const amountData: YooAmount = {
     value: amount.toFixed(2),
     currency: "RUB",
+  };
+
+  const metadata: Record<string, string> = {
+    orderId: String(options.orderId),
   };
 
   const payload: YooCreatePaymentRequest = {
@@ -61,12 +67,26 @@ export async function createPayment(
     metadata,
   };
 
+  if (isYooKassaReceiptEnabled()) {
+    if (!options.receipt) {
+      throw new Error(
+        "[yookassa] YOOKASSA_RECEIPT_ENABLED=true but receipt was not provided"
+      );
+    }
+    payload.receipt = options.receipt;
+  } else if (options.receipt) {
+    payload.receipt = options.receipt;
+  }
+
+  const idempotenceKey =
+    options.idempotenceKey ?? paymentIdempotenceKey(options.orderId);
+
   const response = await fetch(`${YOOKASSA_API_URL}/payments`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: getAuthHeader(),
-      "Idempotence-Key": generateIdempotencyKey(),
+      "Idempotence-Key": idempotenceKey,
     },
     body: JSON.stringify(payload),
     cache: "no-store",
@@ -81,6 +101,8 @@ export async function createPayment(
 
   return (await response.json()) as YooPayment;
 }
+
+export { buildPaymentReceipt, isYooKassaReceiptEnabled };
 
 export async function getPayment(paymentId: string): Promise<YooPayment> {
   const response = await fetch(`${YOOKASSA_API_URL}/payments/${paymentId}`, {
@@ -138,6 +160,13 @@ export function verifyWebhookIp(ip: string): boolean {
     if (cidr.includes(":")) return false;
     return isIpInCidr(ip, cidr);
   });
+}
+
+export function isWebhookIpAllowlistEnabled(): boolean {
+  const flag = process.env.YOOKASSA_WEBHOOK_IP_ALLOWLIST_ENABLED;
+  if (flag === "false") return false;
+  if (flag === "true") return true;
+  return process.env.NODE_ENV === "production";
 }
 
 export function isPaymentSucceeded(payment: YooPayment): boolean {
