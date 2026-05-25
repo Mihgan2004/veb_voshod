@@ -5,7 +5,7 @@ import { Phrase } from "./Phrase";
 import styles from "./text-parallax-section.module.css";
 
 type SlideProps = {
-  src: string;
+  src?: string;
   label: string;
   accent?: string;
   iconVariant?: "square" | "tall";

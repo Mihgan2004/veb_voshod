@@ -1,5 +1,5 @@
 export type TextParallaxSlide = {
-  src: string;
+  src?: string;
   label: string;
   accent?: string;
   direction: "left" | "right";
@@ -23,9 +23,7 @@ export const TEXT_PARALLAX_SLIDES: readonly TextParallaxSlide[] = [
     iconVariant: "tall",
   },
   {
-    src: `/text-parallax/icons/solnechnogorsk.png?v=${ICON_VERSION}`,
-    label: "СОЛНЕЧНОГОРСК",
+    label: "МОСКВА",
     direction: "left",
-    iconVariant: "square",
   },
 ] as const;

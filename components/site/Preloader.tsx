@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { LogoDraw } from "@/components/brand/LogoDraw";
 import { ASSETS } from "@/lib/assets";
+import { BRAND_NAME } from "@/lib/brand";
 import { useLiteMode } from "@/lib/useLiteMode";
 
 const MIN_DURATION_MS = 2800;
@@ -85,7 +86,8 @@ export function Preloader() {
         {liteMode ? (
           <Image
             src={ASSETS.brand.logoDesktop}
-            alt="VOSKHOD"
+            alt={BRAND_NAME}
+            suppressHydrationWarning
             width={280}
             height={80}
             className="w-[140px] md:w-[180px] h-auto object-contain"

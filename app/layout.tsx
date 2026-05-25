@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ВОСХОД",
-  description: "ВОСХОД — тактикул мерч",
+  title: "РАССВЕТ",
+  description: "РАССВЕТ — тактикул мерч",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

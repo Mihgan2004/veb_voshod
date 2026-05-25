@@ -1,7 +1,7 @@
 import styles from "./text-parallax-section.module.css";
 
 type PhraseProps = {
-  src: string;
+  src?: string;
   label: string;
   accent?: string;
   iconVariant?: "square" | "tall";
@@ -36,10 +36,12 @@ export function Phrase({ src, label, accent, iconVariant = "square" }: PhrasePro
   return (
     <div className={styles.phrase}>
       <PhraseText label={label} accent={accent} />
-      <span className={iconClassName}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- прозрачные иконки без оптимизации Next */}
-        <img src={src} alt="" className={styles.icon} decoding="async" draggable={false} />
-      </span>
+      {src ? (
+        <span className={iconClassName}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- прозрачные иконки без оптимизации Next */}
+          <img src={src} alt="" className={styles.icon} decoding="async" draggable={false} />
+        </span>
+      ) : null}
     </div>
   );
 }

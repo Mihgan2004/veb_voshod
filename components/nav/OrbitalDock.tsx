@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart/cart-store";
 import { ASSETS } from "@/lib/assets";
+import { BRAND_NAME } from "@/lib/brand";
 
 const NAV_LINKS = [
   { href: "/collections", label: "КОЛЛЕКЦИИ" },
@@ -88,7 +89,8 @@ export const OrbitalDock: React.FC = () => {
             <Link href="/" className="shrink-0 flex items-center pl-0.5">
               <Image
                 src={ASSETS.header.logo}
-                alt="VOSKHOD"
+                alt={BRAND_NAME}
+                suppressHydrationWarning
                 width={59}
                 height={32}
                 sizes="59px"

@@ -7,7 +7,7 @@ const russoOne = Russo_One({
   variable: "--font-marquee",
 });
 
-const MARQUEE_TEXT = "ВОСХОД х ОТКРЫТИЕ";
+const MARQUEE_TEXT = "РАССВЕТ х ОТКРЫТИЕ";
 
 export function MarqueeStrip() {
   const repeated = Array(20).fill(MARQUEE_TEXT).join("  •  ");

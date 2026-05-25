@@ -37,7 +37,7 @@ export const products: Product[] = [
   {
     id: "p-tee-001",
     slug: "tee-voshod-black",
-    name: "Футболка ВОСХОД Black",
+    name: "Футболка РАССВЕТ Black",
     category: "tee",
     price: 6900,
     description: "Плотный хлопок, минималистичный крой. Классическая посадка, усиленные швы.",
@@ -63,7 +63,7 @@ export const products: Product[] = [
   {
     id: "p-patch-001",
     slug: "patch-voshod-ember",
-    name: "Патч ВОСХОД EMBER",
+    name: "Патч РАССВЕТ EMBER",
     category: "patch",
     price: 1900,
     description: "ПВХ патч на липучке. Универсальное крепление.",
@@ -82,7 +82,7 @@ export const products: Product[] = [
   {
     id: "p-cap-001",
     slug: "cap-voshod-graphite",
-    name: "Кепка ВОСХОД Graphite",
+    name: "Кепка РАССВЕТ Graphite",
     category: "cap",
     price: 4900,
     description: "Лаконичная кепка с вышивкой.",

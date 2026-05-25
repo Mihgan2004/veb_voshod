@@ -1,4 +1,4 @@
-# Directus + PostgreSQL для VOSKHOD
+# Directus + PostgreSQL для РАССВЕТ
 # Запуск: cd deploy/directus && docker compose up -d
 
 services:

@@ -132,7 +132,7 @@ export function WelcomeBlockDesktop() {
           >
             <Image
               src={ASSETS.brand.logoDesktop}
-              alt="Проект Восход"
+              alt="Проект Рассвет"
               width={640}
               height={184}
               sizes="(max-width: 640px) 260px, (max-width: 1024px) 360px, 640px"

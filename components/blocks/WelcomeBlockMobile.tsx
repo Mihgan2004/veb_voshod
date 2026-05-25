@@ -82,7 +82,7 @@ export function WelcomeBlockMobile() {
             )}
             <Image
               src={ASSETS.brand.logoDesktop}
-              alt="Проект Восход"
+              alt="Проект Рассвет"
               width={640}
               height={184}
               sizes="(max-width: 640px) 260px, 360px"

@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export function LogoDraw({
   className = "",
   stroke = "#FFFFFF",
@@ -20,7 +22,8 @@ export function LogoDraw({
     <svg
       className={`vx-logo-draw ${isGold ? "vx-logo-gold" : ""} ${hideFrame ? "vx-logo-no-frame" : ""} ${className}`}
       viewBox="0 0 2500 2500"
-      aria-label="ВОСХОД"
+      aria-label={BRAND_NAME}
+      suppressHydrationWarning
       role="img"
     >
       {isGold && (

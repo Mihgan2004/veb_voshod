@@ -1,86 +1,16 @@
-import Link from "next/link";
+import { LegalDocumentLayout } from "@/components/legal/LegalDocumentLayout";
+import { LegalParagraphs } from "@/components/legal/LegalParagraphs";
+import { OFFER_PARAGRAPHS } from "@/lib/legal/offer-paragraphs";
+import { SELLER } from "@/lib/legal/seller";
 
 export const metadata = {
-  title: "Оферта — VOSKHOD",
+  title: "Оферта — РАССВЕТ",
 };
 
 export default function OfferPage() {
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6">
-      <div className="max-w-3xl mx-auto">
-        <Link
-          href="/"
-          className="text-[11px] font-mono uppercase tracking-widest text-white/40 hover:text-white/70 transition-colors"
-        >
-          ← На главную
-        </Link>
-
-        <h1 className="mt-6 text-[24px] sm:text-[32px] font-semibold tracking-[-0.02em] text-white">
-          Публичная оферта
-        </h1>
-
-        <div className="mt-8 space-y-6 text-[14px] sm:text-[15px] leading-relaxed text-white/60">
-          <section>
-            <h2 className="text-[16px] font-semibold text-white/80 mb-3">1. Общие положения</h2>
-            <p>
-              Настоящий документ является официальным предложением (публичной офертой) интернет-магазина VOSKHOD
-              (далее — «Продавец») и содержит все существенные условия продажи товаров дистанционным способом.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[16px] font-semibold text-white/80 mb-3">2. Предмет оферты</h2>
-            <p>
-              Продавец обязуется передать в собственность Покупателю товар, а Покупатель обязуется оплатить
-              и принять товар на условиях настоящей оферты. Наименование, количество, цена товара определяются
-              на основании сведений, предоставленных Покупателем при оформлении заказа.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[16px] font-semibold text-white/80 mb-3">3. Момент заключения договора</h2>
-            <p>
-              Договор считается заключённым с момента оплаты заказа Покупателем. Акцептом оферты является
-              оплата заказа в порядке и на условиях, предусмотренных настоящей офертой.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[16px] font-semibold text-white/80 mb-3">4. Цена товара и оплата</h2>
-            <p>
-              Цены на товары указаны в российских рублях и включают все применимые налоги. Оплата производится
-              безналичным способом через платёжный сервис ЮKassa. Продавец оставляет за собой право изменять
-              цены на товары в одностороннем порядке до момента оплаты заказа.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[16px] font-semibold text-white/80 mb-3">5. Возврат и обмен</h2>
-            <p>
-              Покупатель вправе отказаться от товара надлежащего качества в течение 14 дней с момента получения.
-              Возврат товара осуществляется при условии сохранения товарного вида, потребительских свойств,
-              а также оригинальной упаковки и бирок.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[16px] font-semibold text-white/80 mb-3">6. Контакты</h2>
-            <p>
-              По всем вопросам, связанным с исполнением настоящей оферты, Покупатель может обратиться
-              по электронной почте tratonis2004@mail.ru, телефону 8 920 576-04-39 или через{" "}
-              <a href="https://t.me/moderatorBOCXOD" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-gold underline underline-offset-2 transition-colors">Telegram</a>.
-              Полные контактные данные и реквизиты указаны на странице{" "}
-              <Link href="/legal/contacts" className="text-white/80 hover:text-gold underline underline-offset-2 transition-colors">
-                Контакты и реквизиты
-              </Link>.
-            </p>
-          </section>
-
-          <p className="text-[12px] text-white/30 pt-4 border-t border-white/[0.06]">
-            Дата публикации: 01.01.2026. Действующая редакция.
-          </p>
-        </div>
-      </div>
-    </div>
+    <LegalDocumentLayout title="Публичная оферта" publishedAt={SELLER.legalPublishedAt}>
+      <LegalParagraphs paragraphs={OFFER_PARAGRAPHS} skipTitle />
+    </LegalDocumentLayout>
   );
 }

@@ -3,7 +3,12 @@ import type { Collection } from "./types";
 /**
  * Статичный список коллекций — без Directus.
  * Источник правды для витрины коллекций.
+ *
+ * После замены файлов в public/HighlightsCollections/ увеличь COVER_VERSION,
+ * иначе next/image и браузер могут показывать старые обложки.
  */
+const COVER_VERSION = "2";
+
 export const STATIC_COLLECTIONS: Collection[] = [
   {
     id: "col-1",
@@ -11,7 +16,7 @@ export const STATIC_COLLECTIONS: Collection[] = [
     name: "Солнце поможет нам",
     tag: "DROP",
     label: "Коллекция №1",
-    coverImage: "/HighlightsCollections/1.avif",
+    coverImage: `/HighlightsCollections/1.avif?v=${COVER_VERSION}`,
     isFeatured: true,
     sort: 1,
   },
@@ -21,7 +26,7 @@ export const STATIC_COLLECTIONS: Collection[] = [
     name: "Веруй.",
     tag: "DROP",
     label: "Коллекция №2",
-    coverImage: "/HighlightsCollections/2.avif",
+    coverImage: `/HighlightsCollections/2.avif?v=${COVER_VERSION}`,
     isFeatured: true,
     sort: 2,
   },
@@ -31,7 +36,7 @@ export const STATIC_COLLECTIONS: Collection[] = [
     name: "Из под земли",
     tag: "DROP",
     label: "Коллекция №3",
-    coverImage: "/HighlightsCollections/3.avif",
+    coverImage: `/HighlightsCollections/3.avif?v=${COVER_VERSION}`,
     isFeatured: true,
     sort: 3,
   },

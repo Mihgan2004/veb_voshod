@@ -1,4 +1,4 @@
-# Деплой VOSKHOD: пошаговая инструкция (от root на сервере)
+# Деплой РАССВЕТ: пошаговая инструкция (от root на сервере)
 
 Ты на сервере `ubuntu@ubuntu-std2-2-8-40gb`, залогинен как root. Ниже — команды по порядку.
 
@@ -74,14 +74,14 @@ cd voshod-web
 
 ```powershell
 # Через SCP (замени IP на IP твоего сервера, путь к ключу — твой)
-scp -i "C:\Users\alant\Downloads\kwvpz493.pem" -r "\\wsl.localhost\Ubuntu\home\alantrei\projects\voshod-web" ubuntu@94.20.229.240:/home/ubuntu/voshod/
+scp -i "C:\Users\alant\Downloads\kwvpz493.pem" -r "\\wsl.localhost\Ubuntu\home\alantrei\projects\veb_voshod" ubuntu@94.20.229.240:/home/ubuntu/voshod/
 ```
 
 Или через rsync (в WSL):
 
 ```bash
 rsync -avz -e "ssh -i /mnt/c/Users/alant/Downloads/kwvpz493.pem" \
-  /home/alantrei/projects/voshod-web/ \
+  /home/alantrei/projects/veb_voshod/ \
   ubuntu@94.20.229.240:/home/ubuntu/voshod/voshod-web/
 ```
 

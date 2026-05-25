@@ -1,25 +1,14 @@
-import Link from "next/link";
+import { LegalDocumentLayout } from "@/components/legal/LegalDocumentLayout";
+import { SELLER } from "@/lib/legal/seller";
 
 export const metadata = {
-  title: "Доставка — VOSKHOD",
+  title: "Доставка — РАССВЕТ",
 };
 
 export default function ShippingPage() {
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6">
-      <div className="max-w-3xl mx-auto">
-        <Link
-          href="/"
-          className="text-[11px] font-mono uppercase tracking-widest text-white/40 hover:text-white/70 transition-colors"
-        >
-          ← На главную
-        </Link>
-
-        <h1 className="mt-6 text-[24px] sm:text-[32px] font-semibold tracking-[-0.02em] text-white">
-          Условия доставки
-        </h1>
-
-        <div className="mt-8 space-y-6 text-[14px] sm:text-[15px] leading-relaxed text-white/60">
+    <LegalDocumentLayout title="Условия доставки" publishedAt={SELLER.legalPublishedAt}>
+        <div className="space-y-6 text-[14px] sm:text-[15px] leading-relaxed text-white/60">
           <section>
             <h2 className="text-[16px] font-semibold text-white/80 mb-3">Способы доставки</h2>
             <p>
@@ -57,11 +46,7 @@ export default function ShippingPage() {
             </p>
           </section>
 
-          <p className="text-[12px] text-white/30 pt-4 border-t border-white/[0.06]">
-            Дата публикации: 01.01.2026. Действующая редакция.
-          </p>
         </div>
-      </div>
-    </div>
+    </LegalDocumentLayout>
   );
 }

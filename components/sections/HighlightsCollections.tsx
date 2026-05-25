@@ -1,12 +1,12 @@
 "use client";
 
 import type { Collection } from "@/lib/catalog";
-import { CollectionMaskSection } from "@/components/sections/CollectionMaskSection/CollectionMaskSection";
+import { PerspectiveSectionTransition } from "@/components/sections/PerspectiveSectionTransition/PerspectiveSectionTransition";
 
 export function HighlightsCollections({
   collections,
 }: {
   collections: Collection[];
 }) {
-  return <CollectionMaskSection collections={collections} />;
+  return <PerspectiveSectionTransition collections={collections} />;
 }

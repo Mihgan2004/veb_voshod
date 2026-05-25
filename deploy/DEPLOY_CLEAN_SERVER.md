@@ -111,7 +111,7 @@ cd voshod-web
 
 ```bash
 rsync -avz -e "ssh -i /mnt/c/Users/alant/Downloads/ТВОЙ_КЛЮЧ.pem" \
-  /home/alantrei/projects/voshod-web/ \
+  /home/alantrei/projects/veb_voshod/ \
   ubuntu@146.185.210.216:/home/ubuntu/voshod/voshod-web/
 ```
 
@@ -176,7 +176,7 @@ cd /home/ubuntu/voshod/voshod-web
 npm ci
 cp .env.example .env.local
 
-cd /home/alantrei/projects/voshod-web && node scripts/svg-to-logo.js
+cd /home/alantrei/projects/veb_voshod && node scripts/svg-to-logo.js
 ```
 
 Заполни:
@@ -332,7 +332,7 @@ pm2 start ecosystem.config.cjs
 ```bash
 rsync -avz --exclude 'node_modules' --exclude '.next' --exclude '.env.local' --exclude '.git' \
   -e "ssh -i /mnt/c/Users/alant/Downloads/ТВОЙ_КЛЮЧ.pem" \
-  /home/alantrei/projects/voshod-web/ \
+  /home/alantrei/projects/veb_voshod/ \
   ubuntu@146.185.210.216:/home/ubuntu/voshod/voshod-web/
 ```
 

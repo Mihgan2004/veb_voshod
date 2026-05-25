@@ -39,7 +39,7 @@ export function LogoDraw({
     <svg
       className={\`vx-logo-draw \${className}\`}
       viewBox="0 0 2500 2500"
-      aria-label="ВОСХОД"
+      aria-label="РАССВЕТ"
       role="img"
     >
       <g>
