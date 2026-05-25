@@ -18,7 +18,7 @@ export function MarqueeStrip() {
         relative w-full overflow-hidden
         py-2.5 sm:py-3 lg:py-3.5
         border-y border-white/[0.04] lg:border-white/[0.05]
-        bg-[#07090c]
+        bg-[var(--vx-bg-section)]
         ${russoOne.variable}
       `}
     >

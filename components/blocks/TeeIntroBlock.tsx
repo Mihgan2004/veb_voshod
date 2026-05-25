@@ -300,9 +300,9 @@ export const TeeIntroBlock: React.FC = () => {
           style={{ opacity: backdropFade }}
           aria-hidden
         >
-          <div className="absolute inset-0 bg-[#0B0D10]" />
+          <div className="absolute inset-0 bg-[var(--vx-bg-base)]" />
           <div
-            className="hidden md:block absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-b from-transparent to-[#07090c] pointer-events-none"
+            className="hidden md:block absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-b from-transparent to-[var(--vx-bg-section)] pointer-events-none"
             aria-hidden
           />
           <div
@@ -315,7 +315,7 @@ export const TeeIntroBlock: React.FC = () => {
           <div className="absolute inset-x-0 top-0 h-[32%] bg-gradient-to-b from-black/25 to-transparent md:h-[22%] md:from-black/15" />
           <div className="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-black/40 to-transparent md:h-[32%] md:from-black/30" />
           <div
-            className="absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.04)_0%,rgba(0,0,0,0.55)_82%)]"
+            className="absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.04)_0%,rgba(0,0,0,0.35)_82%)]"
             aria-hidden
           />
           <div
@@ -356,9 +356,9 @@ export const TeeIntroBlock: React.FC = () => {
                   className="pointer-events-none absolute inset-0 z-0"
                   style={{
                     background: `
-                      radial-gradient(ellipse 130% 100% at 50% 44%, rgba(0,0,0,0) 12%, rgba(0,0,0,0.48) 50%, rgba(11,13,16,0.92) 100%),
-                      linear-gradient(90deg, #0b0d10 0%, rgba(11,13,16,0.92) 14%, rgba(11,13,16,0.5) 30%, transparent 54%),
-                      linear-gradient(to top, rgba(11,13,16,0.55) 0%, transparent 36%)`,
+                      radial-gradient(ellipse 120% 95% at 50% 42%, transparent 35%, rgba(0,0,0,0.35) 100%),
+                      linear-gradient(to top, transparent 55%, rgba(5,6,7,0.38) 100%)`,
+                    opacity: 0.38,
                   }}
                   aria-hidden
                 />
@@ -371,22 +371,12 @@ export const TeeIntroBlock: React.FC = () => {
                       transformOrigin: `${MOBILE_TEE.originX}% ${MOBILE_TEE.originY}%`,
                     }}
                   >
-                    <div
-                      className="pointer-events-none absolute -inset-[18%] z-0"
-                      style={{
-                        background: `
-                          radial-gradient(ellipse 98% 88% at 50% 36%, rgba(0,0,0,0) 18%, rgba(0,0,0,0.55) 58%, rgba(11,13,16,0.96) 100%),
-                          linear-gradient(90deg, rgba(11,13,16,0.85) 0%, rgba(11,13,16,0.35) 35%, transparent 58%),
-                          linear-gradient(to bottom, rgba(11,13,16,0) 40%, rgba(11,13,16,0.72) 100%)`,
-                      }}
-                      aria-hidden
-                    />
                     <img
                       src={ASSETS.tee.cutout}
                       alt=""
                       width={512}
                       height={768}
-                      className={`block ${TEE_INTRO.mobile.teeMaxWidth} w-auto object-contain drop-shadow-[0_32px_64px_rgba(0,0,0,0.6)]`}
+                      className={`block ${TEE_INTRO.mobile.teeMaxWidth} w-auto object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)]`}
                       style={{
                         height: `min(${MOBILE_TEE.heightVh}vh, ${MOBILE_TEE.heightMaxPx}px)`,
                         maxHeight: `${MOBILE_TEE.heightMaxPx}px`,
@@ -399,12 +389,10 @@ export const TeeIntroBlock: React.FC = () => {
                       style={{
                         ...TEE_CUTOUT_MASK(ASSETS.tee.cutout),
                         background: `
-                          radial-gradient(ellipse 76% 74% at 50% 20%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.38) 40%, rgba(0,0,0,0.78) 92%),
-                          linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 32%, transparent 52%),
-                          linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.32) 42%, rgba(0,0,0,0.85) 100%),
-                          radial-gradient(ellipse 125% 92% at 50% 48%, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.52) 100%)`,
-                        mixBlendMode: 'multiply',
-                        opacity: 0.97,
+                          radial-gradient(ellipse 76% 74% at 50% 20%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.22) 42%, rgba(0,0,0,0.48) 92%),
+                          linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.18) 48%, rgba(5,6,7,0.42) 100%)`,
+                        mixBlendMode: 'soft-light',
+                        opacity: 0.42,
                       }}
                       aria-hidden
                     />
@@ -415,7 +403,7 @@ export const TeeIntroBlock: React.FC = () => {
                         background:
                           'radial-gradient(ellipse 62% 48% at 70% 22%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 35%, rgba(255,255,255,0) 70%)',
                         mixBlendMode: 'screen',
-                        opacity: 0.22,
+                        opacity: 0.18,
                       }}
                       aria-hidden
                     />
@@ -451,9 +439,9 @@ export const TeeIntroBlock: React.FC = () => {
                     className="pointer-events-none absolute inset-0 z-0"
                     style={{
                       background: `
-                        radial-gradient(ellipse 90% 80% at 40% 38%, rgba(0,0,0,0) 14%, rgba(0,0,0,0.52) 54%, rgba(11,13,16,0.94) 100%),
-                        linear-gradient(100deg, #0b0d10 0%, rgba(11,13,16,0.95) 16%, rgba(11,13,16,0.55) 34%, transparent 58%),
-                        linear-gradient(to bottom, rgba(11,13,16,0) 38%, rgba(11,13,16,0.65) 100%)`,
+                        radial-gradient(ellipse 120% 95% at 40% 38%, transparent 35%, rgba(0,0,0,0.35) 100%),
+                        linear-gradient(to top, transparent 55%, rgba(5,6,7,0.38) 100%)`,
+                      opacity: 0.4,
                     }}
                     aria-hidden
                   />
@@ -474,7 +462,7 @@ export const TeeIntroBlock: React.FC = () => {
               <div className="col-span-12 md:col-span-8 flex flex-col justify-center items-center md:items-start md:mt-0 relative">
                 <div
                   className="absolute inset-y-0 left-0 w-56 lg:w-72 hidden md:block pointer-events-none"
-                  style={{ background: 'linear-gradient(to right, rgba(11,13,16,0.92) 0%, rgba(11,13,16,0.3) 60%, transparent 100%)' }}
+                  style={{ background: 'linear-gradient(to right, rgba(5,6,7,0.72) 0%, rgba(5,6,7,0.22) 60%, transparent 100%)' }}
                   aria-hidden
                 />
 

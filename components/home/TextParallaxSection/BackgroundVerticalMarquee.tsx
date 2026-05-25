@@ -23,7 +23,7 @@ function BackgroundArt() {
 
 /** Вертикальный аналог Slide: три копии + смещение по скроллу, как текст по горизонтали. */
 export function BackgroundVerticalMarquee({ progress }: BackgroundVerticalMarqueeProps) {
-  const y = useTransform(progress, [0, 1], [-150, 150]);
+  const y = useTransform(progress, [0, 1], [-300, 300]);
 
   return (
     <div className={styles.backgroundViewport} aria-hidden>

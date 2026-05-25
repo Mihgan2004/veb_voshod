@@ -14,7 +14,7 @@ export const revalidate = 300;
 
 function HomeScrollFallback() {
   return (
-    <div className="relative w-full border-t border-white/5 min-h-[100vh] bg-[#0B0D10]" aria-hidden />
+    <div className="relative w-full border-t border-white/5 min-h-[100vh] bg-[var(--vx-bg-base)]" aria-hidden />
   );
 }
 

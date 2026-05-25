@@ -66,7 +66,7 @@ function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[100dvh] h-[100dvh] overflow-hidden mb-0 bg-[#0B0D10]"
+      className="relative min-h-[100dvh] h-[100dvh] overflow-hidden mb-0 bg-[var(--vx-bg-base)]"
     >
       {!videoError && (
         <>
@@ -112,8 +112,8 @@ function Hero() {
       )}
 
       {videoError && (
-        <div className="absolute inset-0 z-0 bg-[#0B0D10]">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#141821] via-[#0B0D10] to-[#0B0D10] opacity-90" />
+        <div className="absolute inset-0 z-0 bg-[var(--vx-bg-base)]">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#141821] via-[var(--vx-bg-elevated)] to-[var(--vx-bg-base)] opacity-90" />
         </div>
       )}
 

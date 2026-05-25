@@ -1,7 +1,13 @@
 .section {
   position: relative;
-  height: 300vh;
-  background: #050607;
+  height: 190svh;
+  background: var(--vx-bg-base, #050607);
+}
+
+@media (min-width: 769px) {
+  .section {
+    height: 220svh;
+  }
 }
 
 .sticky {
@@ -10,7 +16,7 @@
   height: 100vh;
   height: 100svh;
   overflow: hidden;
-  background: #050607;
+  background: var(--vx-bg-base, #050607);
 }
 
 .canvas {

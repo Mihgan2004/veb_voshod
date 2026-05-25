@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   min-height: 220vh;
-  background: transparent;
+  background: var(--vx-bg-base, #050607);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -322,7 +322,7 @@
   display: grid;
   place-items: center;
   padding: 4rem 1.25rem 5rem;
-  background: transparent;
+  background: var(--vx-bg-base, #050607);
 }
 
 @media (max-width: 767px) {
