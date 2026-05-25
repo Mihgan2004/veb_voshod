@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { useLenisRef } from "@/components/providers/LenisContext";
 
 function clamp01(value: number) {
@@ -8,31 +8,56 @@ function clamp01(value: number) {
 }
 
 export type SceneSlugPair = {
-  topSlug: string;
-  bottomSlug: string;
+  currentSlug: string;
+  nextSlug: string;
+};
+
+export type ActiveSceneChange = {
+  slug: string;
+  sceneIndex: number;
 };
 
 type UsePerspectiveScenesProgressArgs = {
-  sceneRefs: RefObject<(HTMLDivElement | null)[]>;
+  sceneRefs: RefObject<(HTMLElement | null)[]>;
   scenes: SceneSlugPair[];
-  onActiveSlugChange: (slug: string) => void;
-  activeSlugRef: RefObject<string>;
+  onActiveChange: (payload: ActiveSceneChange) => void;
 };
 
 export function usePerspectiveScenesProgress({
   sceneRefs,
   scenes,
-  onActiveSlugChange,
-  activeSlugRef,
+  onActiveChange,
 }: UsePerspectiveScenesProgressArgs) {
   const lenisRef = useLenisRef();
+  const lastSlugRef = useRef("");
+  const lastSceneIndexRef = useRef(-1);
+  const onActiveChangeRef = useRef(onActiveChange);
+
+  useEffect(() => {
+    onActiveChangeRef.current = onActiveChange;
+  }, [onActiveChange]);
 
   useEffect(() => {
     if (scenes.length === 0) return;
 
+    lastSlugRef.current = "";
+    lastSceneIndexRef.current = -1;
+
     let raf = 0;
     let lenisCleanup: (() => void) | undefined;
     let retryId: number | undefined;
+
+    const emitIfChanged = (slug: string, sceneIndex: number) => {
+      if (
+        slug === lastSlugRef.current &&
+        sceneIndex === lastSceneIndexRef.current
+      ) {
+        return;
+      }
+      lastSlugRef.current = slug;
+      lastSceneIndexRef.current = sceneIndex;
+      onActiveChangeRef.current({ slug, sceneIndex });
+    };
 
     const calc = () => {
       const nodes = sceneRefs.current;
@@ -55,7 +80,7 @@ export function usePerspectiveScenesProgress({
         const rect = scene.getBoundingClientRect();
         if (rect.bottom < 0 || rect.top > vh) continue;
 
-        const scrollable = scene.offsetHeight - vh;
+        const scrollable = rect.height - vh;
         const progress =
           scrollable <= 0 ? 0 : clamp01(-rect.top / scrollable);
 
@@ -71,11 +96,9 @@ export function usePerspectiveScenesProgress({
       }
 
       if (bestIndex >= 0) {
-        const { topSlug, bottomSlug } = scenes[bestIndex];
-        const nextSlug = bestProgress < 0.5 ? topSlug : bottomSlug;
-        if (nextSlug && nextSlug !== activeSlugRef.current) {
-          onActiveSlugChange(nextSlug);
-        }
+        const { currentSlug, nextSlug } = scenes[bestIndex];
+        const slug = bestProgress < 0.55 ? currentSlug : nextSlug;
+        emitIfChanged(slug, bestIndex);
       }
 
       raf = 0;
@@ -115,5 +138,5 @@ export function usePerspectiveScenesProgress({
       lenisCleanup?.();
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [sceneRefs, scenes, onActiveSlugChange, activeSlugRef, lenisRef]);
+  }, [sceneRefs, scenes, lenisRef]);
 }

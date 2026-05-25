@@ -9,6 +9,8 @@ type CollectionSwipeHintProps = {
   slug: string;
   visible?: boolean;
   onNavigate?: () => void;
+  /** Hint wrap is provided by parent (stage / static slide). */
+  unwrapped?: boolean;
 };
 
 export function CollectionSwipeHint({
@@ -16,6 +18,7 @@ export function CollectionSwipeHint({
   slug,
   visible = true,
   onNavigate,
+  unwrapped = false,
 }: CollectionSwipeHintProps) {
   const router = useRouter();
 
@@ -27,16 +30,18 @@ export function CollectionSwipeHint({
 
   if (!visible || activeSlug !== slug) return null;
 
-  return (
-    <div className={styles.swipeHintWrap}>
-      <button
-        type="button"
-        className={styles.swipeHint}
-        onClick={navigate}
-        aria-label="Перейти в коллекцию"
-      >
-        смахните вправо, чтобы перейти в коллекцию
-      </button>
-    </div>
+  const button = (
+    <button
+      type="button"
+      className={styles.swipeHint}
+      onClick={navigate}
+      aria-label="Перейти в коллекцию"
+    >
+      смахните вправо, чтобы перейти в коллекцию
+    </button>
   );
+
+  if (unwrapped) return button;
+
+  return <div className={styles.swipeHintWrap}>{button}</div>;
 }

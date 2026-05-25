@@ -72,7 +72,9 @@ function StaticSlide({ slug, image, name }: { slug: string; image: string; name:
         sizes={IMAGE_SIZES}
         className={styles.image}
       />
-      <CollectionSwipeHint activeSlug={slug} slug={slug} />
+      <div className={styles.swipeHintWrap}>
+        <CollectionSwipeHint activeSlug={slug} slug={slug} unwrapped />
+      </div>
     </div>
   );
 }
@@ -85,7 +87,7 @@ function StaticFallback({
   isMobile: boolean;
 }) {
   return (
-    <section className={styles.wrapper} aria-label="Коллекции">
+    <section className={styles.staticFallback} aria-label="Коллекции">
       {collections.map((col) => (
         <StaticSlide
           key={col.id}
@@ -104,11 +106,11 @@ export function PerspectiveSectionTransition({
   collections: Collection[];
 }) {
   const wrapperRef = useRef<HTMLElement>(null);
-  const sceneRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const activeSlugRef = useRef(collections[0]?.slug ?? "");
+  const sceneRefs = useRef<(HTMLElement | null)[]>([]);
   const router = useRouter();
 
   const [activeSlug, setActiveSlug] = useState(collections[0]?.slug ?? "");
+  const [activeSceneIndex, setActiveSceneIndex] = useState(0);
   const [sectionInView, setSectionInView] = useState(false);
 
   const reducedMotion = useSyncExternalStore(
@@ -120,9 +122,9 @@ export function PerspectiveSectionTransition({
   const isMobile = useSyncExternalStore(subscribeMobile, getMobile, getMobileServer);
 
   const scenePairs = useMemo((): SceneSlugPair[] => {
-    return collections.slice(0, -1).map((top, index) => {
-      const bottom = collections[index + 1];
-      return { topSlug: top.slug, bottomSlug: bottom.slug };
+    return collections.slice(0, -1).map((current, index) => {
+      const next = collections[index + 1];
+      return { currentSlug: current.slug, nextSlug: next.slug };
     });
   }, [collections]);
 
@@ -130,21 +132,24 @@ export function PerspectiveSectionTransition({
     sceneRefs.current = new Array(scenePairs.length).fill(null);
   }, [scenePairs.length]);
 
-  const handleActiveSlugChange = useCallback((slug: string) => {
-    activeSlugRef.current = slug;
-    setActiveSlug(slug);
-  }, []);
+  const handleActiveChange = useCallback(
+    ({ slug, sceneIndex }: { slug: string; sceneIndex: number }) => {
+      setActiveSlug((prev) => (prev === slug ? prev : slug));
+      setActiveSceneIndex((prev) => (prev === sceneIndex ? prev : sceneIndex));
+    },
+    [],
+  );
 
   usePerspectiveScenesProgress({
     sceneRefs,
     scenes: scenePairs,
-    onActiveSlugChange: handleActiveSlugChange,
-    activeSlugRef,
+    onActiveChange: handleActiveChange,
   });
 
   useEffect(() => {
-    activeSlugRef.current = collections[0]?.slug ?? "";
-    setActiveSlug(collections[0]?.slug ?? "");
+    const initial = collections[0]?.slug ?? "";
+    setActiveSlug(initial);
+    setActiveSceneIndex(0);
   }, [collections]);
 
   useEffect(() => {
@@ -176,8 +181,6 @@ export function PerspectiveSectionTransition({
     return <StaticFallback collections={collections} isMobile={isMobile} />;
   }
 
-  const pairs = collections.slice(0, -1);
-
   return (
     <section
       ref={wrapperRef}
@@ -186,33 +189,28 @@ export function PerspectiveSectionTransition({
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {pairs.map((top, index) => {
-        const bottom = collections[index + 1];
+      {collections.slice(0, -1).map((current, index) => {
+        const next = collections[index + 1];
+
         return (
           <PerspectiveScene
-            key={top.id}
-            ref={(el) => {
-              sceneRefs.current[index] = el;
+            key={`${current.slug}-${next.slug}`}
+            ref={(node) => {
+              sceneRefs.current[index] = node;
             }}
-            topImage={getCollectionCoverImage(top, isMobile)}
-            bottomImage={getCollectionCoverImage(bottom, isMobile)}
-            topAlt={top.name}
-            bottomAlt={bottom.name}
-            priorityTop={index === 0}
+            currentSlug={current.slug}
+            nextSlug={next.slug}
+            currentName={current.name}
+            nextName={next.name}
+            currentImage={getCollectionCoverImage(current, isMobile)}
+            nextImage={getCollectionCoverImage(next, isMobile)}
+            priorityCurrent={index === 0}
+            showHint={index === activeSceneIndex}
+            activeSlug={activeSlug}
+            sectionInView={sectionInView}
           />
         );
       })}
-
-      <div
-        className={styles.hintOverlay}
-        data-visible={sectionInView ? "true" : undefined}
-      >
-        <CollectionSwipeHint
-          activeSlug={activeSlug}
-          slug={activeSlug}
-          visible={sectionInView}
-        />
-      </div>
     </section>
   );
 }

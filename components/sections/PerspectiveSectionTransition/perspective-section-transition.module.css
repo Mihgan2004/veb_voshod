@@ -1,80 +1,47 @@
 .wrapper {
-  --nav-offset: 88px;
-  --p: 0;
   position: relative;
   background: #0b0d10;
-  padding-top: 0 !important;
-  content-visibility: visible;
   overflow-x: clip;
   touch-action: pan-y;
-}
-
-.hintOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.hintOverlay[data-visible="true"] {
-  visibility: visible;
-}
-
-.hintOverlay > * {
-  pointer-events: auto;
 }
 
 .scene {
   --p: 0;
   position: relative;
-  height: 145svh;
+  height: 150svh;
   background: #0b0d10;
 }
 
 .sticky {
   position: sticky;
-  top: calc(env(safe-area-inset-top) + var(--nav-offset));
-  height: calc(100svh - env(safe-area-inset-top) - var(--nav-offset));
+  top: 0;
+  height: 100svh;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  contain: layout paint;
 }
 
-.topCard,
-.bottomCard {
+.stage {
+  --stage-width: min(86vw, 720px);
+  position: relative;
+  width: var(--stage-width);
+  height: min(82svh, calc(var(--stage-width) * 1.36));
+  isolation: isolate;
+}
+
+.card {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: calc(100% - 2rem);
-  max-width: 720px;
-  height: min(78svh, 52rem);
-  max-height: calc(100svh - env(safe-area-inset-top) - var(--nav-offset) - 2rem);
+  inset: 0;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 24px;
   background: #0b0d10;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
-  transform-origin: center center;
-  contain: layout paint;
-  backface-visibility: hidden;
   will-change: transform, opacity;
-}
-
-.topCard {
-  z-index: 2;
-  transform: translate3d(-50%, calc(-50% + var(--p) * -8svh), 0)
-    scale(calc(1 - var(--p) * 0.12)) rotate(calc(var(--p) * -3deg))
-    translateZ(0);
-  opacity: calc(1 - max(0, (var(--p) - 0.25) * 1.4));
-}
-
-.bottomCard {
-  z-index: 3;
-  transform: translate3d(-50%, calc(-50% + (1 - var(--p)) * 42svh), 0)
-    scale(calc(0.86 + var(--p) * 0.14)) rotate(calc((1 - var(--p)) * 3deg))
-    translateZ(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: layout paint;
 }
 
 .image {
@@ -82,62 +49,31 @@
   object-position: center;
 }
 
-@media (max-width: 768px) {
-  .scene {
-    height: 125svh;
-  }
-
-  .topCard,
-  .bottomCard,
-  .staticSlide {
-    width: min(92vw, 420px);
-    height: min(74svh, calc(min(92vw, 420px) * 1.48));
-    max-height: none;
-    border-radius: 12px;
-  }
-
-  .topCard {
-    transform: translate3d(-50%, calc(-50% + var(--p) * -5svh), 0)
-      scale(calc(1 - var(--p) * 0.06)) rotate(calc(var(--p) * -1deg))
-      translateZ(0);
-  }
-
-  .bottomCard {
-    transform: translate3d(-50%, calc(-50% + (1 - var(--p)) * 30svh), 0)
-      scale(calc(0.94 + var(--p) * 0.06)) rotate(calc((1 - var(--p)) * 1deg))
-      translateZ(0);
-  }
+.currentCard {
+  z-index: 1;
+  opacity: calc(1 - var(--p) * 0.22);
+  transform:
+    translate3d(0, calc(var(--p) * -8svh), 0)
+    scale(calc(1 - var(--p) * 0.12))
+    rotate(calc(var(--p) * -3deg));
 }
 
-.staticSlide {
-  position: relative;
-  height: 100svh;
-  width: calc(100% - 2rem);
-  max-width: 720px;
-  margin: 0 auto;
-  overflow: hidden;
-  border-radius: 20px;
-  background: #0b0d10;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
-}
-
-@media (max-width: 768px) {
-  .staticSlide {
-    width: min(92vw, 420px);
-    height: min(74svh, calc(min(92vw, 420px) * 1.48));
-    border-radius: 12px;
-  }
+.nextCard {
+  z-index: 2;
+  opacity: calc(0.72 + var(--p) * 0.28);
+  transform:
+    translate3d(0, calc((1 - var(--p)) * 42svh), 0)
+    scale(calc(0.86 + var(--p) * 0.14))
+    rotate(calc((1 - var(--p)) * 3deg));
 }
 
 .swipeHintWrap {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(24px, 5vh, 48px);
-  z-index: 5;
-  display: flex;
-  justify-content: center;
-  padding: 0 1.25rem;
+  left: 50%;
+  bottom: clamp(18px, 5svh, 42px);
+  z-index: 10;
+  width: min(86%, 520px);
+  transform: translate3d(-50%, 0, 0);
   pointer-events: none;
 }
 
@@ -158,6 +94,7 @@
   line-height: 1.45;
   text-align: center;
   max-width: 20rem;
+  width: 100%;
   cursor: pointer;
 }
 
@@ -166,28 +103,83 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
-@media (prefers-reduced-motion: reduce) {
+.staticFallback {
+  background: #0b0d10;
+  padding: 96px 0 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.staticSlide {
+  position: relative;
+  width: min(86vw, 720px);
+  height: min(82svh, calc(min(86vw, 720px) * 1.36));
+  overflow: hidden;
+  border-radius: 24px;
+  background: #0b0d10;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 768px) {
   .scene {
-    height: auto;
+    height: 135svh;
   }
 
   .sticky {
-    position: relative;
-    top: auto;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1.5rem 0;
+    height: 100svh;
+    padding-top: calc(env(safe-area-inset-top) + 72px);
+    padding-bottom: 24px;
   }
 
-  .topCard,
-  .bottomCard {
-    position: relative;
-    left: auto;
-    margin: 0 auto;
-    transform: none !important;
-    opacity: 1 !important;
-    will-change: auto;
+  .stage {
+    --stage-width: min(92vw, 420px);
+    width: var(--stage-width);
+    height: min(
+      72svh,
+      calc(100svh - env(safe-area-inset-top) - 120px),
+      calc(var(--stage-width) * 1.48)
+    );
   }
+
+  .card {
+    border-radius: 16px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+  }
+
+  .currentCard {
+    opacity: calc(1 - var(--p) * 0.18);
+    transform:
+      translate3d(0, calc(var(--p) * -5svh), 0)
+      scale(calc(1 - var(--p) * 0.06));
+  }
+
+  .nextCard {
+    opacity: calc(0.78 + var(--p) * 0.22);
+    transform:
+      translate3d(0, calc((1 - var(--p)) * 30svh), 0)
+      scale(calc(0.94 + var(--p) * 0.06));
+  }
+
+  .swipeHintWrap {
+    width: min(88%, 360px);
+    bottom: clamp(16px, 4svh, 32px);
+  }
+
+  .staticFallback {
+    padding: calc(env(safe-area-inset-top) + 96px) 0 96px;
+    gap: 28px;
+  }
+
+  .staticSlide {
+    width: min(92vw, 420px);
+    height: min(
+      72svh,
+      calc(100svh - env(safe-area-inset-top) - 120px),
+      calc(min(92vw, 420px) * 1.48)
+    );
+    border-radius: 16px;
+  }
+
 }
