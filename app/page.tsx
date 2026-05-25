@@ -6,6 +6,7 @@ import { GalleryZoomParallax } from "@/components/sections/GalleryZoomParallax/G
 import { STATIC_COLLECTIONS } from "@/lib/catalog";
 import { HomeScrollProvider } from "@/components/home/HomeScrollContext";
 import { TextParallaxSection } from "@/components/home/TextParallaxSection/TextParallaxSection";
+import { RassvetDarkVeil } from "@/components/backgrounds/RassvetDarkVeil";
 import { RassvetManifestoSection } from "@/components/sections/RassvetManifestoSection/RassvetManifestoSection";
 
 import dynamic from "next/dynamic";
@@ -43,7 +44,9 @@ export default function HomePage() {
 
       <GalleryZoomParallax />
 
-      <RassvetManifestoSection />
+      <RassvetDarkVeil variant="manifesto">
+        <RassvetManifestoSection />
+      </RassvetDarkVeil>
     </div>
   );
 }

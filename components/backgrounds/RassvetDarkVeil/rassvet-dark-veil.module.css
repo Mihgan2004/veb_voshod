@@ -1,0 +1,150 @@
+.section {
+  position: relative;
+  isolation: isolate;
+  background: #050607;
+  overflow: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.canvasLayer,
+.mobileFallback,
+.warmGlow,
+.vignette,
+.noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.canvasLayer {
+  opacity: 0.62;
+}
+
+.mobileFallback {
+  display: none;
+  background:
+    radial-gradient(circle at 78% 68%, rgba(255, 139, 38, 0.18), transparent 32%),
+    radial-gradient(circle at 18% 20%, rgba(218, 166, 61, 0.06), transparent 30%),
+    linear-gradient(180deg, #050607 0%, #090b0e 48%, #030405 100%);
+}
+
+.warmGlow {
+  opacity: 0.42;
+  background:
+    radial-gradient(circle at 78% 72%, rgba(255, 139, 38, 0.2), transparent 34%),
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.04), transparent 36%);
+  mix-blend-mode: screen;
+}
+
+.vignette {
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.42) 68%, rgba(0, 0, 0, 0.82) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 22%, transparent 72%, rgba(0, 0, 0, 0.72));
+}
+
+.noise {
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+}
+
+/* collections */
+.collections .canvasLayer {
+  opacity: 0.68;
+}
+
+.collections .warmGlow {
+  opacity: 0.48;
+}
+
+.collections .vignette {
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.5) 65%, rgba(0, 0, 0, 0.88) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.62), transparent 18%, transparent 74%, rgba(0, 0, 0, 0.78));
+}
+
+/* gallery */
+.gallery .canvasLayer {
+  opacity: 0.64;
+}
+
+.gallery .warmGlow {
+  opacity: 0.44;
+}
+
+.gallery .vignette {
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.46) 64%, rgba(0, 0, 0, 0.86) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.58), transparent 20%, transparent 72%, rgba(0, 0, 0, 0.8));
+}
+
+/* manifesto */
+.manifesto .canvasLayer {
+  opacity: 0.48;
+}
+
+.manifesto .warmGlow {
+  opacity: 0.34;
+  background:
+    radial-gradient(circle at 78% 68%, rgba(255, 139, 38, 0.14), transparent 30%),
+    radial-gradient(circle at 22% 22%, rgba(255, 255, 255, 0.025), transparent 34%);
+}
+
+.manifesto .vignette {
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.48) 62%, rgba(0, 0, 0, 0.9) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent 20%, transparent 70%, rgba(0, 0, 0, 0.86));
+}
+
+.manifesto .noise {
+  opacity: 0.07;
+}
+
+.manifesto .mobileFallback {
+  background:
+    radial-gradient(circle at 82% 72%, rgba(207, 99, 28, 0.22), transparent 34%),
+    radial-gradient(circle at 18% 18%, rgba(218, 166, 61, 0.08), transparent 28%),
+    linear-gradient(180deg, #050607 0%, #090b0e 52%, #030405 100%);
+}
+
+@media (max-width: 768px) {
+  .canvasLayer {
+    display: none;
+  }
+
+  .mobileFallback {
+    display: block;
+  }
+
+  .manifesto .warmGlow {
+    opacity: 0.3;
+    filter: blur(16px);
+  }
+
+  .manifesto .noise {
+    opacity: 0.055;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvasLayer {
+    display: none;
+  }
+
+  .mobileFallback {
+    display: block;
+  }
+}

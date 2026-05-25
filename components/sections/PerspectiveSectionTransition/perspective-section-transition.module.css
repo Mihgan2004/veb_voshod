@@ -3,13 +3,7 @@
   background: #0b0d10;
   overflow-x: clip;
   touch-action: pan-y;
-}
-
-.scene {
-  --p: 0;
-  position: relative;
-  height: 150svh;
-  background: #0b0d10;
+  content-visibility: visible;
 }
 
 .sticky {
@@ -21,23 +15,30 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  padding: 24px 0;
 }
 
 .stage {
   --stage-width: min(86vw, 720px);
+
   position: relative;
   width: var(--stage-width);
   height: min(82svh, calc(var(--stage-width) * 1.36));
+  overflow: hidden;
   isolation: isolate;
+  border-radius: 28px;
+  background: #0b0d10;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.46);
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .card {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: inherit;
   background: #0b0d10;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
   will-change: transform, opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -47,31 +48,15 @@
 .image {
   object-fit: cover;
   object-position: center;
-}
-
-.currentCard {
-  z-index: 1;
-  opacity: calc(1 - var(--p) * 0.22);
-  transform:
-    translate3d(0, calc(var(--p) * -8svh), 0)
-    scale(calc(1 - var(--p) * 0.12))
-    rotate(calc(var(--p) * -3deg));
-}
-
-.nextCard {
-  z-index: 2;
-  opacity: calc(0.72 + var(--p) * 0.28);
-  transform:
-    translate3d(0, calc((1 - var(--p)) * 42svh), 0)
-    scale(calc(0.86 + var(--p) * 0.14))
-    rotate(calc((1 - var(--p)) * 3deg));
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .swipeHintWrap {
   position: absolute;
   left: 50%;
   bottom: clamp(18px, 5svh, 42px);
-  z-index: 10;
+  z-index: 999;
   width: min(86%, 520px);
   transform: translate3d(-50%, 0, 0);
   pointer-events: none;
@@ -79,28 +64,27 @@
 
 .swipeHint {
   pointer-events: auto;
-  margin: 0;
-  padding: 0.55rem 1.25rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(8, 10, 12, 0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 10px;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-  letter-spacing: 0.14em;
-  text-transform: lowercase;
-  line-height: 1.45;
-  text-align: center;
-  max-width: 20rem;
   width: 100%;
+  margin: 0;
+  padding: 0.62rem 1.25rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(8, 10, 12, 0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: rgba(255, 255, 255, 0.86);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.45;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: lowercase;
   cursor: pointer;
 }
 
 .swipeHint:active {
   border-color: rgba(255, 255, 255, 0.34);
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .staticFallback {
@@ -110,6 +94,7 @@
   flex-direction: column;
   align-items: center;
   gap: 32px;
+  overflow-x: clip;
 }
 
 .staticSlide {
@@ -117,16 +102,12 @@
   width: min(86vw, 720px);
   height: min(82svh, calc(min(86vw, 720px) * 1.36));
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 28px;
   background: #0b0d10;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.46);
 }
 
 @media (max-width: 768px) {
-  .scene {
-    height: 135svh;
-  }
-
   .sticky {
     height: 100svh;
     padding-top: calc(env(safe-area-inset-top) + 72px);
@@ -135,36 +116,26 @@
 
   .stage {
     --stage-width: min(92vw, 420px);
+
     width: var(--stage-width);
     height: min(
       72svh,
-      calc(100svh - env(safe-area-inset-top) - 120px),
+      calc(100svh - env(safe-area-inset-top) - 128px),
       calc(var(--stage-width) * 1.48)
     );
-  }
-
-  .card {
-    border-radius: 16px;
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
-  }
-
-  .currentCard {
-    opacity: calc(1 - var(--p) * 0.18);
-    transform:
-      translate3d(0, calc(var(--p) * -5svh), 0)
-      scale(calc(1 - var(--p) * 0.06));
-  }
-
-  .nextCard {
-    opacity: calc(0.78 + var(--p) * 0.22);
-    transform:
-      translate3d(0, calc((1 - var(--p)) * 30svh), 0)
-      scale(calc(0.94 + var(--p) * 0.06));
+    border-radius: 18px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.44);
   }
 
   .swipeHintWrap {
     width: min(88%, 360px);
     bottom: clamp(16px, 4svh, 32px);
+  }
+
+  .swipeHint {
+    padding: 0.58rem 1rem;
+    font-size: 9px;
+    letter-spacing: 0.13em;
   }
 
   .staticFallback {
@@ -176,10 +147,9 @@
     width: min(92vw, 420px);
     height: min(
       72svh,
-      calc(100svh - env(safe-area-inset-top) - 120px),
+      calc(100svh - env(safe-area-inset-top) - 128px),
       calc(min(92vw, 420px) * 1.48)
     );
-    border-radius: 16px;
+    border-radius: 18px;
   }
-
 }

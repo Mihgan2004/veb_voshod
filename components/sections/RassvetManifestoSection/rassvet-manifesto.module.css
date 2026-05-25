@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   min-height: 220vh;
-  background: #0b0d10;
+  background: transparent;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -36,6 +36,7 @@
   margin: 0 auto;
   padding: 2.75rem 1.25rem 3.25rem;
   border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(5, 7, 9, 0.38);
 }
 
 @media (min-width: 640px) {
@@ -57,14 +58,13 @@
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(198, 144, 46, 0.07), transparent 62%),
-    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(255, 255, 255, 0.03), transparent 58%);
+    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(198, 144, 46, 0.035), transparent 62%);
 }
 
 .graffitiLayer {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   overflow: hidden;
   pointer-events: none;
   contain: paint;
@@ -92,24 +92,30 @@
   }
 }
 
+@media (max-width: 767px) {
+  .graffitiLayer {
+    opacity: 0.42;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .graffitiLayer {
-    opacity: 0.62;
+    opacity: 0.42;
   }
 }
 
 .noise {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
-  opacity: 0.16;
+  opacity: 0.08;
   mix-blend-mode: overlay;
 }
 
 .corner {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   width: 1.125rem;
   height: 1.125rem;
   pointer-events: none;
@@ -240,12 +246,12 @@
 
 .metaTop,
 .metaBottom {
-  z-index: 1;
+  z-index: 3;
 }
 
 .inner {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 .label {
@@ -359,7 +365,7 @@
   display: grid;
   place-items: center;
   padding: 4rem 1.25rem 5rem;
-  background: #0b0d10;
+  background: transparent;
 }
 
 @media (max-width: 767px) {
