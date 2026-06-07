@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCheckout } from "@/lib/checkout/checkout-store";
 import { useCart, type CartLine } from "@/lib/cart/cart-store";
+import { getStoredCartId } from "@/lib/cart/medusa-cart-client";
 
 type StepSummaryProps = {
   onBack: () => void;
@@ -62,14 +63,19 @@ export function StepSummary({ onBack }: StepSummaryProps) {
           ? (cdekPoint?.cityCode ?? courierAddress?.cityCode)
           : undefined;
 
+      const cartId = getStoredCartId();
+      if (!cartId) {
+        throw new Error("Корзина не найдена. Добавьте товары и попробуйте снова.");
+      }
+
       const payload = {
+        cartId,
         customer: {
           name: contacts.name.trim(),
           email: contacts.email.trim(),
           phone: contacts.phone.trim() || undefined,
           comment: contacts.comment.trim() || undefined,
         },
-        cart,
         delivery: {
           type: deliveryType,
           provider: deliveryProvider,
@@ -80,7 +86,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
         },
       };
 
-      const res = await fetch("/api/checkout", {
+      const res = await fetch("/api/checkout/medusa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -92,11 +98,8 @@ export function StepSummary({ onBack }: StepSummaryProps) {
         throw new Error(data.message || "Ошибка при создании заказа");
       }
 
-      if (data.confirmationUrl) {
-        window.location.href = data.confirmationUrl;
-      } else {
-        throw new Error("Не получена ссылка для оплаты");
-      }
+      const orderRef = data.displayId ?? data.orderId;
+      window.location.href = `/checkout/success?orderId=${encodeURIComponent(String(orderRef))}&source=medusa`;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Произошла ошибка";
       setError(message);

@@ -7,6 +7,13 @@ export type Category = "tee" | "hoodie" | "patch" | "cap" | "lanyard" | "accesso
 export type CollectionTag = "CORE" | "DROP" | "LIMITED" | "ARCHIVE" | "ACCESSORIES";
 
 /** Состав и характеристики товара (из Directus / моков). */
+export type ProductVariant = {
+  variantId: string;
+  size: string;
+  price: number;
+  inStock: boolean;
+};
+
 export type ProductSpecs = {
   /** Артикул (code в Directus). */
   code?: string;
@@ -49,6 +56,7 @@ export type Product = {
   imagePlaceholder?: string;
 
   sizes: string[];
+  variants?: ProductVariant[];
 
   specs?: ProductSpecs;
 

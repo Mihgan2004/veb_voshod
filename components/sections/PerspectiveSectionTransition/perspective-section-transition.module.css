@@ -1,6 +1,6 @@
 .wrapper {
   position: relative;
-  background: var(--vx-bg-base, #050607);
+  background-color: var(--vx-bg-base, #050607);
   overflow-x: clip;
   touch-action: pan-y;
   content-visibility: visible;
@@ -16,19 +16,35 @@
   justify-content: center;
   overflow: hidden;
   padding: 24px 0;
-  background: var(--vx-bg-base, #050607);
+  background-color: var(--vx-bg-base, #050607);
   isolation: isolate;
+}
+
+/* Едва заметная белая сетка на чёрном фоне (как в референсе) */
+.sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 48%, #000 0%, transparent 100%);
 }
 
 .stage {
   --stage-width: min(92vw, 800px);
+  --card-radius: 38px;
 
   position: relative;
+  z-index: 1;
   width: var(--stage-width);
-  height: min(90svh, calc(var(--stage-width) * 1.48));
+  height: min(92svh, calc(var(--stage-width) * 1.68));
   overflow: hidden;
   isolation: isolate;
-  border-radius: 36px;
+  border-radius: var(--card-radius);
   background: var(--vx-bg-elevated, #0b0d10);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.46);
   transform: translateZ(0);
@@ -74,10 +90,12 @@
   text-transform: lowercase;
   letter-spacing: 0.08em;
   white-space: normal;
+  border-radius: var(--card-radius) !important;
 }
 
 .staticFallback {
-  background: transparent;
+  position: relative;
+  background-color: var(--vx-bg-base, #050607);
   padding: 96px 0 120px;
   display: flex;
   flex-direction: column;
@@ -86,12 +104,32 @@
   overflow-x: clip;
 }
 
+.staticFallback::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 48%, #000 0%, transparent 100%);
+}
+
+.staticFallback > * {
+  position: relative;
+  z-index: 1;
+}
+
 .staticSlide {
+  --card-radius: 38px;
+
   position: relative;
   width: min(92vw, 800px);
-  height: min(90svh, calc(min(92vw, 800px) * 1.48));
+  height: min(92svh, calc(min(92vw, 800px) * 1.68));
   overflow: hidden;
-  border-radius: 36px;
+  border-radius: var(--card-radius);
   background: var(--vx-bg-elevated, #0b0d10);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.46);
 }
@@ -105,14 +143,15 @@
 
   .stage {
     --stage-width: min(84vw, 360px);
+    --card-radius: 18px;
 
     width: var(--stage-width);
     height: min(
-      64svh,
-      calc(100svh - env(safe-area-inset-top) - 160px),
-      calc(var(--stage-width) * 1.42)
+      74svh,
+      calc(100svh - env(safe-area-inset-top) - 128px),
+      calc(var(--stage-width) * 1.72)
     );
-    border-radius: 16px;
+    border-radius: var(--card-radius);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
   }
 
@@ -137,13 +176,15 @@
   }
 
   .staticSlide {
+    --card-radius: 18px;
+
     width: min(84vw, 360px);
     height: min(
-      64svh,
-      calc(100svh - env(safe-area-inset-top) - 160px),
-      calc(min(84vw, 360px) * 1.42)
+      74svh,
+      calc(100svh - env(safe-area-inset-top) - 128px),
+      calc(min(84vw, 360px) * 1.72)
     );
-    border-radius: 16px;
+    border-radius: var(--card-radius);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
   }
 

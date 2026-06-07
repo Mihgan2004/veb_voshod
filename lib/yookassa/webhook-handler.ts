@@ -7,7 +7,6 @@ import {
   isWebhookIpAllowlistEnabled,
 } from "@/lib/yookassa/client";
 import type { YooHttpNotification, YooPayment } from "@/lib/yookassa/types";
-import { getOrderById, getOrderByPaymentId } from "@/lib/orders/directus-orders";
 import {
   finalizeOrderAfterPaymentCanceled,
   finalizeOrderAfterPaymentSucceeded,
@@ -15,10 +14,6 @@ import {
 
 /**
  * Извлекает клиентский IP для сверки с allowlist ЮKassa.
- *
- * ВАЖНО: `x-forwarded-for` / `x-real-ip` доверяйте только если запрос проходит через
- * ваш reverse proxy, который перезаписывает эти заголовки и отбрасывает клиентские.
- * Иначе злоумышленник может подставить IP из подсети ЮKassa и обойти проверку.
  */
 export function getWebhookClientIp(headersList: Headers): string {
   const forwarded = headersList.get("x-forwarded-for");
@@ -51,7 +46,7 @@ function parseNotification(body: unknown): { event: string; object: YooPayment }
 }
 
 /**
- * Обработчик HTTP POST уведомлений ЮKassa. Возвращает 200 только после консистентной обработки.
+ * Legacy YooKassa webhook — acknowledges events; order finalization uses Medusa checkout now.
  */
 export async function handleYooKassaPost(req: Request): Promise<Response> {
   const headersList = req.headers;
@@ -62,7 +57,7 @@ export async function handleYooKassaPost(req: Request): Promise<Response> {
 
   if (allowlistOn && !trustProxy) {
     console.warn(
-      "[yookassa/webhook] YOOKASSA_WEBHOOK_IP_ALLOWLIST_ENABLED but TRUST_PROXY is not true — skipping IP verification (configure reverse proxy to overwrite X-Forwarded-For)"
+      "[yookassa/webhook] YOOKASSA_WEBHOOK_IP_ALLOWLIST_ENABLED but TRUST_PROXY is not true — skipping IP verification",
     );
   } else if (allowlistOn) {
     const ipOk = verifyWebhookIp(clientIp);
@@ -70,7 +65,7 @@ export async function handleYooKassaPost(req: Request): Promise<Response> {
       console.warn(`[yookassa/webhook] Rejected — invalid IP: "${clientIp || "—"}"`);
       return NextResponse.json(
         { error: "FORBIDDEN", message: "Invalid source IP" },
-        { status: 403 }
+        { status: 403 },
       );
     }
   }
@@ -96,10 +91,10 @@ export async function handleYooKassaPost(req: Request): Promise<Response> {
 
   const { event, object: webhookPayment } = parsed;
   const paymentId = webhookPayment.id;
-
   const metaOrderId = webhookPayment.metadata?.orderId;
+
   console.log(
-    `[yookassa/webhook] event=${event} payment.id=${paymentId} metadata.orderId=${metaOrderId ?? "—"} ip=${clientIp || "—"}`
+    `[yookassa/webhook] event=${event} payment.id=${paymentId} metadata.orderId=${metaOrderId ?? "—"} ip=${clientIp || "—"} (legacy — Medusa orders)`,
   );
 
   let realPayment: YooPayment;
@@ -110,75 +105,28 @@ export async function handleYooKassaPost(req: Request): Promise<Response> {
     return NextResponse.json({ error: "YOOKASSA_UNAVAILABLE" }, { status: 502 });
   }
 
-  if (realPayment.status !== webhookPayment.status) {
-    console.warn(
-      `[yookassa/webhook] Status mismatch: webhook=${webhookPayment.status}, API=${realPayment.status} (using API)`
-    );
-  }
-
-  const order = await resolveOrder(realPayment, paymentId);
-  if (!order) {
-    console.warn(`[yookassa/webhook] Order not found for paymentId=${paymentId} metadata.orderId=${metaOrderId ?? "—"}`);
-    return NextResponse.json({ ok: true, message: "order_not_found" });
-  }
-
-  const oid = order.id;
+  const orderId = metaOrderId ?? paymentId;
 
   try {
     if (event === "payment.succeeded") {
       if (!isPaymentSucceeded(realPayment)) {
-        console.log(
-          `[yookassa/webhook] event=succeeded but API status=${realPayment.status}, paid=${realPayment.paid} — no-op`
-        );
         return NextResponse.json({ ok: true, skipped: true });
       }
-      console.log(`[yookassa/webhook] Finalize success for order ${oid}`);
-      await finalizeOrderAfterPaymentSucceeded(oid, paymentId, "webhook");
-      return NextResponse.json({ ok: true });
+      await finalizeOrderAfterPaymentSucceeded(orderId, paymentId, "webhook");
+      return NextResponse.json({ ok: true, legacy: true });
     }
 
     if (event === "payment.canceled") {
       if (!isPaymentCanceled(realPayment)) {
-        console.log(`[yookassa/webhook] event=canceled but API status=${realPayment.status} — no-op`);
         return NextResponse.json({ ok: true, skipped: true });
       }
-      await finalizeOrderAfterPaymentCanceled(oid, "webhook");
-      return NextResponse.json({ ok: true });
+      await finalizeOrderAfterPaymentCanceled(orderId, "webhook");
+      return NextResponse.json({ ok: true, legacy: true });
     }
 
-    if (event === "payment.waiting_for_capture") {
-      console.log(
-        `[yookassa/webhook] payment.waiting_for_capture payment.id=${paymentId} — acknowledge, no status change`
-      );
-      return NextResponse.json({ ok: true, acknowledged: true });
-    }
-
-    if (event === "refund.succeeded") {
-      console.log(`[yookassa/webhook] refund.succeeded payment.id=${paymentId} — acknowledged`);
-      return NextResponse.json({ ok: true, acknowledged: true });
-    }
-
-    console.log(`[yookassa/webhook] Unhandled event ${event} — 200 acknowledge`);
     return NextResponse.json({ ok: true, acknowledged: true });
   } catch (e) {
-    console.error(`[yookassa/webhook] Handler error for order ${oid}:`, e);
-    return NextResponse.json(
-      { error: "PROCESSING_FAILED" },
-      { status: 500 }
-    );
+    console.error(`[yookassa/webhook] Handler error:`, e);
+    return NextResponse.json({ error: "PROCESSING_FAILED" }, { status: 500 });
   }
-}
-
-async function resolveOrder(
-  realPayment: YooPayment,
-  paymentId: string
-): Promise<{ id: string | number } | null> {
-  const meta = realPayment.metadata?.orderId;
-  if (meta) {
-    const byMeta = await getOrderById(meta);
-    if (byMeta) return { id: byMeta.id };
-  }
-  const byPay = await getOrderByPaymentId(paymentId);
-  if (byPay) return { id: byPay.id };
-  return null;
 }

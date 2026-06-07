@@ -22,10 +22,16 @@ type StatusJson = {
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
+  const source = searchParams.get("source");
+  const isMedusaOrder = source === "medusa";
   const clear = useCart((s) => s.clear);
   const resetCheckout = useCheckout((s) => s.reset);
 
-  const [uiState, setUiState] = useState<UiState>(() => (orderId ? "loading" : "pending"));
+  const [uiState, setUiState] = useState<UiState>(() => {
+    if (!orderId) return "pending";
+    if (isMedusaOrder) return "paid";
+    return "loading";
+  });
   const [pollSession, setPollSession] = useState(0);
   const pollCount = useRef(0);
   const clearedRef = useRef(false);
@@ -75,7 +81,7 @@ function SuccessContent() {
   }, [orderId]);
 
   useEffect(() => {
-    if (!orderId) {
+    if (!orderId || isMedusaOrder) {
       return;
     }
 
@@ -105,15 +111,15 @@ function SuccessContent() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [checkStatus, orderId, pollSession]);
+  }, [checkStatus, isMedusaOrder, orderId, pollSession]);
 
   useEffect(() => {
-    if (uiState === "paid" && !clearedRef.current) {
+    if ((uiState === "paid" || isMedusaOrder) && !clearedRef.current) {
       clearedRef.current = true;
-      clear();
+      void clear();
       resetCheckout();
     }
-  }, [uiState, clear, resetCheckout]);
+  }, [uiState, isMedusaOrder, clear, resetCheckout]);
 
   if (!orderId) {
     return (

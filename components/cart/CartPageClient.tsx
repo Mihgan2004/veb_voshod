@@ -6,10 +6,48 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart/cart-store";
 
+function QuantityStepper({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: number;
+  onChange: (qty: number) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="inline-flex items-center border border-white/10 rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(1, value - 1))}
+        disabled={disabled || value <= 1}
+        className="w-9 h-9 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/[0.04] transition-all duration-200 disabled:opacity-25 disabled:pointer-events-none"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M5 12h14" strokeLinecap="round" />
+        </svg>
+      </button>
+      <span className="w-9 text-center text-[13px] font-mono text-white/80">{value}</span>
+      <button
+        type="button"
+        onClick={() => onChange(value + 1)}
+        disabled={disabled}
+        className="w-9 h-9 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/[0.04] transition-all duration-200 disabled:opacity-25 disabled:pointer-events-none"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export function CartPageClient() {
   const router = useRouter();
   const cart = useCart((s) => s.cart);
+  const loading = useCart((s) => s.loading);
   const removeFromCart = useCart((s) => s.removeFromCart);
+  const updateQuantity = useCart((s) => s.updateQuantity);
   const clear = useCart((s) => s.clear);
 
   const total = cart.reduce((sum, i) => sum + i.product.price * i.qty, 0);
@@ -30,16 +68,19 @@ export function CartPageClient() {
           </h1>
           <span className="h-px w-8 sm:w-12 bg-white/10 shrink-0" />
           <span className="text-[11px] font-mono tracking-[0.28em] uppercase text-white/45 truncate">
-            {cart.length === 0
-              ? "пусто"
-              : `${totalItems} ${totalItems === 1 ? "товар" : totalItems < 5 ? "товара" : "товаров"}`}
+            {loading
+              ? "загрузка..."
+              : cart.length === 0
+                ? "пусто"
+                : `${totalItems} ${totalItems === 1 ? "товар" : totalItems < 5 ? "товара" : "товаров"}`}
           </span>
         </div>
         {cart.length > 0 && (
           <button
             type="button"
-            onClick={clear}
-            className="text-[11px] font-mono uppercase tracking-widest text-white/40 hover:text-white/70 transition-colors"
+            onClick={() => void clear()}
+            disabled={loading}
+            className="text-[11px] font-mono uppercase tracking-widest text-white/40 hover:text-white/70 transition-colors disabled:opacity-40"
           >
             Очистить корзину
           </button>
@@ -48,16 +89,22 @@ export function CartPageClient() {
 
       {cart.length === 0 ? (
         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 sm:p-12 text-center">
-          <p className="text-[15px] text-white/50">В корзине пока ничего нет.</p>
-          <p className="mt-2 text-[13px] text-white/40">
-            Выберите товары в каталоге и добавьте их в корзину.
+          <p className="text-[15px] text-white/50">
+            {loading ? "Загружаем корзину..." : "В корзине пока ничего нет."}
           </p>
-          <Link
-            href="/catalog"
-            className="mt-6 inline-flex items-center justify-center h-12 px-6 rounded-xl border border-white/15 bg-white/[0.04] text-[12px] font-mono uppercase tracking-[0.2em] text-white/80 hover:bg-white/[0.08] hover:text-white transition-all"
-          >
-            Перейти в каталог
-          </Link>
+          {!loading && (
+            <>
+              <p className="mt-2 text-[13px] text-white/40">
+                Выберите товары в каталоге и добавьте их в корзину.
+              </p>
+              <Link
+                href="/catalog"
+                className="mt-6 inline-flex items-center justify-center h-12 px-6 rounded-xl border border-white/15 bg-white/[0.04] text-[12px] font-mono uppercase tracking-[0.2em] text-white/80 hover:bg-white/[0.08] hover:text-white transition-all"
+              >
+                Перейти в каталог
+              </Link>
+            </>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
@@ -95,20 +142,28 @@ export function CartPageClient() {
                         </p>
                         <p className="mt-1 text-[11px] font-mono text-white/45 uppercase tracking-wider">
                           {item.product.specs?.color && `${item.product.specs.color} · `}
-                          Размер {item.size} × {item.qty}
+                          Размер {item.size}
                         </p>
                       </div>
                       <p className="text-[14px] font-semibold text-white vx-price shrink-0">
                         {(item.product.price * item.qty).toLocaleString("ru-RU")} ₽
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart(item.cartId)}
-                      className="mt-3 text-[11px] font-mono uppercase tracking-wider text-white/40 hover:text-crimson transition-colors"
-                    >
-                      Удалить
-                    </button>
+                    <div className="mt-3 flex flex-wrap items-center gap-4">
+                      <QuantityStepper
+                        value={item.qty}
+                        disabled={loading}
+                        onChange={(qty) => void updateQuantity(item.lineItemId, qty)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => void removeFromCart(item.lineItemId)}
+                        disabled={loading}
+                        className="text-[11px] font-mono uppercase tracking-wider text-white/40 hover:text-crimson transition-colors disabled:opacity-40"
+                      >
+                        Удалить
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -130,7 +185,7 @@ export function CartPageClient() {
 
               <div>
                 <p className="text-[12px] text-white/50 mb-4">
-                  Выберите способ доставки и оплатите заказ онлайн.
+                  Выберите способ доставки и оформите заказ.
                 </p>
                 <ul className="space-y-2 text-[12px] text-white/40">
                   <li className="flex items-center gap-2">
@@ -163,23 +218,7 @@ export function CartPageClient() {
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    Оплата картой через ЮКасса
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <svg
-                      className="w-4 h-4 text-gold"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    Безопасная сделка
+                    Оформление через Medusa
                   </li>
                 </ul>
               </div>
@@ -187,7 +226,8 @@ export function CartPageClient() {
               <button
                 type="button"
                 onClick={handleCheckout}
-                className="w-full vx-gold-btn"
+                disabled={loading}
+                className="w-full vx-gold-btn disabled:opacity-50"
               >
                 Перейти к оформлению
               </button>

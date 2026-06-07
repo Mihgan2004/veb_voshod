@@ -1,15 +1,28 @@
 .section {
   position: relative;
   overflow: hidden;
-  background: var(--vx-bg-base, #050607);
+  background-color: var(--vx-bg-base, #050607);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 45%, #000 0%, transparent 100%);
 }
 
 .background {
   position: absolute;
   inset: 0;
-  z-index: 0;
-  background: var(--vx-bg-base, #050607);
+  z-index: 1;
+  background: transparent;
   overflow: hidden;
   pointer-events: none;
 }

@@ -124,8 +124,8 @@ export function ProductPageClient({ product }: { product: Product }) {
         ? "PREORDER"
         : "SOLD OUT";
 
-  const handleAdd = useCallback(() => {
-    addToCart(product, selectedSize, qty);
+  const handleAdd = useCallback(async () => {
+    await addToCart(product, selectedSize, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
   }, [addToCart, product, selectedSize, qty]);

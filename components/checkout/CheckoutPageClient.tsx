@@ -14,6 +14,7 @@ import { StepSummary } from "./StepSummary";
 export function CheckoutPageClient() {
   const router = useRouter();
   const cart = useCart((s) => s.cart);
+  const loading = useCart((s) => s.loading);
   const step = useCheckout((s) => s.step);
   const setStep = useCheckout((s) => s.setStep);
   const deliveryCost = useCheckout((s) => s.deliveryCost);
@@ -23,20 +24,22 @@ export function CheckoutPageClient() {
   const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
 
   useEffect(() => {
-    if (cart.length === 0) {
+    if (!loading && cart.length === 0) {
       router.push("/cart");
     }
-  }, [cart.length, router]);
+  }, [cart.length, loading, router]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
 
-  if (cart.length === 0) {
+  if (loading || cart.length === 0) {
     return (
       <div className="animate-fade-in min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-[15px] text-white/50">Корзина пуста</p>
+          <p className="text-[15px] text-white/50">
+            {loading ? "Загружаем корзину..." : "Корзина пуста"}
+          </p>
           <Link
             href="/catalog"
             className="mt-4 inline-flex items-center justify-center h-12 px-6 rounded-xl border border-white/15 bg-white/[0.04] text-[12px] font-mono uppercase tracking-[0.2em] text-white/80 hover:bg-white/[0.08] hover:text-white transition-all"

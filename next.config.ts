@@ -26,6 +26,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "http", hostname: "admin.voshod.shop", pathname: "/assets/**" },
+      { protocol: "https", hostname: "api.projectrassvet.ru", pathname: "/**" },
+      { protocol: "https", hostname: "admin.projectrassvet.ru", pathname: "/**" },
       { protocol: "https", hostname: "admin.voshod.shop", pathname: "/assets/**" },
       { protocol: "http", hostname: "localhost", pathname: "/assets/**" },
       { protocol: "http", hostname: "127.0.0.1", pathname: "/assets/**" },

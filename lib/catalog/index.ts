@@ -1,13 +1,13 @@
 // lib/catalog/index.ts
 import type { CatalogRepo } from "./repo";
 import { createMockRepo } from "./mock-repo";
-import { createDirectusRepo } from "./directus-repo";
-import { STATIC_COLLECTIONS, getStaticCollectionBySlug } from "./static-collections";
+import { createMedusaRepo } from "./medusa-repo";
+import { getStaticCollectionBySlug } from "./static-collections";
 
 export * from "./types";
 export type { CatalogRepo } from "./repo";
 
-/** При ошибке Directus возвращаем пустые данные (без mock) и пробрасываем ошибку вверх */
+/** При ошибке каталога возвращаем пустые данные (без mock) и пробрасываем ошибку вверх */
 function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
   return {
     async listCollections() {
@@ -74,7 +74,7 @@ export class CatalogUnavailableError extends Error {
   }
 }
 
-/** getCollectionBySlug: сначала статика (ссылки с главной), иначе Directus/mock */
+/** getCollectionBySlug: сначала статика (ссылки с главной), иначе Medusa/mock */
 function withStaticCollectionFallback(repo: CatalogRepo): CatalogRepo {
   return {
     ...repo,
@@ -86,24 +86,14 @@ function withStaticCollectionFallback(repo: CatalogRepo): CatalogRepo {
   };
 }
 
-/** Каталог: коллекции и товары из Directus при CATALOG_SOURCE=directus; иначе mock. При ошибке Directus — throw CatalogUnavailableError. */
+/** Каталог: Medusa при наличии publishable key; иначе mock. При ошибке Medusa — throw CatalogUnavailableError. */
 function pickRepo(): CatalogRepo {
-  const source = (
-    process.env.CATALOG_SOURCE ??
-    process.env.NEXT_PUBLIC_CATALOG_SOURCE ??
-    "mock"
-  ).toLowerCase();
-
   const mock = createMockRepo();
+  const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY?.trim();
 
   let repo: CatalogRepo = mock;
-  if (source === "directus") {
-    const url = process.env.DIRECTUS_URL ?? "";
-    const token = process.env.DIRECTUS_TOKEN;
-    if (url) {
-      const directus = createDirectusRepo({ url, token });
-      repo = withErrorInsteadOfMock(directus);
-    }
+  if (publishableKey) {
+    repo = withErrorInsteadOfMock(createMedusaRepo());
   }
 
   return withStaticCollectionFallback(repo);
