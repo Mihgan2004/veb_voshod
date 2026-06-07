@@ -46,7 +46,12 @@ function parseNotification(body: unknown): { event: string; object: YooPayment }
 }
 
 /**
- * Legacy YooKassa webhook — acknowledges events; order finalization uses Medusa checkout now.
+ * TODO: Future YooKassa integration as Medusa payment provider.
+ * - Do not create payments from frontend; use Medusa payment sessions.
+ * - On payment.succeeded webhook → finalize Medusa order → trigger CDEK shipment.
+ * - YOOKASSA_SECRET_KEY must remain server-only.
+ *
+ * Currently acknowledges legacy webhook events without Directus order finalization.
  */
 export async function handleYooKassaPost(req: Request): Promise<Response> {
   const headersList = req.headers;

@@ -20,6 +20,18 @@ export type MedusaCheckoutCustomer = {
   comment?: string;
 };
 
+/** Delivery metadata stored on Medusa cart/order for future CDEK integration. */
+export type MedusaDeliveryMetadata = {
+  delivery_type: string;
+  delivery_provider: string;
+  delivery_address: string;
+  delivery_cost: number;
+  cdek_city_code?: number;
+  cdek_pvz_code?: string;
+  cdek_pvz_address?: string;
+  customer_comment?: string;
+};
+
 export type MedusaCheckoutDelivery = {
   type: string;
   provider: string;

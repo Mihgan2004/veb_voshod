@@ -3,11 +3,12 @@ import type { CatalogRepo } from "./repo";
 import { createMockRepo } from "./mock-repo";
 import { createMedusaRepo } from "./medusa-repo";
 import { getStaticCollectionBySlug } from "./static-collections";
+import { assertMedusaEnv, shouldUseMockCatalog } from "@/lib/medusa/env";
 
 export * from "./types";
 export type { CatalogRepo } from "./repo";
 
-/** При ошибке каталога возвращаем пустые данные (без mock) и пробрасываем ошибку вверх */
+/** При ошибке каталога пробрасываем ошибку вверх (без silent mock fallback). */
 function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
   return {
     async listCollections() {
@@ -16,7 +17,9 @@ function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
         return Array.isArray(res) ? res : [];
       } catch (e) {
         console.error("[catalog] listCollections failed:", e);
-        throw new CatalogUnavailableError();
+        throw new CatalogUnavailableError(
+          e instanceof Error ? e.message : undefined,
+        );
       }
     },
     async listProducts() {
@@ -25,7 +28,9 @@ function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
         return Array.isArray(res) ? res : [];
       } catch (e) {
         console.error("[catalog] listProducts failed:", e);
-        throw new CatalogUnavailableError();
+        throw new CatalogUnavailableError(
+          e instanceof Error ? e.message : undefined,
+        );
       }
     },
     async getCollectionBySlug(slug: string) {
@@ -34,7 +39,9 @@ function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
         return res ?? null;
       } catch (e) {
         console.error("[catalog] getCollectionBySlug failed:", e);
-        throw new CatalogUnavailableError();
+        throw new CatalogUnavailableError(
+          e instanceof Error ? e.message : undefined,
+        );
       }
     },
     async getProductBySlug(slug: string) {
@@ -43,7 +50,9 @@ function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
         return res ?? null;
       } catch (e) {
         console.error("[catalog] getProductBySlug failed:", e);
-        throw new CatalogUnavailableError();
+        throw new CatalogUnavailableError(
+          e instanceof Error ? e.message : undefined,
+        );
       }
     },
     async listProductsByCollectionId(collectionId: string) {
@@ -52,7 +61,9 @@ function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
         return Array.isArray(res) ? res : [];
       } catch (e) {
         console.error("[catalog] listProductsByCollectionId failed:", e);
-        throw new CatalogUnavailableError();
+        throw new CatalogUnavailableError(
+          e instanceof Error ? e.message : undefined,
+        );
       }
     },
     async getProductsByCollectionId(collectionId: string) {
@@ -61,15 +72,21 @@ function withErrorInsteadOfMock(primary: CatalogRepo): CatalogRepo {
         return Array.isArray(res) ? res : [];
       } catch (e) {
         console.error("[catalog] getProductsByCollectionId failed:", e);
-        throw new CatalogUnavailableError();
+        throw new CatalogUnavailableError(
+          e instanceof Error ? e.message : undefined,
+        );
       }
     },
   };
 }
 
 export class CatalogUnavailableError extends Error {
-  constructor() {
-    super("Catalog unavailable");
+  constructor(detail?: string) {
+    super(
+      detail
+        ? `Catalog unavailable: ${detail}`
+        : "Catalog unavailable. Check Medusa backend connection and env variables.",
+    );
     this.name = "CatalogUnavailableError";
   }
 }
@@ -86,17 +103,21 @@ function withStaticCollectionFallback(repo: CatalogRepo): CatalogRepo {
   };
 }
 
-/** Каталог: Medusa при наличии publishable key; иначе mock. При ошибке Medusa — throw CatalogUnavailableError. */
+/**
+ * Каталог:
+ * - production / default → Medusa (требует NEXT_PUBLIC_MEDUSA_* env)
+ * - local dev only: CATALOG_SOURCE=mock → mock repo
+ */
 function pickRepo(): CatalogRepo {
-  const mock = createMockRepo();
-  const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY?.trim();
-
-  let repo: CatalogRepo = mock;
-  if (publishableKey) {
-    repo = withErrorInsteadOfMock(createMedusaRepo());
+  if (shouldUseMockCatalog()) {
+    console.info("[catalog] Using mock catalog (CATALOG_SOURCE=mock, non-production)");
+    return withStaticCollectionFallback(createMockRepo());
   }
 
-  return withStaticCollectionFallback(repo);
+  assertMedusaEnv();
+  return withStaticCollectionFallback(
+    withErrorInsteadOfMock(createMedusaRepo()),
+  );
 }
 
 export const catalog: CatalogRepo = pickRepo();

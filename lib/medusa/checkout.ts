@@ -2,6 +2,7 @@ import { getMedusa, getRegionId } from "./client";
 import type {
   MedusaCheckoutPayload,
   MedusaCheckoutResult,
+  MedusaDeliveryMetadata,
 } from "./types";
 import { CART_FIELDS } from "./types";
 import type { HttpTypes } from "@medusajs/types";
@@ -33,12 +34,13 @@ export async function completeMedusaCheckout(
   const { cartId, customer, delivery } = payload;
   const { first_name, last_name } = splitName(customer.name);
 
-  const deliveryMetadata = {
+  const deliveryMetadata: MedusaDeliveryMetadata = {
     delivery_type: delivery.type,
     delivery_provider: delivery.provider,
     delivery_address: delivery.address,
     delivery_cost: delivery.cost,
     cdek_pvz_code: delivery.cdekPvzCode,
+    cdek_pvz_address: delivery.address,
     cdek_city_code: delivery.cdekCityCode,
     customer_comment: customer.comment,
   };

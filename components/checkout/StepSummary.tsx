@@ -175,7 +175,7 @@ export function StepSummary({ onBack }: StepSummaryProps) {
               "/globe.svg";
 
             return (
-              <div key={item.cartId} className="flex gap-3">
+              <div key={item.lineItemId} className="flex gap-3">
                 <div className="relative w-14 h-16 shrink-0 overflow-hidden rounded-lg border border-white/5">
                   <Image
                     src={src}

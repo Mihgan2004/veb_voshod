@@ -8,12 +8,15 @@ import type {
   ProductSpecs,
   ProductVariant,
 } from "@/lib/catalog/types";
+import { normalizeMedusaPrice } from "./price";
 
 type StoreProduct = HttpTypes.StoreProduct;
 type StoreProductVariant = HttpTypes.StoreProductVariant;
 type StoreCollection = HttpTypes.StoreCollection;
 type StoreCart = HttpTypes.StoreCart;
 type StoreCartLineItem = HttpTypes.StoreCartLineItem;
+
+const FALLBACK_IMAGE = "/globe.svg";
 
 function metadataString(
   metadata: Record<string, unknown> | null | undefined,
@@ -24,9 +27,20 @@ function metadataString(
 }
 
 function variantPriceAmount(variant: StoreProductVariant): number {
-  const calculated = variant.calculated_price?.calculated_amount;
-  if (typeof calculated === "number" && Number.isFinite(calculated)) {
-    return calculated;
+  const calculated = variant.calculated_price;
+  const currency = calculated?.currency_code ?? "rub";
+  if (calculated?.calculated_amount != null) {
+    return normalizeMedusaPrice(calculated.calculated_amount, currency);
+  }
+  return 0;
+}
+
+function lineItemUnitPrice(item: StoreCartLineItem): number {
+  if (typeof item.unit_price === "number") {
+    return normalizeMedusaPrice(item.unit_price, "rub");
+  }
+  if (item.variant) {
+    return variantPriceAmount(item.variant);
   }
   return 0;
 }
@@ -87,14 +101,14 @@ function productImages(product: StoreProduct): {
     .map((img) => img.url)
     .filter((url): url is string => Boolean(url));
 
-  const thumbnail = product.thumbnail ?? urls[0] ?? "";
+  const thumbnail = product.thumbnail ?? urls[0] ?? FALLBACK_IMAGE;
   const allImages = thumbnail
     ? [thumbnail, ...urls.filter((url) => url !== thumbnail)]
     : urls;
 
   return {
-    image: thumbnail,
-    images: allImages.length > 0 ? allImages : undefined,
+    image: thumbnail || FALLBACK_IMAGE,
+    images: allImages.length > 0 ? allImages : [FALLBACK_IMAGE],
   };
 }
 
@@ -114,7 +128,7 @@ export function mapMedusaProduct(product: StoreProduct): Product | null {
   const { variants, sizes } = mapVariants(product.variants);
   const defaultVariant = variants.find((v) => v.inStock) ?? variants[0];
   const price = defaultVariant?.price ?? 0;
-  const inStock = variants.some((v) => v.inStock);
+  const inStock = variants.length === 0 ? true : variants.some((v) => v.inStock);
   const category = product.categories?.[0];
   const { image, images } = productImages(product);
   const specs = mapSpecs(product.metadata);
@@ -133,7 +147,7 @@ export function mapMedusaProduct(product: StoreProduct): Product | null {
     image,
     images,
     sizes: sizes.length > 0 ? sizes : ["ONE SIZE"],
-    variants,
+    variants: variants.length > 0 ? variants : undefined,
     specs,
     collectionId: product.collection?.id ?? undefined,
   };
@@ -165,16 +179,11 @@ export function mapMedusaCollection(
 function lineItemToProduct(item: StoreCartLineItem): Product {
   const product = item.product;
   const variant = item.variant;
-  const unitPrice =
-    typeof item.unit_price === "number"
-      ? item.unit_price
-      : variant
-        ? variantPriceAmount(variant)
-        : 0;
-
+  const unitPrice = lineItemUnitPrice(item);
   const size = variant ? extractVariantSize(variant) : "ONE SIZE";
   const variantId = variant?.id ?? item.variant_id ?? "";
   const specs = mapSpecs(product?.metadata);
+  const image = product?.thumbnail ?? item.thumbnail ?? FALLBACK_IMAGE;
 
   return {
     id: product?.id ?? item.product_id ?? item.id,
@@ -186,8 +195,8 @@ function lineItemToProduct(item: StoreCartLineItem): Product {
     categoryName: product?.categories?.[0]?.name,
     inStock: true,
     status: "available",
-    image: product?.thumbnail ?? item.thumbnail ?? "",
-    images: product?.thumbnail ? [product.thumbnail] : undefined,
+    image,
+    images: [image],
     sizes: [size],
     variants: variantId
       ? [{ variantId, size, price: unitPrice, inStock: true }]
@@ -197,13 +206,15 @@ function lineItemToProduct(item: StoreCartLineItem): Product {
 }
 
 export function mapMedusaCartToLines(cart: StoreCart): CartLine[] {
+  const medusaCartId = cart.id;
+
   return (cart.items ?? []).map((item) => {
     const variant = item.variant;
     const size = variant ? extractVariantSize(variant) : "ONE SIZE";
     const variantId = variant?.id ?? item.variant_id ?? "";
 
     return {
-      cartId: item.id,
+      cartId: medusaCartId,
       lineItemId: item.id,
       product: lineItemToProduct(item),
       size,
@@ -214,6 +225,9 @@ export function mapMedusaCartToLines(cart: StoreCart): CartLine[] {
 }
 
 export function findVariantId(product: Product, size: string): string | null {
-  const variant = product.variants?.find((v) => v.size === size);
-  return variant?.variantId ?? null;
+  if (!product.variants?.length) return null;
+  const variant = product.variants.find((v) => v.size === size);
+  if (variant) return variant.variantId;
+  if (product.variants.length === 1) return product.variants[0].variantId;
+  return null;
 }

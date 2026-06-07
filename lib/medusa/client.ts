@@ -26,7 +26,7 @@ export function getMedusa(): Medusa {
   return instance;
 }
 
-/** Lazy singleton — safe when Medusa env vars are absent (mock catalog fallback). */
+/** Lazy singleton Medusa client. */
 export const medusa = new Proxy({} as Medusa, {
   get(_target, prop, receiver) {
     const client = getMedusa();

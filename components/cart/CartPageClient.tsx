@@ -121,7 +121,7 @@ export function CartPageClient() {
 
               return (
                 <div
-                  key={item.cartId}
+                  key={item.lineItemId}
                   className="flex gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.1]"
                 >
                   <div className="relative w-20 h-24 sm:w-24 sm:h-28 shrink-0 overflow-hidden rounded-lg border border-white/5">
